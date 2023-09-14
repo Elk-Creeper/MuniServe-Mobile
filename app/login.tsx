@@ -25,7 +25,7 @@ export default function signupsuccess() {
   const screens = []
 
   return (
-    <SafeAreaView className="flex-1 justify-between  bg-white">
+    <View className="flex-1 justify-between  bg-white">
       <View className="justify-center items-center mt-5 ">
         <Image
           source={require("../assets/imported/Del_Gallego_Camarines_Sur.png")}
@@ -36,10 +36,12 @@ export default function signupsuccess() {
           MUNI<Text className="text-green-700">SERVE</Text>
         </Text>
       </View>
-      <View className="my-10 flex-1 px-5">
-        <Text className="font-bold text-2xl text-center">Welcome to MuniServe!</Text>
-        <View className="flex-row justify-between mb-5">
-          <Text className="font-medium text-medium">Enter your MPIN</Text>
+      <View className="my-10 flex-1 px-8">
+        <Text className="font-bold text-2xl text-center">
+          Welcome to MuniServe!
+        </Text>
+        <View className="flex-row justify-between mt-10">
+          <Text className="font-medium text-medium mb-5">Enter your MPIN</Text>
           <TouchableOpacity
             className="text-green-700"
             onPress={() => {
@@ -56,6 +58,9 @@ export default function signupsuccess() {
           onTextChange={(text) => console.log(text)}
           focusColor={"green"}
         />
+        <Link href={"/login"} className="text-blue-600 ml-1 text-center mt-6">
+          Forgot Password?
+        </Link>
       </View>
 
       <Image
@@ -63,6 +68,6 @@ export default function signupsuccess() {
         resizeMode="cover"
         className="w-full h-28  mb-0"
       />
-    </SafeAreaView>
+    </View>
   );
 }
