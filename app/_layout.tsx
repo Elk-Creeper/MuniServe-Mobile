@@ -1,4 +1,4 @@
-import FontAwesome from "@expo/vector-icons/FontAwesome";
+import FontAwesome from "@expo/vector-icons";
 import {
   DarkTheme,
   DefaultTheme,
@@ -25,36 +25,18 @@ export const unstable_settings = {
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const [loaded, error] = useFonts({
-    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
-    ...FontAwesome.font,
-  });
 
-  // Expo Router uses Error Boundaries to catch errors in the navigation tree.
-  useEffect(() => {
-    if (error) throw error;
-  }, [error]);
 
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
 
-  if (!loaded) {
-    return null;
-  }
+ // Expo Router uses Error Boundaries to catch errors in the navigation tree.
+ 
+ useEffect(() => {
 
-  <Tabs>
-    <Tabs.Screen
-      // Name of the route to hide.
-      name="index"
-      options={{
-        // This tab will no longer show up in the tab bar.
-        href: null,
-      }}
-    />
-  </Tabs>;
+     SplashScreen.hideAsync();
+   
+ }, []);
+
+
 
   return <RootLayoutNav />;
 }

@@ -24,10 +24,10 @@ export default function onboarding() {
       />
       <View>
         <Text className="text-center font-bold text-xl ">
-          OTP and MPIN Authetication
+          Gmail Authetication
         </Text>
-        <Text className="text-center px-10 text-lg font-light mt-5">
-          MuniServe ensures secure transation and great user experience.
+        <Text className="text-center px-10 text-medium font-light mt-3">
+          MuniServe ensures secure transaction and great user experience.
         </Text>
       </View>
     </View>,
@@ -41,7 +41,7 @@ export default function onboarding() {
         <Text className="text-center font-bold text-xl ">
           Interactive Navigation
         </Text>
-        <Text className="text-center px-10 text-lg font-light mt-5">
+        <Text className="text-center px-10 text-medium font-light mt-3">
           Effortlessly explore our office spaces through virtual tours,
           discovering each workspaces.
         </Text>
@@ -55,9 +55,9 @@ export default function onboarding() {
       />
       <View>
         <Text className="text-center font-bold text-xl ">
-          Ease of doing Business
+          Ease of Acquiring Services
         </Text>
-        <Text className="text-center px-10 text-lg font-light mt-5">
+        <Text className="text-center px-10 text-medium font-light mt-3">
           Enjoy hassle-free, simplified steps, and quick access to a wide range
           of services at your fingertips.
         </Text>
@@ -66,7 +66,7 @@ export default function onboarding() {
   ];
   return (
     <SafeAreaView className="flex-1 justify-center items-center bg-white">
-      <Text className="font-bold text-3xl tracking-[3px] mt-10">
+      <Text className="font-bold text-2xl tracking-[3px] mt-10">
         MUNI<Text className="text-green-800">SERVE</Text>
       </Text>
 
@@ -113,7 +113,7 @@ export default function onboarding() {
         </TouchableOpacity>
         <View className="flex-row mt-3 self-center">
           <Text>Already a member?</Text>
-          <Link href={"/login"} className="text-blue-600 ml-2">
+          <Link href = {"/login"} className="text-blue-600 ml-2">
             Login here
           </Link>
         </View>

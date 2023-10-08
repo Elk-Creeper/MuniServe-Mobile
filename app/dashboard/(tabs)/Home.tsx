@@ -9,44 +9,45 @@ import {
   Dimensions,
   Platform,
 } from "react-native";
+import { StatusBar } from "expo-status-bar";
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons"; // Import the Ionicons library for the bell icon
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Link, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 
-import NewsScreen from "./NewsScreen"; // Replace with your actual NewsScreen component
-import AppointmentScreen from "./AppointmentScreen"; // Replace with your actual AppointmentsScreen component
-import AccountScreen from "./AccountScreen"; // Replace with your actual AccountScreen component
-
-const Tab = createBottomTabNavigator();
-
-export default function HomeScreen() {
+export default function tab1() {
   const router = useRouter();
   const navigation = useNavigation();
 
+      const [name, setName] = useState("");
+
   return (
     <View style={styles.container}>
-      <ScrollView>
-        <View style={styles.header}>
-          <View style={styles.titleContainer}>
-            <Image
-              source={require("../assets/imported/Del_Gallego_Camarines_Sur.png")}
-              style={styles.imageStyle}
-            />
-            <Text style={styles.titleText}>
-              <Text style={styles.blackText}>MUNI</Text>
-              <Text style={styles.greenText}>SERVE</Text>
-            </Text>
-          </View>
-          <TouchableOpacity>
-            <Ionicons name="notifications-outline" size={24} color="black" />
-          </TouchableOpacity>
+      <StatusBar
+        backgroundColor="#93C49E" // Change the background color as needed
+      />
+      <View style={styles.header}>
+        <View style={styles.titleContainer}>
+          <Image
+            source={require("../../../assets/imported/Del_Gallego_Camarines_Sur.png")}
+            style={styles.imageStyle}
+          />
+          <Text style={styles.titleText}>
+            <Text style={styles.blackText}>MUNI</Text>
+            <Text style={styles.greenText}>SERVE</Text>
+          </Text>
         </View>
+        <TouchableOpacity>
+          <Ionicons name="notifications-outline" size={24} color="black" />
+        </TouchableOpacity>
+      </View>
+
+      <ScrollView>
         <View style={styles.greenContainer}>
           <View style={styles.profileContainer}>
             <Image
-              source={require("../assets/imported/raiza.jpg")} // Replace with the user's profile image
+              source={require("../../../assets/imported/raiza.jpg")} // Replace with the user's profile image
               style={styles.profileImage}
             />
             <View style={styles.userInfo}>
@@ -58,9 +59,14 @@ export default function HomeScreen() {
 
         <View style={styles.iconContainer}>
           <View style={styles.iconWithLabel}>
-            <TouchableOpacity style={styles.circularIcon}>
+            <TouchableOpacity
+              style={styles.circularIcon}
+              onPress={() => {
+                router.replace("/service");
+              }}
+            >
               <Image
-                source={require("../assets/icons/service.png")} // Replace with the user's profile image
+                source={require("../../../assets/icons/service.png")} // Replace with the user's profile image
                 style={styles.icons}
               />
             </TouchableOpacity>
@@ -70,7 +76,7 @@ export default function HomeScreen() {
           <View style={styles.iconWithLabel}>
             <TouchableOpacity style={styles.circularIcon}>
               <Image
-                source={require("../assets/icons/projects.png")} // Replace with the user's profile image
+                source={require("../../../assets/icons/projects.png")} // Replace with the user's profile image
                 style={styles.icons}
               />
             </TouchableOpacity>
@@ -80,7 +86,7 @@ export default function HomeScreen() {
           <View style={styles.iconWithLabel}>
             <TouchableOpacity style={styles.circularIcon}>
               <Image
-                source={require("../assets/icons/Map.png")} // Replace with the user's profile image
+                source={require("../../../assets/icons/Map.png")} // Replace with the user's profile image
                 style={styles.icons}
               />
             </TouchableOpacity>
@@ -92,7 +98,7 @@ export default function HomeScreen() {
           <View style={styles.iconWithLabel}>
             <TouchableOpacity style={styles.circularIcon}>
               <Image
-                source={require("../assets/icons/Speech.png")} // Replace with the user's profile image
+                source={require("../../../assets/icons/Speech.png")} // Replace with the user's profile image
                 style={styles.icons}
               />
             </TouchableOpacity>
@@ -102,7 +108,7 @@ export default function HomeScreen() {
           <View style={styles.iconWithLabel}>
             <TouchableOpacity style={styles.circularIcon}>
               <Image
-                source={require("../assets/icons/History.png")} // Replace with the user's profile image
+                source={require("../../../assets/icons/History.png")} // Replace with the user's profile image
                 style={styles.icons}
               />
             </TouchableOpacity>
@@ -112,7 +118,7 @@ export default function HomeScreen() {
           <View style={styles.iconWithLabel}>
             <TouchableOpacity style={styles.circularIcon}>
               <Image
-                source={require("../assets/icons/tour.png")} // Replace with the user's profile image
+                source={require("../../../assets/icons/tour.png")} // Replace with the user's profile image
                 style={styles.icons}
               />
             </TouchableOpacity>
@@ -127,13 +133,13 @@ export default function HomeScreen() {
             <TouchableOpacity
               style={styles.blueContainer}
               onPress={() => {
-                router.push("/signup");
+                router.push("/BirthReg");
               }}
             >
               <View style={styles.serviceContainer}>
-                <Text style={styles.text}>Philippine Statistics Authority</Text>
+                <Text style={styles.text}>Birth {"\n"}Registration</Text>
                 <Image
-                  source={require("../assets/imported/psa.png")} // Replace with the user's profile image
+                  source={require("../../../assets/imported/psa.png")} // Replace with the user's profile image
                   style={styles.logoImage}
                 />
               </View>
@@ -142,13 +148,13 @@ export default function HomeScreen() {
             <TouchableOpacity
               style={styles.redContainer}
               onPress={() => {
-                router.push("/signup");
+                router.push("/");
               }}
             >
               <View style={styles.serviceContainer}>
-                <Text style={styles.text}>Blood Test</Text>
+                <Text style={styles.text}>Business {"\n"}Permit</Text>
                 <Image
-                  source={require("../assets/imported/doh.png")} // Replace with the user's profile image
+                  source={require("../../../assets/imported/doh.jpg")} // Replace with the user's profile image
                   style={styles.logoImage}
                 />
               </View>
@@ -157,13 +163,13 @@ export default function HomeScreen() {
             <TouchableOpacity
               style={styles.yellowContainer}
               onPress={() => {
-                router.push("/signup");
+                router.push("/");
               }}
             >
               <View style={styles.serviceContainer}>
-                <Text style={styles.texts}>Job {"\n"} Application</Text>
+                <Text style={styles.texts}>Job {"\n"}Application</Text>
                 <Image
-                  source={require("../assets/imported/hr.jpg")} // Replace with the user's profile image
+                  source={require("../../../assets/imported/hr.jpg")} // Replace with the user's profile image
                   style={styles.logoImage}
                 />
               </View>
@@ -171,55 +177,6 @@ export default function HomeScreen() {
           </View>
         </ScrollView>
       </ScrollView>
-      {/* Bottom Navigation 
-      <Tab.Navigator
-        initialRouteName="Home"
-        tabBarOptions={{
-          activeTintColor: "#307A59",
-          inactiveTintColor: "#4A4A4A",
-        }}
-      >
-        <Tab.Screen
-          name="Home"
-          component={HomeScreen}
-          options={{
-            tabBarLabel: 'Home',
-            tabBarIcon: ({ color }) => (
-              <Ionicons name="home" size={30} color={color} />
-            ),
-          }}
-        />
-        <Tab.Screen
-          name="News"
-          component={NewsScreen}
-          options={{
-            tabBarLabel: 'News',
-            tabBarIcon: ({ color }) => ( 
-            <Ionicons name="newspaper" size={30} color={color} />
-            ),
-          }}
-        />
-        <Tab.Screen
-          name="Appointments"
-          component={AppointmentScreen}
-          options={{
-            tabBarLabel: 'Appointment',
-            tabBarIcon: ({ color }) => (
-              <Ionicons name="calendar" size={30} color={color} />
-        ),
-          }}
-        />
-        <Tab.Screen
-          name="Account"
-          component={AccountScreen}
-          options={{
-            tabBarLabel: 'Account',
-            tabBarIcon: ({ color }) => (
-              <Ionicons name="person" size={30} color={color} />
-        ),
-          }}
-        />
-      </Tab.Navigator> */}
     </View>
   );
 }
@@ -243,8 +200,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   imageStyle: {
-    width: 50,
-    height: 50,
+    width: 40,
+    height: 40,
     marginRight: 8,
   },
   titleText: {
@@ -256,15 +213,15 @@ const styles = StyleSheet.create({
   blackText: {
     color: "black",
     fontWeight: "bold",
-    fontSize: 25,
+    fontSize: 20,
   },
   greenText: {
     color: "green",
     fontWeight: "bold",
-    fontSize: 25,
+    fontSize: 20,
   },
   greenContainer: {
-    width: 350,
+    width: "100%",
     height: 120,
     backgroundColor: "#307A59",
     borderRadius: 25,
