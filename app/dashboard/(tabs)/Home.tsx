@@ -43,7 +43,7 @@ export default function tab1() {
         </TouchableOpacity>
       </View>
 
-      <ScrollView>
+      <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
         <View style={styles.greenContainer}>
           <View style={styles.profileContainer}>
             <Image
@@ -62,7 +62,7 @@ export default function tab1() {
             <TouchableOpacity
               style={styles.circularIcon}
               onPress={() => {
-                router.replace("/service");
+                router.replace("/services");
               }}
             >
               <Image
@@ -74,7 +74,12 @@ export default function tab1() {
           </View>
 
           <View style={styles.iconWithLabel}>
-            <TouchableOpacity style={styles.circularIcon}>
+            <TouchableOpacity
+              style={styles.circularIcon}
+              onPress={() => {
+                router.replace("/services");
+              }}
+            >
               <Image
                 source={require("../../../assets/icons/projects.png")} // Replace with the user's profile image
                 style={styles.icons}
@@ -84,7 +89,12 @@ export default function tab1() {
           </View>
 
           <View style={styles.iconWithLabel}>
-            <TouchableOpacity style={styles.circularIcon}>
+            <TouchableOpacity
+              style={styles.circularIcon}
+              onPress={() => {
+                router.replace("/services");
+              }}
+            >
               <Image
                 source={require("../../../assets/icons/Map.png")} // Replace with the user's profile image
                 style={styles.icons}
@@ -96,7 +106,12 @@ export default function tab1() {
 
         <View style={styles.iconContainer}>
           <View style={styles.iconWithLabel}>
-            <TouchableOpacity style={styles.circularIcon}>
+            <TouchableOpacity
+              style={styles.circularIcon}
+              onPress={() => {
+                router.replace("/services");
+              }}
+            >
               <Image
                 source={require("../../../assets/icons/Speech.png")} // Replace with the user's profile image
                 style={styles.icons}
@@ -106,7 +121,12 @@ export default function tab1() {
           </View>
 
           <View style={styles.iconWithLabel}>
-            <TouchableOpacity style={styles.circularIcon}>
+            <TouchableOpacity
+              style={styles.circularIcon}
+              onPress={() => {
+                router.replace("/history");
+              }}
+            >
               <Image
                 source={require("../../../assets/icons/History.png")} // Replace with the user's profile image
                 style={styles.icons}
@@ -116,7 +136,12 @@ export default function tab1() {
           </View>
 
           <View style={styles.iconWithLabel}>
-            <TouchableOpacity style={styles.circularIcon}>
+            <TouchableOpacity
+              style={styles.circularIcon}
+              onPress={() => {
+                router.replace("/services");
+              }}
+            >
               <Image
                 source={require("../../../assets/icons/tour.png")} // Replace with the user's profile image
                 style={styles.icons}

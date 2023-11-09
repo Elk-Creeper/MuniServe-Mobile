@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Pressable, FlatList, View, TextInput, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Dimensions, Platform, SafeAreaView, Button, Alert} from "react-native";
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
-import Icon from "react-native-vector-icons/FontAwesome";
+import { Picker } from "@react-native-picker/picker";
 import * as ImagePicker from "expo-image-picker";
 import {firebase} from '../config';
 import * as FileSystem from 'expo-file-system';
 
-export default function HomeScreen() {
+export default function BirthReg() {
   const [image, setImage] = useState(null);
   const [uploading, setUploading] = useState(false);
   const timestamp = firebase.firestore.FieldValue.serverTimestamp();
@@ -138,44 +138,6 @@ const uploadMedia = async () => {
     setM_totchild("");
   };
 
-  const storeFormData = async () => {
-    try {
-      const MuniServe = firebase.firestore();
-      const birthreg = MuniServe.collection("birth_reg");
-
-      await birthreg.add({
-        attendant: attendant,
-        c_birthdate: birthdate,
-        c_birthorder: birthorder,
-        c_birthplace: birthplace,
-        c_sex: sex,
-        c_typeofbirth: typeofbirth,
-        c_weight: weight,
-        childname: childname,
-        f_age: f_age,
-        f_citizenship: f_citizenship,
-        f_name: f_name,
-        f_occur: f_occur,
-        f_placemarried: f_placemarried,
-        f_religion: f_religion,
-        m_age: m_age,
-        m_citizenship: m_citizenship,
-        m_name: m_name,
-        m_occur: m_occur,
-        m_religion: m_religion,
-        m_totchild: m_totchild,
-        payment: payment,
-      });
-
-      // Data is stored in Firestore
-      resetForm(); // Reset the form after successful booking
-      Alert.alert("Success", "Form filled successfully.");
-    } catch (error) {
-      console.error("Error storing form data:", error);
-      Alert.alert("Error", "Form filling failed.");
-    }
-  };
-
   const [serve, setServe] = useState([]);
   const MuniServe = firebase.firestore().collection("services");
 
@@ -248,35 +210,15 @@ const uploadMedia = async () => {
             )}
           />
 
-        <Text style={styles.regText}>Register Now!</Text>
         <Text style={styles.noteText}>
-          Please be ready to supply the following information.
-        </Text>
-        <Text style={styles.noteText}>Fill the form below:</Text>
+          Please be ready to supply the following information. Fill the form below:</Text>
+        <Text style={styles.noteText}>Child's Information</Text>
         <View style={{ marginBottom: 10 }}>
-          <Text
-            style={{
-              fontSize: 15,
-              fontWeight: 400,
-              marginVertical: 8,
-              marginTop: 20,
-            }}
-          >
+          <Text style={styles.label}>
             Name of newborn child
           </Text>
 
-          <View
-            style={{
-              width: "100%",
-              height: 48,
-              borderColor: "black",
-              borderRadius: 8,
-              borderWidth: 1,
-              alignItems: "center",
-              justifyContent: "center",
-              paddingLeft: 10,
-            }}
-          >
+          <View style={styles.placeholder}>
             <TextInput
               placeholder=""
               maxLength={50}
@@ -289,28 +231,11 @@ const uploadMedia = async () => {
           </View>
         </View>
         <View style={{ marginBottom: 10 }}>
-          <Text
-            style={{
-              fontSize: 15,
-              fontWeight: 400,
-              marginVertical: 8,
-            }}
-          >
+          <Text style={styles.label}>
             Birth Date
           </Text>
 
-          <View
-            style={{
-              width: "100%",
-              height: 48,
-              borderColor: "black",
-              borderRadius: 8,
-              borderWidth: 1,
-              alignItems: "center",
-              justifyContent: "center",
-              paddingLeft: 10,
-            }}
-          >
+          <View style={styles.placeholder}>
             <TextInput
               placeholder=""
               maxLength={50}
@@ -323,28 +248,11 @@ const uploadMedia = async () => {
           </View>
         </View>
         <View style={{ marginBottom: 10 }}>
-          <Text
-            style={{
-              fontSize: 15,
-              fontWeight: 400,
-              marginVertical: 8,
-            }}
-          >
+          <Text style={styles.label}>
             Birth Place
           </Text>
 
-          <View
-            style={{
-              width: "100%",
-              height: 48,
-              borderColor: "black",
-              borderRadius: 8,
-              borderWidth: 1,
-              alignItems: "center",
-              justifyContent: "center",
-              paddingLeft: 10,
-            }}
-          >
+          <View style={styles.placeholder}>
             <TextInput
               placeholder=""
               maxLength={50}
@@ -358,62 +266,27 @@ const uploadMedia = async () => {
         </View>
         <View style={styles.boxContainer}>
           <View style={{ marginBottom: 10 }}>
-            <Text
-              style={{
-                fontSize: 15,
-                fontWeight: 400,
-                marginVertical: 8,
-              }}
-            >
+            <Text style={styles.label}>
               Sex
             </Text>
 
-            <View
-              style={{
-                width: 150,
-                height: 48,
-                borderColor: "black",
-                borderRadius: 8,
-                borderWidth: 1,
-                alignItems: "center",
-                justifyContent: "center",
-                paddingLeft: 10,
-              }}
-            >
-              <TextInput
-                placeholder=""
-                maxLength={6}
-                value={sex}
-                onChangeText={(sex) => setSex(sex)}
-                style={{
-                  width: "100%",
-                }}
-              ></TextInput>
+            <View style={styles.placeholder2}>
+              <Picker
+                selectedValue={sex}
+                onValueChange={(itemValue, itemIndex) => setSex(itemValue)}
+                style={{ width: "100%" }}
+              >
+                <Picker.Item label="Male" value="Male" />
+                <Picker.Item label="Female" value="Female" />
+              </Picker>
             </View>
           </View>
           <View style={{ marginBottom: 10 }}>
-            <Text
-              style={{
-                fontSize: 15,
-                fontWeight: 400,
-                marginVertical: 8,
-              }}
-            >
+            <Text style={styles.label}>
               Type of birth
             </Text>
 
-            <View
-              style={{
-                width: 150,
-                height: 48,
-                borderColor: "black",
-                borderRadius: 8,
-                borderWidth: 1,
-                alignItems: "center",
-                justifyContent: "center",
-                paddingLeft: 10,
-              }}
-            >
+            <View style={styles.placeholder2}>
               <TextInput
                 placeholder=""
                 maxLength={20}
@@ -429,28 +302,11 @@ const uploadMedia = async () => {
 
         <View style={styles.boxContainer}>
           <View style={{ marginBottom: 10 }}>
-            <Text
-              style={{
-                fontSize: 15,
-                fontWeight: 400,
-                marginVertical: 8,
-              }}
-            >
+            <Text style={styles.label}>
               Weight
             </Text>
 
-            <View
-              style={{
-                width: 150,
-                height: 48,
-                borderColor: "black",
-                borderRadius: 8,
-                borderWidth: 1,
-                alignItems: "center",
-                justifyContent: "center",
-                paddingLeft: 10,
-              }}
-            >
+            <View style={styles.placeholder2}>
               <TextInput
                 placeholder=""
                 maxLength={6}
@@ -463,28 +319,11 @@ const uploadMedia = async () => {
             </View>
           </View>
           <View style={{ marginBottom: 10 }}>
-            <Text
-              style={{
-                fontSize: 15,
-                fontWeight: 400,
-                marginVertical: 8,
-              }}
-            >
+            <Text style={styles.label}>
               Birth Order
             </Text>
 
-            <View
-              style={{
-                width: 150,
-                height: 48,
-                borderColor: "black",
-                borderRadius: 8,
-                borderWidth: 1,
-                alignItems: "center",
-                justifyContent: "center",
-                paddingLeft: 10,
-              }}
-            >
+            <View style={styles.placeholder2}>
               <TextInput
                 placeholder=""
                 maxLength={20}
@@ -500,29 +339,11 @@ const uploadMedia = async () => {
 
         <Text style={styles.noteText}>Mother's Information:</Text>
         <View style={{ marginBottom: 10 }}>
-          <Text
-            style={{
-              fontSize: 15,
-              fontWeight: 400,
-              marginVertical: 8,
-              marginTop: 20,
-            }}
-          >
+          <Text style={styles.label}>
             Mother's Maiden Name
           </Text>
 
-          <View
-            style={{
-              width: "100%",
-              height: 48,
-              borderColor: "black",
-              borderRadius: 8,
-              borderWidth: 1,
-              alignItems: "center",
-              justifyContent: "center",
-              paddingLeft: 10,
-            }}
-          >
+          <View style={styles.placeholder}>
             <TextInput
               placeholder=""
               maxLength={50}
@@ -536,28 +357,11 @@ const uploadMedia = async () => {
         </View>
         <View style={styles.boxContainer}>
           <View style={{ marginBottom: 10 }}>
-            <Text
-              style={{
-                fontSize: 15,
-                fontWeight: 400,
-                marginVertical: 8,
-              }}
-            >
+            <Text style={styles.label}>
               Citizenship
             </Text>
 
-            <View
-              style={{
-                width: 150,
-                height: 48,
-                borderColor: "black",
-                borderRadius: 8,
-                borderWidth: 1,
-                alignItems: "center",
-                justifyContent: "center",
-                paddingLeft: 10,
-              }}
-            >
+            <View style={styles.placeholder2}>
               <TextInput
                 placeholder=""
                 maxLength={50}
@@ -572,63 +376,30 @@ const uploadMedia = async () => {
             </View>
           </View>
           <View style={{ marginBottom: 10 }}>
-            <Text
-              style={{
-                fontSize: 15,
-                fontWeight: 400,
-                marginVertical: 8,
-              }}
-            >
+            <Text style={styles.label}>
               Religion
             </Text>
 
-            <View
-              style={{
-                width: 150,
-                height: 48,
-                borderColor: "black",
-                borderRadius: 8,
-                borderWidth: 1,
-                alignItems: "center",
-                justifyContent: "center",
-                paddingLeft: 10,
-              }}
-            >
-              <TextInput
-                placeholder=""
-                maxLength={20}
-                value={m_religion}
-                onChangeText={(m_religion) => setM_religion(m_religion)}
-                style={{
-                  width: "100%",
-                }}
-              ></TextInput>
+            <View style={styles.placeholder2}>
+              <Picker
+                selectedValue={m_religion}
+                onValueChange={(itemValue, itemIndex) => setM_religion(itemValue)}
+                style={{ width: "100%" }}
+              >
+                <Picker.Item label="Christianity" value="Christianity" />
+                <Picker.Item label="Islam" value="Islam" />
+                <Picker.Item label="Hinduism" value="Hinduism" />
+                {/* Add more religion options as needed */}
+              </Picker>
             </View>
           </View>
         </View>
         <View style={{ marginBottom: 10 }}>
-          <Text
-            style={{
-              fontSize: 15,
-              fontWeight: 400,
-              marginVertical: 8,
-            }}
-          >
+          <Text style={styles.label}>
             Occupation
           </Text>
 
-          <View
-            style={{
-              width: "100%",
-              height: 48,
-              borderColor: "black",
-              borderRadius: 8,
-              borderWidth: 1,
-              alignItems: "center",
-              justifyContent: "center",
-              paddingLeft: 10,
-            }}
-          >
+          <View style={styles.placeholder}>
             <TextInput
               placeholder=""
               maxLength={50}
@@ -642,28 +413,11 @@ const uploadMedia = async () => {
         </View>
         <View style={styles.boxContainer}>
           <View style={{ marginBottom: 10 }}>
-            <Text
-              style={{
-                fontSize: 15,
-                fontWeight: 400,
-                marginVertical: 8,
-              }}
-            >
+            <Text style={styles.label}>
               Age at the time of birth
             </Text>
 
-            <View
-              style={{
-                width: 150,
-                height: 48,
-                borderColor: "black",
-                borderRadius: 8,
-                borderWidth: 1,
-                alignItems: "center",
-                justifyContent: "center",
-                paddingLeft: 10,
-              }}
-            >
+            <View style={styles.placeholder2}>
               <TextInput
                 placeholder=""
                 maxLength={6}
@@ -676,28 +430,11 @@ const uploadMedia = async () => {
             </View>
           </View>
           <View style={{ marginBottom: 10 }}>
-            <Text
-              style={{
-                fontSize: 15,
-                fontWeight: 400,
-                marginVertical: 8,
-              }}
-            >
+            <Text style={styles.label}>
               Total of children
             </Text>
 
-            <View
-              style={{
-                width: 150,
-                height: 48,
-                borderColor: "black",
-                borderRadius: 8,
-                borderWidth: 1,
-                alignItems: "center",
-                justifyContent: "center",
-                paddingLeft: 10,
-              }}
-            >
+            <View style={styles.placeholder2}>
               <TextInput
                 placeholder=""
                 maxLength={20}
@@ -712,29 +449,11 @@ const uploadMedia = async () => {
         </View>
         <Text style={styles.noteText}>Father's Information:</Text>
         <View style={{ marginBottom: 10 }}>
-          <Text
-            style={{
-              fontSize: 15,
-              fontWeight: 400,
-              marginVertical: 8,
-              marginTop: 20,
-            }}
-          >
+          <Text style={styles.label}>
             Father's Name
           </Text>
 
-          <View
-            style={{
-              width: "100%",
-              height: 48,
-              borderColor: "black",
-              borderRadius: 8,
-              borderWidth: 1,
-              alignItems: "center",
-              justifyContent: "center",
-              paddingLeft: 10,
-            }}
-          >
+          <View style={styles.placeholder}>
             <TextInput
               placeholder=""
               maxLength={50}
@@ -748,28 +467,11 @@ const uploadMedia = async () => {
         </View>
         <View style={styles.boxContainer}>
           <View style={{ marginBottom: 10 }}>
-            <Text
-              style={{
-                fontSize: 15,
-                fontWeight: 400,
-                marginVertical: 8,
-              }}
-            >
+            <Text style={styles.label}>
               Citizenship
             </Text>
 
-            <View
-              style={{
-                width: 150,
-                height: 48,
-                borderColor: "black",
-                borderRadius: 8,
-                borderWidth: 1,
-                alignItems: "center",
-                justifyContent: "center",
-                paddingLeft: 10,
-              }}
-            >
+            <View style={styles.placeholder2}>
               <TextInput
                 placeholder=""
                 maxLength={20}
@@ -784,63 +486,30 @@ const uploadMedia = async () => {
             </View>
           </View>
           <View style={{ marginBottom: 10 }}>
-            <Text
-              style={{
-                fontSize: 15,
-                fontWeight: 400,
-                marginVertical: 8,
-              }}
-            >
+            <Text style={styles.label}>
               Religion
             </Text>
 
-            <View
-              style={{
-                width: 150,
-                height: 48,
-                borderColor: "black",
-                borderRadius: 8,
-                borderWidth: 1,
-                alignItems: "center",
-                justifyContent: "center",
-                paddingLeft: 10,
-              }}
-            >
-              <TextInput
-                placeholder=""
-                maxLength={20}
-                value={f_religion}
-                onChangeText={(f_religion) => setF_religion(f_religion)}
-                style={{
-                  width: "100%",
-                }}
-              ></TextInput>
+            <View style={styles.placeholder2}>
+              <Picker
+                selectedValue={f_religion}
+                onValueChange={(itemValue, itemIndex) => setM_religion(itemValue)}
+                style={{ width: "100%" }}
+              >
+                <Picker.Item label="Christianity" value="Christianity" />
+                <Picker.Item label="Islam" value="Islam" />
+                <Picker.Item label="Hinduism" value="Hinduism" />
+                {/* Add more religion options as needed */}
+              </Picker>
             </View>
           </View>
         </View>
         <View style={{ marginBottom: 10 }}>
-          <Text
-            style={{
-              fontSize: 15,
-              fontWeight: 400,
-              marginVertical: 8,
-            }}
-          >
+          <Text style={styles.label}>
             Occupation
           </Text>
 
-          <View
-            style={{
-              width: "100%",
-              height: 48,
-              borderColor: "black",
-              borderRadius: 8,
-              borderWidth: 1,
-              alignItems: "center",
-              justifyContent: "center",
-              paddingLeft: 10,
-            }}
-          >
+          <View style={styles.placeholder}>
             <TextInput
               placeholder=""
               maxLength={50}
@@ -852,30 +521,12 @@ const uploadMedia = async () => {
             ></TextInput>
           </View>
         </View>
-        <View style={styles.boxContainer}>
           <View style={{ marginBottom: 10 }}>
-            <Text
-              style={{
-                fontSize: 15,
-                fontWeight: 400,
-                marginVertical: 8,
-              }}
-            >
+          <Text style={styles.label}>
               Age at the time of birth
             </Text>
 
-            <View
-              style={{
-                width: 150,
-                height: 48,
-                borderColor: "black",
-                borderRadius: 8,
-                borderWidth: 1,
-                alignItems: "center",
-                justifyContent: "center",
-                paddingLeft: 10,
-              }}
-            >
+          <View style={styles.placeholder}>
               <TextInput
                 placeholder=""
                 maxLength={20}
@@ -887,29 +538,14 @@ const uploadMedia = async () => {
               ></TextInput>
             </View>
           </View>
+
+          <Text style={styles.noteText}>Additional Information:</Text>
           <View style={{ marginBottom: 10 }}>
-            <Text
-              style={{
-                fontSize: 15,
-                fontWeight: 400,
-                marginVertical: 8,
-              }}
-            >
+            <Text style={styles.label}>
               Place of marriage
             </Text>
 
-            <View
-              style={{
-                width: 150,
-                height: 48,
-                borderColor: "black",
-                borderRadius: 8,
-                borderWidth: 1,
-                alignItems: "center",
-                justifyContent: "center",
-                paddingLeft: 10,
-              }}
-            >
+          <View style={styles.placeholder}>
               <TextInput
                 placeholder=""
                 maxLength={20}
@@ -923,30 +559,13 @@ const uploadMedia = async () => {
               ></TextInput>
             </View>
           </View>
-        </View>
+        
         <View style={{ marginBottom: 10 }}>
-          <Text
-            style={{
-              fontSize: 15,
-              fontWeight: 400,
-              marginVertical: 8,
-            }}
-          >
+          <Text style={styles.label}>
             Attendant of birth
           </Text>
 
-          <View
-            style={{
-              width: "100%",
-              height: 48,
-              borderColor: "black",
-              borderRadius: 8,
-              borderWidth: 1,
-              alignItems: "center",
-              justifyContent: "center",
-              paddingLeft: 10,
-            }}
-          >
+          <View style={styles.placeholder}>
             <TextInput
               placeholder=""
               value={attendant}
@@ -959,13 +578,14 @@ const uploadMedia = async () => {
           </View>
         </View>
 
+        <Text style={styles.noteText}>Note: Upload first your proof of payment before submitting your application. Lack of needed information will cause delay or rejection.</Text>
         <TouchableOpacity style={styles.selectButton} onPress={pickImage}>
           <Text style={styles.buttonText}>
             Proof of Payment(G-CASH RECEIPT)
           </Text>
         </TouchableOpacity>
 
-        <View style={styles.imageContainer}>
+        <View style={styles.imageContainer}> 
           {image && (
             <Image
               source={{ uri: image }}
@@ -1162,7 +782,8 @@ const styles = StyleSheet.create({
   noteText: {
     fontSize: 17,
     textAlign: "justify",
-    marginTop: 20,
+    marginTop: 5,
+    marginBottom: 5,
     fontWeight: "500",
   },
   boxContainer: {
@@ -1211,5 +832,30 @@ const styles = StyleSheet.create({
     marginTop: 30,
     marginBottom: 50,
     alignItems: "center",
+  },
+  placeholder: {
+    width: "100%",
+    height: 48,
+    borderColor: "black",
+    borderRadius: 8,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingLeft: 10,
+  },
+  placeholder2: {
+    width: 150,
+    height: 48,
+    borderColor: "black",
+    borderRadius: 8,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingLeft: 10,
+  },
+  label: {
+    fontSize: 15,
+    fontWeight: "400",
+    marginVertical: 8,
   },
 });

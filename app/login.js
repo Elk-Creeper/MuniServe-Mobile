@@ -2,37 +2,50 @@ import {
   View,
   Text,
   Image,
-  FlatList,
-  SafeAreaView,
-  Pressable,
   TouchableOpacity,
-  TextInput,
-  ScrollView,
   StyleSheet,
-  ImageBackground,
+  Keyboard,
 } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import { Link, useRouter } from "expo-router";
-import { twJoin } from "tailwind-merge";
-import { Ionicons } from "@expo/vector-icons";
 import { OtpInput } from "react-native-otp-entry";
 
 export default function signupsuccess() {
   const router = useRouter();
-  const [curIdx, setCurIdx] = useState(0);
-  const [isChecked, setChecked] = useState(false);
   const otpRef = useRef();
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+  const [mainContentHeight, setMainContentHeight] = useState("100%");
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      "keyboardDidShow",
+      () => {
+        setKeyboardVisible(true);
+        setMainContentHeight("100%"); // Adjust the height as needed
+      }
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      "keyboardDidHide",
+      () => {
+        setKeyboardVisible(false);
+        setMainContentHeight("100%");
+      }
+    );
+
+    // Cleanup listeners on component unmount
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, []);
+
 
   return (
     <View style={styles.container}>
       <StatusBar
         backgroundColor="#93C49E" // Change the background color as needed
       />
-      <ImageBackground
-        source={require("../assets/imported/back.png")}
-        style={styles.backgroundImage}
-      >
         <View style={styles.logoContainer}>
           <Image
             source={require("../assets/imported/Del_Gallego_Camarines_Sur.png")}
@@ -43,7 +56,7 @@ export default function signupsuccess() {
             MUNI<Text style={styles.greenText}>SERVE</Text>
           </Text>
         </View>
-        <View style={styles.mainContent}>
+        <View style={[styles.mainContent]}>          
           <Text style={styles.boldText}>Welcome to MuniServe!</Text>
           <View style={styles.inputContainer}>
             <Text style={styles.mediumText}>Enter your MPIN</Text>
@@ -64,7 +77,7 @@ export default function signupsuccess() {
             focusColor={"green"}
           />
           <Link href={""} style={styles.forgotPasswordLink}>
-            Forgot Password?
+            Forgot MPIN?
           </Link>
           <View style={styles.login}>
             <TouchableOpacity
@@ -73,11 +86,16 @@ export default function signupsuccess() {
               }}
               style={styles.loginButton}
             >
-              <Text style={styles.loginButtonText}>Login</Text>
+              <Text style={styles.loginButtonText}>Reset Credentials</Text>
             </TouchableOpacity>
           </View>
         </View>
-      </ImageBackground>
+      {!isKeyboardVisible && (
+        <Image
+          source={require("../assets/imported/bg.jpg")}
+          style={styles.bottomImage}
+        />
+      )}
     </View>
   );
 }
@@ -89,19 +107,11 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     width: "100%",
     height: "100%",
-  },
-  backgroundImage: {
-    flex: 1,
-    resizeMode: "cover", // You can also use 'contain' or 'stretch'
-  },
-  all: {
-    
+    justifyContent: "center",
   },
   logoContainer: {
-    justifyContent: "center",
     alignItems: "center",
     marginTop: 40,
-    marginBottom: 30,
   },
   logo: {
     width: 80,
@@ -109,7 +119,7 @@ const styles = StyleSheet.create({
   },
   logoText: {
     fontWeight: "bold",
-    fontSize: 20,
+    fontSize: 22,
     marginTop: 10,
     justifyContent: "center",
     alignItems: "center",
@@ -121,10 +131,11 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 20,
     paddingTop: 10,
+    justifyContent: "center",
   },
   boldText: {
     fontWeight: "bold",
-    fontSize: 22,
+    fontSize: 25,
     textAlign: "center",
     marginBottom: 30,
   },
@@ -153,10 +164,10 @@ const styles = StyleSheet.create({
     color: "blue",
     marginLeft: 2,
     textAlign: "center",
-    fontSize: 15,
+    fontSize: 12,
     fontWeight: 400,
     marginTop: 28,
-    marginBottom: 20,
+    marginBottom: 10,
   },
   login: {
     justifyContent: "center",
@@ -165,13 +176,13 @@ const styles = StyleSheet.create({
   loginButton: {
     backgroundColor: "#307A59",
     borderRadius: 50,
+    padding: 20,
     paddingVertical: 10,
-    marginTop: 20,
-    width: 165,
+    marginTop: 10,
   },
   loginButtonText: {
     color: "white",
-    fontSize: 20,
+    fontSize: 12,
     textAlign: "center",
   },
   bottom: {
@@ -180,8 +191,10 @@ const styles = StyleSheet.create({
   },
   bottomImage: {
     width: "100%",
-    height: 100,
+    height: 150,
     alignSelf: "flex-end",
-    marginBottom: 0,
+    bottom: 0,
+    borderRadius: 25,
+    paddingHorizontal: 0,
   },
 });

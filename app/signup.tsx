@@ -4,7 +4,6 @@ import {
   Image,
   FlatList,
   SafeAreaView,
-  Pressable,
   TouchableOpacity,
   TextInput,
   Alert,
@@ -13,9 +12,8 @@ import React, { useEffect, useRef, useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import { Link, useRouter } from "expo-router";
 import { twJoin } from "tailwind-merge";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, FontAwesome } from "@expo/vector-icons";
 import Checkbox from "expo-checkbox";
-import { OtpInput } from "react-native-otp-entry";
 
 export default function signup() {
   const [phoneNumber, setPhoneNumber] = useState("+63"); // Set the default value to "+63"
@@ -70,6 +68,21 @@ export default function signup() {
           </Link>
         </Text>
       </View>
+      <Text className="font-bolder text-m mb-2 mt-10 text-center">
+        {" "}
+        - or sign up with -{" "}
+      </Text>
+      <TouchableOpacity
+        onPress={() => {
+          Alert.alert("Google Sign Up", "Implement Google sign-up logic here.");
+        }}
+        className="flex-row justify-center items-center rounded-3xl py-3 mb-5"
+      >
+        <Image
+          source={require("../assets/imported/google.png")}
+          className="w-10 h-10 rounded-full"
+        />
+      </TouchableOpacity>
     </View>,
   ];
 

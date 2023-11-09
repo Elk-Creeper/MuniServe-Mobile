@@ -26,7 +26,7 @@ export default function tab4() {
         </TouchableOpacity>
       </View>
 
-      <ScrollView>
+      <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
         <View style={styles.greenContainer}>
           <View style={styles.profileContainer}>
             <Image

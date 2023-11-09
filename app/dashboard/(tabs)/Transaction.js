@@ -75,7 +75,7 @@ export default function Tab4() {
             );
           }
         });
-        setAppointmentData(transactions);
+        setTransactionData(transactions);
       }
     );
 
@@ -147,7 +147,7 @@ export default function Tab4() {
             );
           }
         });
-        setTransactionData(appointments);
+        setAppointmentData(appointments);
       }
     );
 
@@ -206,7 +206,7 @@ export default function Tab4() {
           <Text style={styles.buttonText}>Service Requests</Text>
         </TouchableOpacity>
       </View>
-
+      
       {/* Conditionally Render Content */}
       {showAppointments && (
         <View>

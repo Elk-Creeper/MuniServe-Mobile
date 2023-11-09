@@ -8,5 +8,5 @@
     "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
-, "app/login.tsx"  ]
+, "app/login.js", "app/BirthReg.js", "app/dashboard/(tabs)/Appointment.js", "app/dashboard/(tabs)/Transaction.js", "app/dashboard/(tabs)/Transaction.js", "app/dashboard/(tabs)/Transaction.js", "app/dashboard/(tabs)/Transaction.js", "app/dashboard/(tabs)/Appointment.js", "app/services.js", "app/services.js"  ]
 }

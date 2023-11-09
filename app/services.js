@@ -9,7 +9,6 @@ import {
   FlatList,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { Link, useRouter } from "expo-router";
 
 export default function Service() {
@@ -38,6 +37,33 @@ export default function Service() {
   const handleSearch = (query) => {
     setSearchQuery(query);
   };
+
+  const handleServiceItemClick = (itemId) => {
+    // Use the router to navigate to different pages based on the itemId
+    switch (itemId) {
+      case 1:
+        router.push("/BirthReg");
+        break;
+      case 2:
+        router.push("/BusinessPermit");
+        break;
+      case 3:
+        router.push("/DeathCertificate");
+        break;
+      case 4:
+        router.push("/JobApplication");
+        break;
+      case 5:
+        router.push("/MarriageCert");
+        break;
+      case 6:
+        router.push("/PSA");
+        break;
+      default:
+        break;
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -74,7 +100,7 @@ export default function Service() {
         renderItem={({ item }) => (
           <TouchableOpacity
             onPress={() => {
-              router.push("/BirthReg");
+              handleServiceItemClick(item.id);
             }}
           >
             <View style={styles.boxes}>

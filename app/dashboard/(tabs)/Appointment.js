@@ -156,7 +156,7 @@ export default function tab1() {
         </TouchableOpacity>
       </View>
 
-      <ScrollView>
+      <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
         <Text style={styles.serveText}>BOOK AN APPOINTMENT</Text>
 
         <View style={styles.inputContainer}>
