@@ -5,6 +5,7 @@ import { Picker } from "@react-native-picker/picker";
 import * as ImagePicker from "expo-image-picker";
 import { firebase } from '../config';
 import * as FileSystem from 'expo-file-system';
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 export default function BirthReg() {
     const [image, setImage] = useState(null);
@@ -54,19 +55,17 @@ export default function BirthReg() {
 
             // Store the download URL in Firestore
             const MuniServe = firebase.firestore();
-            const deathCert = MuniServe.collection("deathCert");
+            const marriageCert = MuniServe.collection("marriageCert");
 
-            await deathCert.add({
-                attendant: attendant,
-                c_birthdate: birthdate,
-                c_birthplace: birthplace,
-                childname: childname,
-                f_age: f_age,
-                f_citizenship: f_citizenship,
-                f_name: f_name,
-                f_occur: f_occur,
-                f_placemarried: f_placemarried,
-                m_name: m_name,
+            await marriageCert.add({
+                hname: hname,
+                wname: wname,
+                date: date,
+                marriage: marriage,
+                rname: rname,
+                address: address,
+                copies: copies,
+                purpose: purpose,
                 payment: downloadURL, // Store the download URL here
                 status: "Pending", // Set the initial status to "Pending"
                 createdAt: timestamp,
@@ -83,9 +82,9 @@ export default function BirthReg() {
     };
 
     // Data add
-    const [name, setName] = useState("");
-    const [date, setDate] = useState("");
-    const [place, setPlace] = useState("");
+    const [hname, setHname] = useState("");
+    const [wname, setWname] = useState("");
+    const [date, setDate] = useState(new Date());
     const [marriage, setMarriage] = useState("");
     const [rname, setRname] = useState("");
     const [address, setAddress] = useState("");
@@ -94,9 +93,9 @@ export default function BirthReg() {
     const [payment, setPayment] = useState("");
 
     const resetForm = () => {
-        setName("");
+        setHname("");
+        setWname("");
         setDate("");
-        setPlace("");
         setMarriage("");
         setRname("");
         setAddress("");
@@ -132,6 +131,14 @@ export default function BirthReg() {
         fetchData();
     }, []);
 
+    const [showDatePicker, setShowDatePicker] = useState(false);
+
+    const onDateChange = (event, selectedDate) => {
+        const currentDate = selectedDate || date;
+        setShowDatePicker(Platform.OS === 'ios'); // Close the date picker on iOS
+        setDate(currentDate); // Update the state with the selected date
+    };
+
     return (
         <View style={styles.container}>
             <View style={styles.header}>
@@ -150,7 +157,7 @@ export default function BirthReg() {
                 </TouchableOpacity>
             </View>
 
-            <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
+            <ScrollView style={{ flex: 1 }}>
                 <FlatList
                     data={serve}
                     numColumns={1}
@@ -180,54 +187,60 @@ export default function BirthReg() {
                     Please be ready to supply the following information. Fill the form below:</Text>
                 <View style={{ marginBottom: 10 }}>
                     <Text style={styles.label}>
-                        Complete name of the deceased person
+                        Complete name of the husband
                     </Text>
 
                     <View style={styles.placeholder}>
                         <TextInput
                             placeholder=""
                             maxLength={50}
-                            value={name}
-                            onChangeText={(name) => setName(name)}
+                            value={hname}
+                            onChangeText={(hname) => setHname(hname)}
                             style={{
                                 width: "100%",
                             }}
                         ></TextInput>
                     </View>
                 </View>
+
                 <View style={{ marginBottom: 10 }}>
                     <Text style={styles.label}>
-                        Date of death
+                        Complete name of the wife
                     </Text>
 
                     <View style={styles.placeholder}>
                         <TextInput
                             placeholder=""
                             maxLength={50}
+                            value={wname}
+                            onChangeText={(wname) => setWname(wname)}
+                            style={{
+                                width: "100%",
+                            }}
+                        ></TextInput>
+                    </View>
+                </View>
+
+                <View style={{ marginBottom: 10 }}>
+                    <Text style={styles.label}>
+                        Date of marriage
+                    </Text>
+
+                    <TouchableOpacity
+                        onPress={() => setShowDatePicker(true)}
+                        style={styles.placeholder}
+                    >
+                    </TouchableOpacity>
+
+                    {showDatePicker && (
+                        <DateTimePicker
                             value={date}
-                            onChangeText={(date) => setDate(date)}
-                            style={{
-                                width: "100%",
-                            }}
-                        ></TextInput>
-                    </View>
-                </View>
-                <View style={{ marginBottom: 10 }}>
-                    <Text style={styles.label}>
-                        Place of death
-                    </Text>
+                            mode="date"
+                            display="default"
+                            onChange={onDateChange}
+                        />
+                    )}
 
-                    <View style={styles.placeholder}>
-                        <TextInput
-                            placeholder=""
-                            maxLength={50}
-                            value={place}
-                            onChangeText={(place) => setPlace(place)}
-                            style={{
-                                width: "100%",
-                            }}
-                        ></TextInput>
-                    </View>
                 </View>
 
                 <View style={{ marginBottom: 10 }}>
@@ -610,5 +623,13 @@ const styles = StyleSheet.create({
         fontSize: 15,
         fontWeight: "400",
         marginVertical: 8,
+    },
+    datePickerStyle: {
+        width: '100%',
+        borderColor: 'black',
+        borderRadius: 8,
+        borderWidth: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
 });

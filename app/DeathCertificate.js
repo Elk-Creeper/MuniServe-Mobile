@@ -5,12 +5,13 @@ import { Picker } from "@react-native-picker/picker";
 import * as ImagePicker from "expo-image-picker";
 import { firebase } from '../config';
 import * as FileSystem from 'expo-file-system';
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { dismissAuthSession } from "expo-web-browser";
 
 export default function BirthReg() {
     const [image, setImage] = useState(null);
     const [uploading, setUploading] = useState(false);
     const timestamp = firebase.firestore.FieldValue.serverTimestamp();
-    const [date, setDate] = useState('');
 
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -58,16 +59,14 @@ export default function BirthReg() {
             const deathCert = MuniServe.collection("deathCert");
 
             await deathCert.add({
-                attendant: attendant,
-                c_birthdate: birthdate,
-                c_birthplace: birthplace,
-                childname: childname,
-                f_age: f_age,
-                f_citizenship: f_citizenship,
-                f_name: f_name,
-                f_occur: f_occur,
-                f_placemarried: f_placemarried,
-                m_name: m_name,
+                name: name,
+                date: date,
+                place: place,
+                marriage: marriage,
+                rname: rname,
+                address: address,
+                copies: copies,
+                purpose: purpose,
                 payment: downloadURL, // Store the download URL here
                 status: "Pending", // Set the initial status to "Pending"
                 createdAt: timestamp,
@@ -85,7 +84,7 @@ export default function BirthReg() {
 
     // Data add
     const [name, setName] = useState("");
-    const [dates, setDates] = useState("");
+    const [date, setDate] = useState(new Date());
     const [place, setPlace] = useState("");
     const [marriage, setMarriage] = useState("");
     const [rname, setRname] = useState("");
@@ -132,6 +131,14 @@ export default function BirthReg() {
 
         fetchData();
     }, []);
+
+    const [showDatePicker, setShowDatePicker] = useState(false);
+
+    const onDateChange = (event, selectedDate) => {
+        const currentDate = selectedDate || date;
+        setShowDatePicker(Platform.OS === 'ios'); // Close the date picker on iOS
+        setDate(currentDate); // Update the state with the selected date
+    };
 
     return (
         <View style={styles.container}>
@@ -202,17 +209,21 @@ export default function BirthReg() {
                         Date of death
                     </Text>
 
-                    <View style={styles.placeholder}>
-                        <TextInput
-                            placeholder=""
-                            maxLength={50}
+                    <TouchableOpacity
+                        onPress={() => setShowDatePicker(true)}
+                        style={styles.placeholder}
+                    >
+                    </TouchableOpacity>
+
+                    {showDatePicker && (
+                        <DateTimePicker
                             value={date}
-                            onChangeText={(date) => setDates(dates)}
-                            style={{
-                                width: "100%",
-                            }}
-                        ></TextInput>
-                    </View>
+                            mode="date"
+                            display="default"
+                            onChange={onDateChange}
+                        />
+                    )}
+
                 </View>
 
                 <View style={{ marginBottom: 10 }}>
