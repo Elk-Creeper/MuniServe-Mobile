@@ -30,7 +30,14 @@ export default function tab1() {
 
   // State to control date and time picker visibility
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showDatepickerOptions, setShowDatepickerOptions] = useState({
+    minDate: new Date(),
+  });
   const [showTimePicker, setShowTimePicker] = useState(false);
+  const [showTimePickerOptions, setShowTimePickerOptions] = useState({
+    minTime: new Date(),
+    maxTime: new Date(),
+  });
 
   const [textMessage, setTextMessage] = useState(""); // State for text message
   const [wordCount, setWordCount] = useState(0);
@@ -65,20 +72,70 @@ export default function tab1() {
     setSelectedPersonnel(value);
   };
 
+  const isWeekend = (date) => {
+    const day = date.getDay();
+    return day === 0 || day === 6; // 0 is Sunday, 6 is Saturday
+  };
+
   // Function to show date picker
   const showDatepicker = () => {
+    const now = new Date();
+    const minDate = new Date(now); // Current date
+    minDate.setHours(0, 0, 0, 0);
+
     setShowDatePicker(true);
+    setShowTimePicker(false);
+
+    setShowDatepickerOptions({
+      minDate: minDate,
+      maxDate: null, // You can set a max date if needed
+    });
   };
 
   // Function to show time picker
   const showTimepicker = () => {
+    const now = new Date();
+    const startHour = 8; // 8 am
+    const endHour = 16; // 4 pm
+
+    // Set minimum and maximum allowed time
+    const minTime = new Date(now);
+    minTime.setHours(startHour, 0, 0, 0);
+
+    const maxTime = new Date(now);
+    maxTime.setHours(endHour, 0, 0, 0);
+
     setShowTimePicker(true);
+    setShowDatePicker(false);
+    setSelectedTime(selectedTime || minTime); // Set default value to minimum time
+
+    // Set the minimum and maximum time for the time picker
+    setShowTimePickerOptions({
+      minTime: minTime,
+      maxTime: maxTime,
+    });
   };
 
   // Handle date change
   const handleDateChange = (event, selectedDate) => {
     if (selectedDate) {
-      setSelectedDate(selectedDate);
+      const { minDate, maxDate } = showDatepickerOptions;
+
+      if (
+        selectedDate >= minDate &&
+        (!maxDate || selectedDate <= maxDate) &&
+        !isWeekend(selectedDate)
+      ) {
+        setSelectedDate(selectedDate);
+      } else {
+        Alert.alert(
+          "Invalid Date",
+          "We are not open on weekends. Please select a valid date from Monday to Friday. Thank you!",
+          [{ text: "OK", onPress: () => console.log("OK Pressed") }],
+          { cancelable: false }
+        );
+      }
+
       setShowDatePicker(false);
     }
   };
@@ -86,10 +143,23 @@ export default function tab1() {
   // Handle time change
   const handleTimeChange = (event, selectedTime) => {
     if (selectedTime) {
-      setSelectedTime(selectedTime);
+      const { minTime, maxTime } = showTimePickerOptions;
+
+      if (selectedTime >= minTime && selectedTime <= maxTime) {
+        setSelectedTime(selectedTime);
+      } else {
+        // Alert the user about the invalid time selection
+        Alert.alert(
+          "Invalid Time",
+          "We're not available to setup an appointment by this time.Please select a time between 8am and 4pm. Thank you!",
+          [{ text: "OK", onPress: () => console.log("OK Pressed") }],
+          { cancelable: false }
+        );
+      }
       setShowTimePicker(false);
     }
   };
+
 
   const handleTextChange = (text) => {
     // Limit text to 300 characters
@@ -228,6 +298,7 @@ export default function tab1() {
               is24Hour={true}
               display="default"
               onChange={handleDateChange}
+              minimumDate={showDatepickerOptions.minDate}
             />
           )}
         </View>
@@ -267,7 +338,7 @@ export default function tab1() {
             value={textMessage}
             onChangeText={handleTextChange}
             maxLength={300}
-            style={styles.textInput}
+            style={[styles.textInput, { textAlignVertical: 'top' }]}
           />
           <Text style={styles.wordCount}>{wordCount}/300</Text>
         </View>
@@ -391,6 +462,7 @@ const styles = StyleSheet.create({
     color: "black",
     maxHeight: 120, // Adjust the height as needed
     textAlign: "justify",
+    top: 0,
   },
   loginButton: {
     backgroundColor: "#307A59",

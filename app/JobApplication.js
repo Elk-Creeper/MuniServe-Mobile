@@ -21,14 +21,14 @@ export default function BirthReg() {
 
     useEffect(() => {
         // If an image is selected, start the fade-out animation
-        if (payment.length > 0) {
+        if (pictures.length > 0) {
             Animated.timing(fadeAnimation, {
                 toValue: 0,
                 duration: 500,
                 useNativeDriver: true,
             }).start();
         }
-    }, [payment, fadeAnimation]);
+    }, [pictures, fadeAnimation]);
 
     const pickImage = async () => {
         try {
@@ -83,18 +83,16 @@ export default function BirthReg() {
 
             // Store the download URL in Firestore
             const MuniServe = firebase.firestore();
-            const marriageCert = MuniServe.collection("marriageCert");
+            const job = MuniServe.collection("job");
 
-            await marriageCert.add({
-                hname: hname,
-                wname: wname,
-                date: date,
-                marriage: marriage,
-                rname: rname,
+            await job.add({
+                name: name,
+                age: age,
+                sex: sex,
                 address: address,
-                copies: copies,
-                purpose: purpose,
-                payment: downloadURL, // Store the download URL here
+                phoneNum: phoneNum,
+                educ: educ,
+                pictures: downloadURL, // Store the download URL here
                 status: "Pending", // Set the initial status to "Pending"
                 createdAt: timestamp,
             });
@@ -114,27 +112,21 @@ export default function BirthReg() {
     };
 
     // Data add
-    const [hname, setHname] = useState("");
-    const [wname, setWname] = useState("");
-    const [date, setDate] = useState(new Date());
-    const [marriage, setMarriage] = useState("");
-    const [rname, setRname] = useState("");
+    const [name, setName] = useState("");
+    const [age, setAge] = useState("");
+    const [sex, setSex] = useState("");
     const [address, setAddress] = useState("");
-    const [copies, setCopies] = useState("");
-    const [purpose, setPurpose] = useState("");
-    const [payment, setPayment] = useState("");
+    const [phoneNum, setPhoneNum] = useState("");
+    const [educ, setEduc] = useState("");
+    const [pictures, setPictures] = useState("");
 
     const resetForm = () => {
-        setHname("");
-        setDate(new Date());
-        setDate("");
-        setMarriage("");
-        setRname("");
+        setName("");
+        setAge("");
+        setSex("");
         setAddress("");
-        setCopies("");
-        setPurpose("");
-
-        setSelectedDateText("");
+        setPhoneNum("");
+        setEduc("");
     };
 
     const [serve, setServe] = useState([]);
@@ -200,36 +192,36 @@ export default function BirthReg() {
             </View>
 
             <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
-                            <View style={styles.boxes1}>
-                                <View style={styles.boxAcc}>
-                                    <Image
-                                        source={require("../assets/imported/Del_Gallego_Camarines_Sur.png")}
-                                        style={styles.boxIcon}
-                                    />
-                                    <Text style={styles.itemService_name}>
-                                        Marriage Certificate
-                                    </Text>
-                                </View>
-                            </View>
-                            <View style={styles.innerContainer}>
-                                <Text style={styles.itemService_desc}>
+                <View style={styles.boxes1}>
+                    <View style={styles.boxAcc}>
+                        <Image
+                            source={require("../assets/imported/Del_Gallego_Camarines_Sur.png")}
+                            style={styles.boxIcon}
+                        />
+                        <Text style={styles.itemService_name}>
+                            Job Application
+                        </Text>
+                    </View>
+                </View>
+                <View style={styles.innerContainer}>
+                    <Text style={styles.itemService_desc}>
                         A Marriage Certificate is a document that shows social union or a legal contract between people that creates kinship. Such a union, often formalized via a wedding ceremony, may also be called matrimony. A general definition of marriage is that it is a social contract between two individuals that unites their lives legally, economically and emotionally.  It is an institution in which interpersonal relationships, usually intimate and sexual, are acknowledged in a variety of ways, depending on the culture or subculture in which it is found. The state of being united to a person of the opposite sex as husband or wife in a legal, consensual, and contractual relationship recognized and sanctioned by and dissolvable only by law.  A marriage certificate is a document containing the important details of marriage, signed by the couple and by all in attendance. Marriage occurs during the meeting for worship after approval is obtained from the meetings of which the two people are members. Approval is based on a statement of good character and clearness from any other engagements. The clerk usually records a copy of the marriage certificate in the meeting's records.
-                                </Text>
-                            </View>
+                    </Text>
+                </View>
 
                 <Text style={styles.noteText}>
                     Please be ready to supply the following information. Fill the form below:</Text>
                 <View style={{ marginBottom: 10 }}>
                     <Text style={styles.label}>
-                        Complete name of the husband
+                        Complete name
                     </Text>
 
                     <View style={styles.placeholder}>
                         <TextInput
                             placeholder=""
                             maxLength={50}
-                            value={hname}
-                            onChangeText={(hname) => setHname(hname)}
+                            value={name}
+                            onChangeText={(name) => setName(name)}
                             style={{
                                 width: "100%",
                             }}
@@ -239,15 +231,15 @@ export default function BirthReg() {
 
                 <View style={{ marginBottom: 10 }}>
                     <Text style={styles.label}>
-                        Complete name of the wife
+                        Age
                     </Text>
 
                     <View style={styles.placeholder}>
                         <TextInput
                             placeholder=""
                             maxLength={50}
-                            value={wname}
-                            onChangeText={(wname) => setWname(wname)}
+                            value={age}
+                            onChangeText={(age) => setAge(age)}
                             style={{
                                 width: "100%",
                             }}
@@ -255,39 +247,18 @@ export default function BirthReg() {
                     </View>
                 </View>
 
-                <View style={{ marginBottom: 10 }}>
-                    <Text style={styles.label}>
-                        Date of marriage
-                    </Text>
-
-                    <TouchableOpacity
-                        onPress={() => setShowDatePicker(true)}
-                        style={styles.placeholder}
-                    >
-                        <Text>{selectedDateText}</Text>
-                    </TouchableOpacity>
-
-                    {showDatePicker && (
-                        <DateTimePicker
-                            value={date}
-                            mode="date"
-                            display="default"
-                            onChange={onDateChange}
-                        />
-                    )}
-                </View>
 
                 <View style={{ marginBottom: 10 }}>
                     <Text style={styles.label}>
-                        Place of marriage
+                       Sex
                     </Text>
 
                     <View style={styles.placeholder}>
                         <TextInput
                             placeholder=""
-                            maxLength={50}
-                            value={marriage}
-                            onChangeText={(marriage) => setMarriage(marriage)}
+                            maxLength={6}
+                            value={sex}
+                            onChangeText={(sex) => setSex(sex)}
                             style={{
                                 width: "100%",
                             }}
@@ -297,25 +268,7 @@ export default function BirthReg() {
 
                 <View style={{ marginBottom: 10 }}>
                     <Text style={styles.label}>
-                        Complete name of the requesting party
-                    </Text>
-
-                    <View style={styles.placeholder}>
-                        <TextInput
-                            placeholder=""
-                            maxLength={100}
-                            value={rname}
-                            onChangeText={(rname) => setRname(rname)}
-                            style={{
-                                width: "100%",
-                            }}
-                        ></TextInput>
-                    </View>
-                </View>
-
-                <View style={{ marginBottom: 10 }}>
-                    <Text style={styles.label}>
-                        Complete address of the requesting party
+                        Address
                     </Text>
 
                     <View style={styles.placeholder}>
@@ -323,8 +276,26 @@ export default function BirthReg() {
                             placeholder=""
                             maxLength={100}
                             value={address}
-                            onChangeText={(address) =>
-                                setAddress(address)
+                            onChangeText={(address) => setAddress(address)}
+                            style={{
+                                width: "100%",
+                            }}
+                        ></TextInput>
+                    </View>
+                </View>
+
+                <View style={{ marginBottom: 10 }}>
+                    <Text style={styles.label}>
+                        Phone number
+                    </Text>
+
+                    <View style={styles.placeholder}>
+                        <TextInput
+                            placeholder=""
+                            maxLength={11}
+                            value={phoneNum}
+                            onChangeText={(phoneNum) =>
+                                setPhoneNum(phoneNum)
                             }
                             style={{
                                 width: "100%",
@@ -335,15 +306,15 @@ export default function BirthReg() {
 
                 <View style={{ marginBottom: 10 }}>
                     <Text style={styles.label}>
-                        Number of copies needed
+                        Educational Attainment
                     </Text>
 
                     <View style={styles.placeholder}>
                         <TextInput
                             placeholder=""
-                            value={copies}
-                            onChangeText={(copies) => setCopies(copies)}
-                            maxLength={10}
+                            value={educ}
+                            onChangeText={(educ) => setEduc(educ)}
+                            maxLength={100}
                             style={{
                                 width: "100%",
                             }}
@@ -351,31 +322,13 @@ export default function BirthReg() {
                     </View>
                 </View>
 
-                <View style={{ marginBottom: 10 }}>
-                    <Text style={styles.label}>
-                        Purpose of the certification
-                    </Text>
-
-                    <View style={styles.placeholder3}>
-                        <TextInput
-                            placeholder=""
-                            multiline={true}
-                            numberOfLines={5}
-                            value={purpose}
-                            onChangeText={(purpose) => setPurpose(purpose)}
-                            maxLength={300}
-                            style={{
-                                width: "100%",
-                            }}
-                        ></TextInput>
-                    </View>
-                </View>
-
-                <Text style={styles.noteText}>Note: Upload first your proof of payment before submitting your application. Lack of needed information will cause delay or rejection.</Text>
+                <Text style={styles.noteText}>Note: Upload first the needed requirements before submitting your application. Lack of needed information will cause delay or rejection.</Text>
+                
+                
                 <View style={styles.selectButton}>
-                    <Text style={styles.buttonText}>Proof of Payment(G-CASH RECEIPT)</Text>
+                    <Text style={styles.buttonText}>2x2 Pictures</Text>
                     <TouchableOpacity onPress={pickImage}>
-                        {payment.length > 0 ? (
+                        {pictures.length > 0 ? (
                             <Animatable.View
                                 style={{
                                     ...styles.plusCircle,
@@ -389,7 +342,7 @@ export default function BirthReg() {
                                 <Ionicons name="ios-add" size={24} color="white" />
                             </View>
                         )}
-                        {payment.length > 0 && (
+                        {pictures.length > 0 && (
                             <View style={styles.checkCircle}>
                                 <Ionicons name="ios-checkmark" size={24} color="white" />
                             </View>
@@ -402,24 +355,24 @@ export default function BirthReg() {
                     {image && (
                         <Image
                             source={{ uri: image }}
-                            style={{ width: 300, height: 300 }}
+                            style={{ width: 200, height: 200 }}
                         />
                     )}
                     <TouchableOpacity
                         style={styles.button}
                         onPress={() => {
-                            uploadMedia();                           
+                            uploadMedia();
                         }}
                     >
                         <Text style={styles.submitText}>Submit</Text>
                     </TouchableOpacity>
                 </View>
             </ScrollView>
-                {uploading && (
-                    <View style={styles.loadingContainer}>
-                        <ActivityIndicator size="large" color="#307A59" />
-                    </View>
-                )}
+            {uploading && (
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color="#307A59" />
+                </View>
+            )}
         </View>
     );
 }

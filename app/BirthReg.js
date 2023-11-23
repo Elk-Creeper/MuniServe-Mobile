@@ -1,15 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { Pressable, FlatList, View, TextInput, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Dimensions, Platform, SafeAreaView, Button, Alert} from "react-native";
+import { Pressable, Modal, FlatList, View, TextInput, Text, StyleSheet, Image, TouchableOpacity, ActivityIndicator, ScrollView, Dimensions, Platform, SafeAreaView, Button, Alert } from "react-native";
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
+import { StatusBar } from "expo-status-bar";
 import * as ImagePicker from "expo-image-picker";
-import {firebase} from '../config';
+import { firebase } from '../config';
 import * as FileSystem from 'expo-file-system';
+import DateTimePicker from "@react-native-community/datetimepicker";
+
 
 export default function BirthReg() {
   const [image, setImage] = useState(null);
   const [uploading, setUploading] = useState(false);
   const timestamp = firebase.firestore.FieldValue.serverTimestamp();
+  const [loadingModalVisible, setLoadingModalVisible] = useState(false);
+  const [selectedDateText, setSelectedDateText] = useState("");
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -25,76 +30,81 @@ export default function BirthReg() {
   };
 
   // upload media files
-const uploadMedia = async () => {
-  setUploading(true);
+  const uploadMedia = async () => {
+    setLoadingModalVisible(true);
+    setUploading(true);
 
-  try {
-    const { uri } = await FileSystem.getInfoAsync(image);
-    const blob = await new Promise((resolve, reject) => {
-      const xhr = new XMLHttpRequest();
-      xhr.onload = () => {
-        resolve(xhr.response);
-      };
-      xhr.onerror = (e) => {
-        reject(new TypeError("Network request failed"));
-      };
-      xhr.responseType = "blob";
-      xhr.open("GET", uri, true);
-      xhr.send(null);
-    });
+    try {
+      const { uri } = await FileSystem.getInfoAsync(image);
+      const blob = await new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.onload = () => {
+          resolve(xhr.response);
+        };
+        xhr.onerror = (e) => {
+          reject(new TypeError("Network request failed"));
+        };
+        xhr.responseType = "blob";
+        xhr.open("GET", uri, true);
+        xhr.send(null);
+      });
 
-    const filename = image.substring(image.lastIndexOf("/") + 1);
-    const ref = firebase.storage().ref().child(filename);
+      const filename = image.substring(image.lastIndexOf("/") + 1);
+      const ref = firebase.storage().ref().child(filename);
 
-    // Upload the image to Firebase Storage
-    const snapshot = await ref.put(blob);
+      // Upload the image to Firebase Storage
+      const snapshot = await ref.put(blob);
 
-    // Get the download URL of the uploaded image
-    const downloadURL = await snapshot.ref.getDownloadURL();
+      // Get the download URL of the uploaded image
+      const downloadURL = await snapshot.ref.getDownloadURL();
 
-    // Store the download URL in Firestore
-    const MuniServe = firebase.firestore();
-    const birthreg = MuniServe.collection("birth_reg");
+      // Store the download URL in Firestore
+      const MuniServe = firebase.firestore();
+      const birthreg = MuniServe.collection("birth_reg");
 
-    await birthreg.add({
-      attendant: attendant,
-      c_birthdate: birthdate,
-      c_birthorder: birthorder,
-      c_birthplace: birthplace,
-      c_sex: sex,
-      c_typeofbirth: typeofbirth,
-      c_weight: weight,
-      childname: childname,
-      f_age: f_age,
-      f_citizenship: f_citizenship,
-      f_name: f_name,
-      f_occur: f_occur,
-      f_placemarried: f_placemarried,
-      f_religion: f_religion,
-      m_age: m_age,
-      m_citizenship: m_citizenship,
-      m_name: m_name,
-      m_occur: m_occur,
-      m_religion: m_religion,
-      m_totchild: m_totchild,
-      payment: downloadURL, // Store the download URL here
-      status: "Pending", // Set the initial status to "Pending"
-      createdAt: timestamp,
-    });
+      await birthreg.add({
+        attendant: attendant,
+        c_birthdate: birthdate,
+        c_birthorder: birthorder,
+        c_birthplace: birthplace,
+        c_sex: sex,
+        c_typeofbirth: typeofbirth,
+        c_weight: weight,
+        childname: childname,
+        f_age: f_age,
+        f_citizenship: f_citizenship,
+        f_name: f_name,
+        f_occur: f_occur,
+        f_placemarried: f_placemarried,
+        f_religion: f_religion,
+        m_age: m_age,
+        m_citizenship: m_citizenship,
+        m_name: m_name,
+        m_occur: m_occur,
+        m_religion: m_religion,
+        m_totchild: m_totchild,
+        payment: downloadURL, // Store the download URL here
+        status: "Pending", // Set the initial status to "Pending"
+        createdAt: timestamp,
+      });
 
-    setUploading(false);
-    setImage(null);
-    Alert.alert("Success", "Form filled successfully.");
-  } catch (error) {
-    console.error(error);
-    setUploading(false);
-    Alert.alert("Error", "Form filling failed.");
-  }
-};
+      setUploading(false);
+      setImage(null);
+      resetForm();
+      Alert.alert("Success", "Form filled successfully.");
+    } catch (error) {
+      console.error(error);
+      setUploading(false);
+      Alert.alert("Error", "Form filling failed.");
+    } finally {
+      setUploading(false);
+      setLoadingModalVisible(false); // Hide loading modal
+    }
+  };
 
   // Data add
   const [attendant, setAttendant] = useState("");
-  const [birthdate, setBirthdate] = useState("");
+  const [birthdate, setBirthdate] = useState(new Date());
   const [birthorder, setBirthorder] = useState("");
   const [birthplace, setBirthplace] = useState("");
   const [sex, setSex] = useState("");
@@ -117,7 +127,7 @@ const uploadMedia = async () => {
 
   const resetForm = () => {
     setAttendant("");
-    setBirthdate("");
+    setBirthdate(new Date());
     setBirthorder("");
     setBirthplace("");
     setSex("");
@@ -136,6 +146,8 @@ const uploadMedia = async () => {
     setM_occur("");
     setM_religion("");
     setM_totchild("");
+
+    setSelectedDateText("");
   };
 
   const [serve, setServe] = useState([]);
@@ -166,8 +178,24 @@ const uploadMedia = async () => {
     fetchData();
   }, []);
 
+  const [showDatePicker, setShowDatePicker] = useState(false);
+
+  const onDateChange = (event, selectedDate) => {
+    const currentDate = selectedDate || date;
+    setShowDatePicker(Platform.OS === 'ios'); // Close the date picker on iOS
+    setDate(currentDate); // Update the state with the selected date
+    setSelectedDateText(formatDate(currentDate)); // Format and set the selected date text
+  };
+
+  const formatDate = (date) => {
+    // Format the date as needed (you can customize this based on your requirements)
+    const formattedDate = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+    return formattedDate;
+  };
+
   return (
     <View style={styles.container}>
+      <StatusBar backgroundColor="#93C49E" />
       <View style={styles.header}>
         <View style={styles.titleContainer}>
           <Image
@@ -183,32 +211,25 @@ const uploadMedia = async () => {
           <Ionicons name="notifications-outline" size={24} color="black" />
         </TouchableOpacity>
       </View>
-      
-        <ScrollView style={{ flex: 1 }}>
-          <FlatList
-            data={serve}
-            numColumns={1}
-            renderItem={({ item }) => (
-              <Pressable>
-                <View style={styles.boxes1}>
-                  <View style={styles.boxAcc}>
-                    <Image
-                      source={require("../assets/imported/Del_Gallego_Camarines_Sur.png")}
-                      style={styles.boxIcon}
-                    />
-                    <Text style={styles.itemService_name}>
-                      {item.service_name}
-                    </Text>
-                  </View>
-                </View>
-                <View style={styles.innerContainer}>
-                  <Text style={styles.itemService_desc}>
-                    {item.service_desc}
-                  </Text>
-                </View>
-              </Pressable>
-            )}
-          />
+
+      <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
+
+        <View style={styles.boxes1}>
+          <View style={styles.boxAcc}>
+            <Image
+              source={require("../assets/imported/Del_Gallego_Camarines_Sur.png")}
+              style={styles.boxIcon}
+            />
+            <Text style={styles.itemService_name}>
+              Birth Registration
+            </Text>
+          </View>
+        </View>
+        <View style={styles.innerContainer}>
+          <Text style={styles.itemService_desc}>
+            Registration of live birth or birth certificate is a very important document needed by every citizen. This is usually a requirement for school, employment, marriage, passport and many other things. Its authenticity can only be verified through the civil registrar. They issue a certified true copy of this document, if your birth is indeed registered in this Municipality. The fee is 30 pesos per application and is processed and issued within the same day upon payment of the fee.
+          </Text>
+        </View>
 
         <Text style={styles.noteText}>
           Please be ready to supply the following information. Fill the form below:</Text>
@@ -230,28 +251,34 @@ const uploadMedia = async () => {
             ></TextInput>
           </View>
         </View>
+
+
         <View style={{ marginBottom: 10 }}>
           <Text style={styles.label}>
             Birth Date
           </Text>
 
-          <View style={styles.placeholder}>
-            <TextInput
-              placeholder=""
-              maxLength={50}
+          <TouchableOpacity
+            onPress={() => setShowDatePicker(true)}
+            style={styles.placeholder}
+          >
+            <Text>{selectedDateText}</Text>
+          </TouchableOpacity>
+
+          {showDatePicker && (
+            <DateTimePicker
               value={birthdate}
-              onChangeText={(birthdate) => setBirthdate(birthdate)}
-              style={{
-                width: "100%",
-              }}
-            ></TextInput>
-          </View>
+              mode="date"
+              display="default"
+              onChange={onDateChange}
+            />
+          )}
         </View>
+
         <View style={{ marginBottom: 10 }}>
           <Text style={styles.label}>
             Birth Place
           </Text>
-
           <View style={styles.placeholder}>
             <TextInput
               placeholder=""
@@ -264,6 +291,7 @@ const uploadMedia = async () => {
             ></TextInput>
           </View>
         </View>
+
         <View style={styles.boxContainer}>
           <View style={{ marginBottom: 10 }}>
             <Text style={styles.label}>
@@ -276,6 +304,7 @@ const uploadMedia = async () => {
                 onValueChange={(itemValue, itemIndex) => setSex(itemValue)}
                 style={{ width: "100%" }}
               >
+                <Picker.Item label="Select" value="" />
                 <Picker.Item label="Male" value="Male" />
                 <Picker.Item label="Female" value="Female" />
               </Picker>
@@ -287,15 +316,22 @@ const uploadMedia = async () => {
             </Text>
 
             <View style={styles.placeholder2}>
-              <TextInput
-                placeholder=""
-                maxLength={20}
-                value={typeofbirth}
-                onChangeText={(typeofbirth) => setTypeofbirth(typeofbirth)}
-                style={{
-                  width: "100%",
-                }}
-              ></TextInput>
+              <Picker
+                selectedValue={typeofbirth}
+                onValueChange={(itemValue, itemIndex) => setTypeofbirth(itemValue)}
+                style={{ width: "100%" }}
+              >
+                <Picker.Item label="Select" value="" />
+                <Picker.Item label="Vaginal Birth" value="Vaginal Birth" />
+                <Picker.Item label="Assisted Birth" value="Assisted Birth" />
+                <Picker.Item label="Cesarian Section" value="Cesarian Section" />
+                <Picker.Item label="Caesarean Section" value="Caesarean Section" />
+                <Picker.Item label="Hypnobirthing" value="Hypnobirthing" />
+                <Picker.Item label="Forceps Delivery" value="Forceps Delivery" />
+                <Picker.Item label="VBAC" value="VBAC" />
+                <Picker.Item label="Water Birth" value="Water Birth" />
+                <Picker.Item label="Scheduled Induction" value="Scheduled Induction" />
+              </Picker>
             </View>
           </View>
         </View>
@@ -386,6 +422,7 @@ const uploadMedia = async () => {
                 onValueChange={(itemValue, itemIndex) => setM_religion(itemValue)}
                 style={{ width: "100%" }}
               >
+                <Picker.Item label="Select" value="" />
                 <Picker.Item label="Christianity" value="Christianity" />
                 <Picker.Item label="Islam" value="Islam" />
                 <Picker.Item label="Hinduism" value="Hinduism" />
@@ -493,9 +530,10 @@ const uploadMedia = async () => {
             <View style={styles.placeholder2}>
               <Picker
                 selectedValue={f_religion}
-                onValueChange={(itemValue, itemIndex) => setM_religion(itemValue)}
+                onValueChange={(itemValue, itemIndex) => setF_religion(itemValue)}
                 style={{ width: "100%" }}
               >
+                <Picker.Item label="Select" value="" />
                 <Picker.Item label="Christianity" value="Christianity" />
                 <Picker.Item label="Islam" value="Islam" />
                 <Picker.Item label="Hinduism" value="Hinduism" />
@@ -521,45 +559,45 @@ const uploadMedia = async () => {
             ></TextInput>
           </View>
         </View>
-          <View style={{ marginBottom: 10 }}>
+        <View style={{ marginBottom: 10 }}>
           <Text style={styles.label}>
-              Age at the time of birth
-            </Text>
+            Age at the time of birth
+          </Text>
 
           <View style={styles.placeholder}>
-              <TextInput
-                placeholder=""
-                maxLength={20}
-                value={f_age}
-                onChangeText={(f_age) => setF_age(f_age)}
-                style={{
-                  width: "100%",
-                }}
-              ></TextInput>
-            </View>
+            <TextInput
+              placeholder=""
+              maxLength={20}
+              value={f_age}
+              onChangeText={(f_age) => setF_age(f_age)}
+              style={{
+                width: "100%",
+              }}
+            ></TextInput>
           </View>
+        </View>
 
-          <Text style={styles.noteText}>Additional Information:</Text>
-          <View style={{ marginBottom: 10 }}>
-            <Text style={styles.label}>
-              Place of marriage
-            </Text>
+        <Text style={styles.noteText}>Additional Information:</Text>
+        <View style={{ marginBottom: 10 }}>
+          <Text style={styles.label}>
+            Place of marriage
+          </Text>
 
           <View style={styles.placeholder}>
-              <TextInput
-                placeholder=""
-                maxLength={20}
-                value={f_placemarried}
-                onChangeText={(f_placemarried) =>
-                  setF_placemarried(f_placemarried)
-                }
-                style={{
-                  width: "100%",
-                }}
-              ></TextInput>
-            </View>
+            <TextInput
+              placeholder=""
+              maxLength={20}
+              value={f_placemarried}
+              onChangeText={(f_placemarried) =>
+                setF_placemarried(f_placemarried)
+              }
+              style={{
+                width: "100%",
+              }}
+            ></TextInput>
           </View>
-        
+        </View>
+
         <View style={{ marginBottom: 10 }}>
           <Text style={styles.label}>
             Attendant of birth
@@ -579,13 +617,33 @@ const uploadMedia = async () => {
         </View>
 
         <Text style={styles.noteText}>Note: Upload first your proof of payment before submitting your application. Lack of needed information will cause delay or rejection.</Text>
-        <TouchableOpacity style={styles.selectButton} onPress={pickImage}>
-          <Text style={styles.buttonText}>
-            Proof of Payment(G-CASH RECEIPT)
-          </Text>
-        </TouchableOpacity>
+        <View style={styles.selectButton}>
+          <Text style={styles.buttonText}>Proof of Payment(G-CASH RECEIPT)</Text>
+          <TouchableOpacity onPress={pickImage}>
+            {payment.length > 0 ? (
+              <Animatable.View
+                style={{
+                  ...styles.plusCircle,
+                  opacity: fadeAnimation,
+                }}
+              >
+                <Ionicons name="ios-add" size={24} color="white" />
+              </Animatable.View>
+            ) : (
+              <View style={styles.plusCircle}>
+                <Ionicons name="ios-add" size={24} color="white" />
+              </View>
+            )}
+            {payment.length > 0 && (
+              <View style={styles.checkCircle}>
+                <Ionicons name="ios-checkmark" size={24} color="white" />
+              </View>
+            )}
 
-        <View style={styles.imageContainer}> 
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.imageContainer}>
           {image && (
             <Image
               source={{ uri: image }}
@@ -596,13 +654,17 @@ const uploadMedia = async () => {
             style={styles.button}
             onPress={() => {
               uploadMedia();
-              storeFormData();
             }}
           >
-            <Text style={styles.buttonText}>Submit</Text>
+            <Text style={styles.submitText}>Submit</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
+      {uploading && (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#307A59" />
+        </View>
+      )}
     </View>
   );
 }
@@ -806,28 +868,66 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: "#307A59",
+    justifyContent: "center",
     alignItems: "center",
+    alignContent: "center",
     borderRadius: 50,
     paddingVertical: 10,
-    marginTop: 10,
+    marginTop: 20,
     width: 165,
-    marginLeft: 15,
     marginBottom: 40,
   },
   selectButton: {
     borderRadius: 10,
+    flexDirection: "row", // Align items horizontally
+    justifyContent: "space-between", // Space between children
+    alignItems: "center", // Center vertically
     width: "100%",
     height: 50,
-    backgroundColor: "#307A59",
-    alignItems: "center",
-    justifyContent: "center",
+    backgroundColor: "transparent",
+    borderColor: "#000",
+    borderWidth: 1,
     marginTop: 10,
+    flexDirection: "row",
+    marginVertical: 10,
+    padding: 10,
   },
+
   buttonText: {
+    flex: 1, // Take up available space
+    color: "#000",
+    fontSize: 14,
+    fontWeight: "light",
+    textAlign: "left",
+  },
+
+  submitText: {
     color: "#fff",
     fontSize: 15,
     fontWeight: "bold",
   },
+
+  plusCircle: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: "#307A59",
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 10, // Adjust margin as needed
+  },
+
+  checkCircle: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: "#3498db", // Check sign color
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 10, // Adjust margin as needed
+    marginBottom: 30,
+  },
+
   imageContainer: {
     marginTop: 30,
     marginBottom: 50,
@@ -857,5 +957,21 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "400",
     marginVertical: 8,
+  },
+  loadingModal: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  loadingModalText: {
+    marginTop: 10,
+    color: "#fff",
+  },
+  loadingContainer: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
 });

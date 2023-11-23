@@ -1,33 +1,44 @@
 import React, { useState, useEffect } from "react";
-import { Pressable, FlatList, View, TextInput, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Dimensions, Platform, SafeAreaView, Button, Alert } from "react-native";
+import { Pressable, Modal, FlatList, View, TextInput, Text, StyleSheet, Image, TouchableOpacity, ActivityIndicator, ScrollView, Dimensions, Platform, SafeAreaView, Button, Alert } from "react-native";
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
+import { StatusBar } from "expo-status-bar";
 import * as ImagePicker from "expo-image-picker";
 import { firebase } from '../config';
 import * as FileSystem from 'expo-file-system';
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { dismissAuthSession } from "expo-web-browser";
 
 export default function BirthReg() {
     const [image, setImage] = useState(null);
     const [uploading, setUploading] = useState(false);
     const timestamp = firebase.firestore.FieldValue.serverTimestamp();
+    const [selectedDateText, setSelectedDateText] = useState("");
+    const [loadingModalVisible, setLoadingModalVisible] = useState(false);
 
     const pickImage = async () => {
-        let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.All, //All, Image, Videos
-            allowsEditing: false,
-            aspect: [4, 3],
-            quality: 1,
-        });
+        try {
+            let result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.All,
+                allowsEditing: false,
+                aspect: [4, 3],
+                quality: 1,
+            });
 
-        if (!result.canceled) {
-            setImage(result.assets[0].uri);
+            if (!result.canceled) {
+                setImage(result.assets[0].uri);
+            }
+        } catch (error) {
+            Alert.alert(
+                "Error",
+                "There was an error picking images. Please try again.",
+                [{ text: "OK", onPress: () => console.log("OK Pressed") }],
+                { cancelable: false }
+            );
         }
     };
 
-    // upload media files
     const uploadMedia = async () => {
+        setLoadingModalVisible(true);
         setUploading(true);
 
         try {
@@ -48,13 +59,9 @@ export default function BirthReg() {
             const filename = image.substring(image.lastIndexOf("/") + 1);
             const ref = firebase.storage().ref().child(filename);
 
-            // Upload the image to Firebase Storage
             const snapshot = await ref.put(blob);
-
-            // Get the download URL of the uploaded image
             const downloadURL = await snapshot.ref.getDownloadURL();
 
-            // Store the download URL in Firestore
             const MuniServe = firebase.firestore();
             const deathCert = MuniServe.collection("deathCert");
 
@@ -62,23 +69,25 @@ export default function BirthReg() {
                 name: name,
                 date: date,
                 place: place,
-                marriage: marriage,
                 rname: rname,
                 address: address,
                 copies: copies,
                 purpose: purpose,
-                payment: downloadURL, // Store the download URL here
-                status: "Pending", // Set the initial status to "Pending"
+                payment: downloadURL,
+                status: "Pending",
                 createdAt: timestamp,
             });
 
             setUploading(false);
             setImage(null);
+            resetForm();
             Alert.alert("Success", "Form filled successfully.");
         } catch (error) {
             console.error(error);
             setUploading(false);
             Alert.alert("Error", "Form filling failed.");
+        } finally {
+            setLoadingModalVisible(false);
         }
     };
 
@@ -86,7 +95,6 @@ export default function BirthReg() {
     const [name, setName] = useState("");
     const [date, setDate] = useState(new Date());
     const [place, setPlace] = useState("");
-    const [marriage, setMarriage] = useState("");
     const [rname, setRname] = useState("");
     const [address, setAddress] = useState("");
     const [copies, setCopies] = useState("");
@@ -95,13 +103,16 @@ export default function BirthReg() {
 
     const resetForm = () => {
         setName("");
-        setDate("");
+        setDate(new Date());
         setPlace("");
-        setMarriage("");
         setRname("");
         setAddress("");
         setCopies("");
         setPurpose("");
+        setPayment("");
+
+        // Reset date related states
+        setSelectedDateText("");
     };
 
     const [serve, setServe] = useState([]);
@@ -138,10 +149,19 @@ export default function BirthReg() {
         const currentDate = selectedDate || date;
         setShowDatePicker(Platform.OS === 'ios'); // Close the date picker on iOS
         setDate(currentDate); // Update the state with the selected date
+        setSelectedDateText(formatDate(currentDate)); // Format and set the selected date text
+    };
+
+    const formatDate = (date) => {
+        // Format the date as needed (you can customize this based on your requirements)
+        const formattedDate = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+        return formattedDate;
     };
 
     return (
-        <View style={styles.container}>
+            <SafeAreaView style={styles.container}>
+                <StatusBar backgroundColor="#93C49E" />
+
             <View style={styles.header}>
                 <View style={styles.titleContainer}>
                     <Image
@@ -158,12 +178,7 @@ export default function BirthReg() {
                 </TouchableOpacity>
             </View>
 
-            <ScrollView style={{ flex: 1 }}>
-                <FlatList
-                    data={serve}
-                    numColumns={1}
-                    renderItem={({ item }) => (
-                        <Pressable>
+            <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
                             <View style={styles.boxes1}>
                                 <View style={styles.boxAcc}>
                                     <Image
@@ -171,18 +186,16 @@ export default function BirthReg() {
                                         style={styles.boxIcon}
                                     />
                                     <Text style={styles.itemService_name}>
-                                        {item.service_name}
+                                        Death Certificate
                                     </Text>
                                 </View>
                             </View>
                             <View style={styles.innerContainer}>
                                 <Text style={styles.itemService_desc}>
-                                    {item.service_desc}
+                                    A Death Certificate is an official document setting forth particulars relating to a dead person, including the name of the individual, the date of birth and the date of death.  When requesting for death certificate, the interested party shall provide the following information to facilitate verification and issuance of certification.
                                 </Text>
                             </View>
-                        </Pressable>
-                    )}
-                />
+                       
 
                 <Text style={styles.noteText}>
                     Please be ready to supply the following information. Fill the form below:</Text>
@@ -213,6 +226,7 @@ export default function BirthReg() {
                         onPress={() => setShowDatePicker(true)}
                         style={styles.placeholder}
                     >
+                        <Text>{selectedDateText}</Text>
                     </TouchableOpacity>
 
                     {showDatePicker && (
@@ -223,7 +237,6 @@ export default function BirthReg() {
                             onChange={onDateChange}
                         />
                     )}
-
                 </View>
 
                 <View style={{ marginBottom: 10 }}>
@@ -237,24 +250,6 @@ export default function BirthReg() {
                             maxLength={50}
                             value={place}
                             onChangeText={(place) => setPlace(place)}
-                            style={{
-                                width: "100%",
-                            }}
-                        ></TextInput>
-                    </View>
-                </View>
-
-                <View style={{ marginBottom: 10 }}>
-                    <Text style={styles.label}>
-                        Place of marriage
-                    </Text>
-
-                    <View style={styles.placeholder}>
-                        <TextInput
-                            placeholder=""
-                            maxLength={50}
-                            value={marriage}
-                            onChangeText={(marriage) => setMarriage(marriage)}
                             style={{
                                 width: "100%",
                             }}
@@ -332,18 +327,38 @@ export default function BirthReg() {
                             onChangeText={(purpose) => setPurpose(purpose)}
                             maxLength={300}
                             style={{
-                                width: "100%",
+                                width: "100%", textAlignVertical: "top",
                             }}
                         ></TextInput>
                     </View>
                 </View>
 
                 <Text style={styles.noteText}>Note: Upload first your proof of payment before submitting your application. Lack of needed information will cause delay or rejection.</Text>
-                <TouchableOpacity style={styles.selectButton} onPress={pickImage}>
-                    <Text style={styles.buttonText}>
-                        Proof of Payment(G-CASH RECEIPT)
-                    </Text>
-                </TouchableOpacity>
+                <View style={styles.selectButton}>
+                    <Text style={styles.buttonText}>Proof of Payment(G-CASH RECEIPT)</Text>
+                    <TouchableOpacity onPress={pickImage}>
+                        {payment.length > 0 ? (
+                            <Animatable.View
+                                style={{
+                                    ...styles.plusCircle,
+                                    opacity: fadeAnimation,
+                                }}
+                            >
+                                <Ionicons name="ios-add" size={24} color="white" />
+                            </Animatable.View>
+                        ) : (
+                            <View style={styles.plusCircle}>
+                                <Ionicons name="ios-add" size={24} color="white" />
+                            </View>
+                        )}
+                        {payment.length > 0 && (
+                            <View style={styles.checkCircle}>
+                                <Ionicons name="ios-checkmark" size={24} color="white" />
+                            </View>
+                        )}
+
+                    </TouchableOpacity>
+                </View>
 
                 <View style={styles.imageContainer}>
                     {image && (
@@ -356,14 +371,18 @@ export default function BirthReg() {
                         style={styles.button}
                         onPress={() => {
                             uploadMedia();
-                            storeFormData();
                         }}
                     >
-                        <Text style={styles.buttonText}>Submit</Text>
+                        <Text style={styles.submitText}>Submit</Text>
                     </TouchableOpacity>
                 </View>
             </ScrollView>
-        </View>
+            {uploading && (
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color="#307A59" />
+                </View>
+            )}
+        </SafeAreaView>
     );
 }
 
@@ -576,14 +595,46 @@ const styles = StyleSheet.create({
     },
     selectButton: {
         borderRadius: 10,
+        flexDirection: "row", // Align items horizontally
+        justifyContent: "space-between", // Space between children
+        alignItems: "center", // Center vertically
         width: "100%",
         height: 50,
-        backgroundColor: "#307A59",
-        alignItems: "center",
-        justifyContent: "center",
+        backgroundColor: "transparent",
+        borderColor: "#000",
+        borderWidth: 1,
         marginTop: 10,
+        flexDirection: "row",
+        marginVertical: 10,
+        padding: 10,
     },
     buttonText: {
+        flex: 1, // Take up available space
+        color: "#000",
+        fontSize: 14,
+        fontWeight: "light",
+        textAlign: "left",
+    },
+    plusCircle: {
+        width: 30,
+        height: 30,
+        borderRadius: 15,
+        backgroundColor: "#307A59",
+        justifyContent: "center",
+        alignItems: "center",
+        marginRight: 10, // Adjust margin as needed
+    },
+    checkCircle: {
+        width: 30,
+        height: 30,
+        borderRadius: 15,
+        backgroundColor: "#3498db", // Check sign color
+        justifyContent: "center",
+        alignItems: "center",
+        marginRight: 10, // Adjust margin as needed
+        marginBottom: 30,
+    },
+    submitText: {
         color: "#fff",
         fontSize: 15,
         fontWeight: "bold",
@@ -599,7 +650,7 @@ const styles = StyleSheet.create({
         borderColor: "black",
         borderRadius: 8,
         borderWidth: 1,
-        alignItems: "center",
+        alignItems: "justify",
         justifyContent: "center",
         paddingLeft: 10,
     },
@@ -632,5 +683,11 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         alignItems: 'center',
         justifyContent: 'center',
+    },
+    loadingContainer: {
+        ...StyleSheet.absoluteFillObject,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "rgba(0, 0, 0, 0.5)",
     },
 });

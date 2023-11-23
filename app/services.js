@@ -15,12 +15,11 @@ export default function Service() {
   const router = useRouter();
 
   const servicesData = [
-    { id: 1, name: "Birth Registration" },
+    { id: 1, name: "Registration of Live Birth" },
     { id: 2, name: "Business Permit" },
     { id: 3, name: "Death Certificate" },
     { id: 4, name: "Job Application" },
     { id: 5, name: "Marriage Certificate" },
-    { id: 6, name: "Philippine Statistics Authority" },
   ];
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -168,13 +167,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#F1F1F1",
     borderRadius: 15,
-    marginTop: 10,
+    marginTop: 5,
     textAlign: "center"
   },
   box: {
     marginLeft: 20,
     color: "black",
-    fontSize: 17,
+    fontSize: 15,
     marginTop: 18,
   },
   boxAcc: {
