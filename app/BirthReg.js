@@ -181,11 +181,12 @@ export default function BirthReg() {
   const [showDatePicker, setShowDatePicker] = useState(false);
 
   const onDateChange = (event, selectedDate) => {
-    const currentDate = selectedDate || date;
-    setShowDatePicker(Platform.OS === 'ios'); // Close the date picker on iOS
-    setDate(currentDate); // Update the state with the selected date
-    setSelectedDateText(formatDate(currentDate)); // Format and set the selected date text
-  };
+  const currentDate = selectedDate || birthdate;
+  setShowDatePicker(Platform.OS === 'ios'); // Close the date picker on iOS
+  setBirthdate(currentDate); // Update the state with the selected date
+  setSelectedDateText(formatDate(currentDate)); // Format and set the selected date text
+};
+
 
   const formatDate = (date) => {
     // Format the date as needed (you can customize this based on your requirements)
@@ -262,7 +263,7 @@ export default function BirthReg() {
             onPress={() => setShowDatePicker(true)}
             style={styles.placeholder}
           >
-            <Text>{selectedDateText}</Text>
+            <Text style={styles.label}>{selectedDateText}</Text>
           </TouchableOpacity>
 
           {showDatePicker && (
@@ -423,10 +424,14 @@ export default function BirthReg() {
                 style={{ width: "100%" }}
               >
                 <Picker.Item label="Select" value="" />
-                <Picker.Item label="Christianity" value="Christianity" />
-                <Picker.Item label="Islam" value="Islam" />
+                <Picker.Item label="Born Again Christian" value="Born Again Christian" />
+                <Picker.Item label="Buddhism" value="Buddhism" />
                 <Picker.Item label="Hinduism" value="Hinduism" />
-                {/* Add more religion options as needed */}
+                <Picker.Item label="Iglesia ni Cristo" value="Iglesia ni Cristo" />
+                <Picker.Item label="Islam" value="Islam" />
+                <Picker.Item label="Jehovah Witness" value="Jehovah Witness" />
+                <Picker.Item label="Roman Catholic" value="Roman Catholic" />
+                <Picker.Item label="Seventh-day Adventist" value="Seventh-day Adventist" />
               </Picker>
             </View>
           </View>
@@ -534,10 +539,14 @@ export default function BirthReg() {
                 style={{ width: "100%" }}
               >
                 <Picker.Item label="Select" value="" />
-                <Picker.Item label="Christianity" value="Christianity" />
-                <Picker.Item label="Islam" value="Islam" />
+                <Picker.Item label="Born Again Christian" value="Born Again Christian" />
+                <Picker.Item label="Buddhism" value="Buddhism" />
                 <Picker.Item label="Hinduism" value="Hinduism" />
-                {/* Add more religion options as needed */}
+                <Picker.Item label="Iglesia ni Cristo" value="Iglesia ni Cristo" />
+                <Picker.Item label="Islam" value="Islam" />
+                <Picker.Item label="Jehovah Witness" value="Jehovah Witness" />
+                <Picker.Item label="Roman Catholic" value="Roman Catholic" />
+                <Picker.Item label="Seventh-day Adventist" value="Seventh-day Adventist" />
               </Picker>
             </View>
           </View>
@@ -957,6 +966,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "400",
     marginVertical: 8,
+    textAlign: "justify",
   },
   loadingModal: {
     flex: 1,

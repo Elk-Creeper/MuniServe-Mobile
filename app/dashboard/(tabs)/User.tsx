@@ -2,9 +2,15 @@ import React from "react";
 import { View, Text, StyleSheet, Image, TouchableOpacity, TextInput, ScrollView } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons"; // Import the Ionicons library for the bell icon
+import { Link, useRouter } from "expo-router";
+import { useEffect, useRef, useState } from "react";
+import { useNavigation } from "@react-navigation/native";
 
 
 export default function tab4() {
+  const router = useRouter();
+  const navigation = useNavigation();
+
   return (
     <View style={styles.container}>
       <StatusBar
@@ -41,7 +47,11 @@ export default function tab4() {
         </View>
 
         <View style={styles.boxes1}>
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              router.replace("/faqs");
+            }}
+          >
             <View style={styles.boxAcc}>
               <Image
                 source={require("../../../assets/icons/Help.png")}
@@ -52,7 +62,11 @@ export default function tab4() {
           </TouchableOpacity>
         </View>
         <View style={styles.boxes2}>
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              router.replace("/about");
+            }}
+          >
             <View style={styles.boxAcc}>
               <Image
                 source={require("../../../assets/icons/Info.png")}
@@ -63,7 +77,11 @@ export default function tab4() {
           </TouchableOpacity>
         </View>
         <View style={styles.boxes3}>
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              router.replace("/contact");
+            }}
+          >
             <View style={styles.boxAcc}>
               <Image
                 source={require("../../../assets/icons/contact.png")}

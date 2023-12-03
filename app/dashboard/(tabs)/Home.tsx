@@ -38,7 +38,11 @@ export default function tab1() {
             <Text style={styles.greenText}>SERVE</Text>
           </Text>
         </View>
-        <TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            router.replace("/notif");
+          }}
+        >
           <Ionicons name="notifications-outline" size={24} color="black" />
         </TouchableOpacity>
       </View>
