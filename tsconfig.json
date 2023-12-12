@@ -1,12 +1,17 @@
 {
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
-    "strict": true,
+    "strict": true
   },
   "include": [
     "**/*.ts",
     "**/*.tsx",
     ".expo/types/**/*.ts",
-    "expo-env.d.ts"
-, "app/login.js", "app/BirthReg.js", "app/dashboard/(tabs)/Appointment.js", "app/dashboard/(tabs)/Transaction.jsp/noapp/dashboard/(tabs)/Transaction.jsf.jsapp/dashboard/(tabs)/Transaction.js "apapp/dashboard/(tabs)/Transaction.js/Appointment.js", "app/services.js", "app/services.js"  ]
+    "expo-env.d.ts",
+    "app/login.js",
+    "app/BirthReg.js",
+    "app/dashboard/(tabs)/Appointment.js",
+    "app/dashboard/(tabs)/Transaction.js",
+    "app/services.js"
+, "app/dashboard/(tabs)/News.js", "app/dashboard/(tabs)/News.tsx"  ]
 }

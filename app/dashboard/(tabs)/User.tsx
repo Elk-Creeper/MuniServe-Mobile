@@ -92,7 +92,11 @@ export default function tab4() {
           </TouchableOpacity>
         </View>
         <View style={styles.boxes4}>
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              router.replace("/settings");
+            }}
+          >
             <View style={styles.boxAcc}>
               <Image
                 source={require("../../../assets/icons/Settings.png")}

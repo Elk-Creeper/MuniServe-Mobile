@@ -11,8 +11,9 @@ import {
 import React, { useState, useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, addDoc } from "firebase/firestore";
+import { getFirestore, collection, addDoc } from"firebase/firestore";
 import { firebase } from '../config';
+
 
 const Contact = () => {
     const [c_sub, setAddSubject] = useState("");

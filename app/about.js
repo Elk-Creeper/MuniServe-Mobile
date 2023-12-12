@@ -5,7 +5,7 @@ import { StatusBar } from "expo-status-bar";
 
 const About = () => {
     const [about, setAbout] = useState([]);
-    const MuniServe = firebase.firestore().collection("about");
+    const MuniServe =firebase.firestore().collection("about");
 
     useEffect(() => {
         const fetchData = async () => {
@@ -39,8 +39,6 @@ const About = () => {
             <View style={styles.header}>
                 <Text style={styles.aboutText}>About MuniServe</Text>
             </View>
-
-            <Text style={styles.text}>About MuniServe</Text>
 
             <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
                 <FlatList

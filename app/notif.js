@@ -266,7 +266,7 @@ export default function Tab4() {
                                     <View style={styles.container3}>
                                         <View style={styles.container4}>
                                             <Image
-                                                source={require("../assets/imported/Del_kGallego_Camarines_Sur.png")}
+                                                source={require("../assets/imported/Del_Gallego_Camarines_Sur.png")}
                                                 style={styles.boxIcon}
                                             />
                                             <Text style={styles.appText}>Transaction</Text>

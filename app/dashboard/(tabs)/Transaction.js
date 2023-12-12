@@ -158,6 +158,7 @@ export default function Tab4() {
   }, []);
 
   return (
+
     <View style={styles.container}>
       <StatusBar
         backgroundColor="#93C49E" // Change the background color as needed
@@ -177,7 +178,7 @@ export default function Tab4() {
           <Ionicons name="notifications-outline" size={24} color="black" />
         </TouchableOpacity>
       </View>
-
+      
       {/* Navigation Buttons */}
       <View style={styles.navigationButtons}>
         <TouchableOpacity
@@ -207,7 +208,7 @@ export default function Tab4() {
         </TouchableOpacity>
       </View>
       
-      {/* Conditionally Render Content */}
+      <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
       {showAppointments && (
         <View>
           {appointmentData.length === 0 ? (
@@ -289,6 +290,7 @@ export default function Tab4() {
           )}
         </View>
       )}
+      </ScrollView>
     </View>
   );
 }

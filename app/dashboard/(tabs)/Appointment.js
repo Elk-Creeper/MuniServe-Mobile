@@ -107,13 +107,19 @@ export default function tab1() {
 
     setShowTimePicker(true);
     setShowDatePicker(false);
-    setSelectedTime(selectedTime || minTime); // Set default value to minimum time
 
     // Set the minimum and maximum time for the time picker
     setShowTimePickerOptions({
       minTime: minTime,
       maxTime: maxTime,
     });
+
+    // If the current selected time is 12, change it to the minimum time
+    if (selectedTime && selectedTime.getHours() === 12) {
+      setSelectedTime(minTime);
+    } else {
+      setSelectedTime(selectedTime || minTime); // Set default value to minimum time
+    }
   };
 
   // Handle date change
@@ -145,13 +151,13 @@ export default function tab1() {
     if (selectedTime) {
       const { minTime, maxTime } = showTimePickerOptions;
 
-      if (selectedTime >= minTime && selectedTime <= maxTime) {
+      if (selectedTime >= minTime && selectedTime <= maxTime && selectedTime.getHours() !== 12) {
         setSelectedTime(selectedTime);
       } else {
         // Alert the user about the invalid time selection
         Alert.alert(
           "Invalid Time",
-          "We're not available to setup an appointment by this time.Please select a time between 8am and 4pm. Thank you!",
+          "We're not available to set up an appointment at 12:00 PM. Please select a different time between 8 AM and 4 PM. Thank you!",
           [{ text: "OK", onPress: () => console.log("OK Pressed") }],
           { cancelable: false }
         );
@@ -203,7 +209,6 @@ export default function tab1() {
       Alert.alert("Error", "Appointment booking failed.");
     }
   };
-
 
   return (
     <View style={styles.container}>

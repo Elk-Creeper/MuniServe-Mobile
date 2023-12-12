@@ -1,13 +1,30 @@
 import React, { useState, useEffect } from "react";
-import { Pressable, Modal, FlatList, View, TextInput, Text, StyleSheet, Image, TouchableOpacity, ActivityIndicator, ScrollView, Dimensions, Platform, SafeAreaView, Button, Alert } from "react-native";
+import {
+  Pressable,
+  Modal,
+  FlatList,
+  View,
+  TextInput,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  ActivityIndicator,
+  ScrollView,
+  Dimensions,
+  Platform,
+  SafeAreaView,
+  Button,
+  Alert,
+} from "react-native";
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
+import { TextInputMask } from 'react-native-masked-text';
 import { Picker } from "@react-native-picker/picker";
 import { StatusBar } from "expo-status-bar";
 import * as ImagePicker from "expo-image-picker";
-import { firebase } from '../config';
-import * as FileSystem from 'expo-file-system';
+import { firebase } from "../config";
+import * as FileSystem from "expo-file-system";
 import DateTimePicker from "@react-native-community/datetimepicker";
-
 
 export default function BirthReg() {
   const [image, setImage] = useState(null);
@@ -15,6 +32,16 @@ export default function BirthReg() {
   const timestamp = firebase.firestore.FieldValue.serverTimestamp();
   const [loadingModalVisible, setLoadingModalVisible] = useState(false);
   const [selectedDateText, setSelectedDateText] = useState("");
+  const [childnames, setChildnames] = useState('');
+
+  const handleChildnameChange = (input) => {
+    // Use regex to allow only alphabetical characters
+    const regex = /^[a-zA-Z]*$/;
+    if (regex.test(input) || input === '') {
+      // Only update the state if the input is valid or empty
+      setChildnames(input);
+    }
+  };
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -69,6 +96,7 @@ export default function BirthReg() {
         c_birthplace: birthplace,
         c_sex: sex,
         c_typeofbirth: typeofbirth,
+        c_multiple: multiple,
         c_weight: weight,
         childname: childname,
         f_age: f_age,
@@ -109,6 +137,7 @@ export default function BirthReg() {
   const [birthplace, setBirthplace] = useState("");
   const [sex, setSex] = useState("");
   const [typeofbirth, setTypeofbirth] = useState("");
+  const [multiple, setMultiple] = useState("");
   const [weight, setWeight] = useState("");
   const [childname, setChildname] = useState("");
   const [f_age, setF_age] = useState("");
@@ -132,6 +161,7 @@ export default function BirthReg() {
     setBirthplace("");
     setSex("");
     setTypeofbirth("");
+    setMultiple("");
     setWeight("");
     setChildname("");
     setF_age("");
@@ -179,18 +209,22 @@ export default function BirthReg() {
   }, []);
 
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [maxDate, setMaxDate] = useState(new Date());
 
   const onDateChange = (event, selectedDate) => {
-  const currentDate = selectedDate || birthdate;
-  setShowDatePicker(Platform.OS === 'ios'); // Close the date picker on iOS
-  setBirthdate(currentDate); // Update the state with the selected date
-  setSelectedDateText(formatDate(currentDate)); // Format and set the selected date text
-};
+    const currentDate = selectedDate || birthdate;
 
+    setMaxDate(new Date());
+
+    setShowDatePicker(Platform.OS === 'ios');
+    setBirthdate(currentDate);
+    setSelectedDateText(formatDate(currentDate));
+  };
 
   const formatDate = (date) => {
     // Format the date as needed (you can customize this based on your requirements)
-    const formattedDate = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+    const formattedDate = `${date.getDate()}/${date.getMonth() + 1
+      }/${date.getFullYear()}`;
     return formattedDate;
   };
 
@@ -214,45 +248,50 @@ export default function BirthReg() {
       </View>
 
       <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
-
         <View style={styles.boxes1}>
           <View style={styles.boxAcc}>
             <Image
               source={require("../assets/imported/Del_Gallego_Camarines_Sur.png")}
               style={styles.boxIcon}
             />
-            <Text style={styles.itemService_name}>
-              Birth Registration
-            </Text>
+            <Text style={styles.itemService_name}>Birth Registration</Text>
           </View>
         </View>
         <View style={styles.innerContainer}>
           <Text style={styles.itemService_desc}>
-            Registration of live birth or birth certificate is a very important document needed by every citizen. This is usually a requirement for school, employment, marriage, passport and many other things. Its authenticity can only be verified through the civil registrar. They issue a certified true copy of this document, if your birth is indeed registered in this Municipality. The fee is 30 pesos per application and is processed and issued within the same day upon payment of the fee.
+            Registration of live birth or birth certificate is a very important
+            document needed by every citizen. This is usually a requirement for
+            school, employment, marriage, passport and many other things. Its
+            authenticity can only be verified through the civil registrar. They
+            issue a certified true copy of this document, if your birth is
+            indeed registered in this Municipality. The fee is 30 pesos per
+            application and is processed and issued within the same day upon
+            payment of the fee.
           </Text>
         </View>
 
         <Text style={styles.noteText}>
-          Please be ready to supply the following information. Fill the form below:</Text>
+          Please be ready to supply the following information. Fill the form
+          below:
+        </Text>
+
         <Text style={styles.noteText}>Child's Information</Text>
+        
         <View style={{ marginBottom: 10 }}>
-          <Text style={styles.label}>
-            Name of newborn child
-          </Text>
+          <Text style={styles.label}>Name of newborn child</Text>
 
           <View style={styles.placeholder}>
             <TextInput
               placeholder=""
-              maxLength={50}
+              maxLength={100}
               value={childname}
-              onChangeText={(childname) => setChildname(childname)}
+              onChangeText={handleChildnameChange}
               style={{
                 width: "100%",
               }}
             ></TextInput>
           </View>
         </View>
-
 
         <View style={{ marginBottom: 10 }}>
           <Text style={styles.label}>
@@ -263,7 +302,7 @@ export default function BirthReg() {
             onPress={() => setShowDatePicker(true)}
             style={styles.placeholder}
           >
-            <Text style={styles.label}>{selectedDateText}</Text>
+            <Text style={styles.selectedDateText}>{selectedDateText}</Text>
           </TouchableOpacity>
 
           {showDatePicker && (
@@ -272,18 +311,17 @@ export default function BirthReg() {
               mode="date"
               display="default"
               onChange={onDateChange}
+              maximumDate={maxDate}
             />
           )}
         </View>
 
         <View style={{ marginBottom: 10 }}>
-          <Text style={styles.label}>
-            Birth Place
-          </Text>
+          <Text style={styles.label}>Birth Place</Text>
           <View style={styles.placeholder}>
             <TextInput
               placeholder=""
-              maxLength={50}
+              maxLength={200}
               value={birthplace}
               onChangeText={(birthplace) => setBirthplace(birthplace)}
               style={{
@@ -295,9 +333,7 @@ export default function BirthReg() {
 
         <View style={styles.boxContainer}>
           <View style={{ marginBottom: 10 }}>
-            <Text style={styles.label}>
-              Sex
-            </Text>
+            <Text style={styles.label}>Sex</Text>
 
             <View style={styles.placeholder2}>
               <Picker
@@ -311,10 +347,9 @@ export default function BirthReg() {
               </Picker>
             </View>
           </View>
+
           <View style={{ marginBottom: 10 }}>
-            <Text style={styles.label}>
-              Type of birth
-            </Text>
+            <Text style={styles.label}>Type of birth</Text>
 
             <View style={styles.placeholder2}>
               <Picker
@@ -323,25 +358,37 @@ export default function BirthReg() {
                 style={{ width: "100%" }}
               >
                 <Picker.Item label="Select" value="" />
-                <Picker.Item label="Vaginal Birth" value="Vaginal Birth" />
-                <Picker.Item label="Assisted Birth" value="Assisted Birth" />
-                <Picker.Item label="Cesarian Section" value="Cesarian Section" />
-                <Picker.Item label="Caesarean Section" value="Caesarean Section" />
-                <Picker.Item label="Hypnobirthing" value="Hypnobirthing" />
-                <Picker.Item label="Forceps Delivery" value="Forceps Delivery" />
-                <Picker.Item label="VBAC" value="VBAC" />
-                <Picker.Item label="Water Birth" value="Water Birth" />
-                <Picker.Item label="Scheduled Induction" value="Scheduled Induction" />
+                <Picker.Item label="Single" value="Single" />
+                <Picker.Item label="Twins" value="Twins" />
+                <Picker.Item label="Triplets" value="Triplets" />
+                <Picker.Item label="Quadruplets" value="Quadruplets" />
               </Picker>
             </View>
-          </View>
+          </View> 
         </View>
+
+          {typeofbirth !== 'Single' && (
+            <View style={{ marginBottom: 10 }}>
+              <Text style={styles.label}>If multiple birth, child was</Text>
+
+              <View style={styles.placeholder}>
+                <Picker
+                  selectedValue={multiple}
+                  onValueChange={(itemValue, itemIndex) => setMultiple(itemValue)}
+                  style={{ width: "100%" }}
+                >
+                  <Picker.Item label="Select" value="" />
+                  <Picker.Item label="First" value="First" />
+                  <Picker.Item label="Second" value="Second" />
+                  <Picker.Item label="Third" value="Third" />
+                </Picker>
+              </View>
+            </View>
+          )}
 
         <View style={styles.boxContainer}>
           <View style={{ marginBottom: 10 }}>
-            <Text style={styles.label}>
-              Weight
-            </Text>
+            <Text style={styles.label}>Weight at Birth</Text>
 
             <View style={styles.placeholder2}>
               <TextInput
@@ -356,9 +403,7 @@ export default function BirthReg() {
             </View>
           </View>
           <View style={{ marginBottom: 10 }}>
-            <Text style={styles.label}>
-              Birth Order
-            </Text>
+            <Text style={styles.label}>Birth Order</Text>
 
             <View style={styles.placeholder2}>
               <TextInput
@@ -376,9 +421,7 @@ export default function BirthReg() {
 
         <Text style={styles.noteText}>Mother's Information:</Text>
         <View style={{ marginBottom: 10 }}>
-          <Text style={styles.label}>
-            Mother's Maiden Name
-          </Text>
+          <Text style={styles.label}>Mother's Maiden Name</Text>
 
           <View style={styles.placeholder}>
             <TextInput
@@ -394,9 +437,7 @@ export default function BirthReg() {
         </View>
         <View style={styles.boxContainer}>
           <View style={{ marginBottom: 10 }}>
-            <Text style={styles.label}>
-              Citizenship
-            </Text>
+            <Text style={styles.label}>Citizenship</Text>
 
             <View style={styles.placeholder2}>
               <TextInput
@@ -413,33 +454,40 @@ export default function BirthReg() {
             </View>
           </View>
           <View style={{ marginBottom: 10 }}>
-            <Text style={styles.label}>
-              Religion
-            </Text>
+            <Text style={styles.label}>Religion</Text>
 
             <View style={styles.placeholder2}>
               <Picker
                 selectedValue={m_religion}
-                onValueChange={(itemValue, itemIndex) => setM_religion(itemValue)}
+                onValueChange={(itemValue, itemIndex) =>
+                  setM_religion(itemValue)
+                }
                 style={{ width: "100%" }}
               >
                 <Picker.Item label="Select" value="" />
-                <Picker.Item label="Born Again Christian" value="Born Again Christian" />
+                <Picker.Item
+                  label="Born Again Christian"
+                  value="Born Again Christian"
+                />
                 <Picker.Item label="Buddhism" value="Buddhism" />
                 <Picker.Item label="Hinduism" value="Hinduism" />
-                <Picker.Item label="Iglesia ni Cristo" value="Iglesia ni Cristo" />
+                <Picker.Item
+                  label="Iglesia ni Cristo"
+                  value="Iglesia ni Cristo"
+                />
                 <Picker.Item label="Islam" value="Islam" />
                 <Picker.Item label="Jehovah Witness" value="Jehovah Witness" />
                 <Picker.Item label="Roman Catholic" value="Roman Catholic" />
-                <Picker.Item label="Seventh-day Adventist" value="Seventh-day Adventist" />
+                <Picker.Item
+                  label="Seventh-day Adventist"
+                  value="Seventh-day Adventist"
+                />
               </Picker>
             </View>
           </View>
         </View>
         <View style={{ marginBottom: 10 }}>
-          <Text style={styles.label}>
-            Occupation
-          </Text>
+          <Text style={styles.label}>Occupation</Text>
 
           <View style={styles.placeholder}>
             <TextInput
@@ -455,9 +503,7 @@ export default function BirthReg() {
         </View>
         <View style={styles.boxContainer}>
           <View style={{ marginBottom: 10 }}>
-            <Text style={styles.label}>
-              Age at the time of birth
-            </Text>
+            <Text style={styles.label}>Age at the time of birth</Text>
 
             <View style={styles.placeholder2}>
               <TextInput
@@ -472,9 +518,7 @@ export default function BirthReg() {
             </View>
           </View>
           <View style={{ marginBottom: 10 }}>
-            <Text style={styles.label}>
-              Total of children
-            </Text>
+            <Text style={styles.label}>Total of children</Text>
 
             <View style={styles.placeholder2}>
               <TextInput
@@ -491,9 +535,7 @@ export default function BirthReg() {
         </View>
         <Text style={styles.noteText}>Father's Information:</Text>
         <View style={{ marginBottom: 10 }}>
-          <Text style={styles.label}>
-            Father's Name
-          </Text>
+          <Text style={styles.label}>Father's Name</Text>
 
           <View style={styles.placeholder}>
             <TextInput
@@ -509,9 +551,7 @@ export default function BirthReg() {
         </View>
         <View style={styles.boxContainer}>
           <View style={{ marginBottom: 10 }}>
-            <Text style={styles.label}>
-              Citizenship
-            </Text>
+            <Text style={styles.label}>Citizenship</Text>
 
             <View style={styles.placeholder2}>
               <TextInput
@@ -528,33 +568,40 @@ export default function BirthReg() {
             </View>
           </View>
           <View style={{ marginBottom: 10 }}>
-            <Text style={styles.label}>
-              Religion
-            </Text>
+            <Text style={styles.label}>Religion</Text>
 
             <View style={styles.placeholder2}>
               <Picker
                 selectedValue={f_religion}
-                onValueChange={(itemValue, itemIndex) => setF_religion(itemValue)}
+                onValueChange={(itemValue, itemIndex) =>
+                  setF_religion(itemValue)
+                }
                 style={{ width: "100%" }}
               >
                 <Picker.Item label="Select" value="" />
-                <Picker.Item label="Born Again Christian" value="Born Again Christian" />
+                <Picker.Item
+                  label="Born Again Christian"
+                  value="Born Again Christian"
+                />
                 <Picker.Item label="Buddhism" value="Buddhism" />
                 <Picker.Item label="Hinduism" value="Hinduism" />
-                <Picker.Item label="Iglesia ni Cristo" value="Iglesia ni Cristo" />
+                <Picker.Item
+                  label="Iglesia ni Cristo"
+                  value="Iglesia ni Cristo"
+                />
                 <Picker.Item label="Islam" value="Islam" />
                 <Picker.Item label="Jehovah Witness" value="Jehovah Witness" />
                 <Picker.Item label="Roman Catholic" value="Roman Catholic" />
-                <Picker.Item label="Seventh-day Adventist" value="Seventh-day Adventist" />
+                <Picker.Item
+                  label="Seventh-day Adventist"
+                  value="Seventh-day Adventist"
+                />
               </Picker>
             </View>
           </View>
         </View>
         <View style={{ marginBottom: 10 }}>
-          <Text style={styles.label}>
-            Occupation
-          </Text>
+          <Text style={styles.label}>Occupation</Text>
 
           <View style={styles.placeholder}>
             <TextInput
@@ -569,9 +616,7 @@ export default function BirthReg() {
           </View>
         </View>
         <View style={{ marginBottom: 10 }}>
-          <Text style={styles.label}>
-            Age at the time of birth
-          </Text>
+          <Text style={styles.label}>Age at the time of birth</Text>
 
           <View style={styles.placeholder}>
             <TextInput
@@ -589,7 +634,11 @@ export default function BirthReg() {
         <Text style={styles.noteText}>Additional Information:</Text>
         <View style={{ marginBottom: 10 }}>
           <Text style={styles.label}>
-            Place of marriage
+            Date and Place of Marriage of Parents
+          </Text>
+          <Text style={styles.label1}>
+            (If not married, accomplish Affidavit of Acknowledgement/Admission
+            of Paternity.)
           </Text>
 
           <View style={styles.placeholder}>
@@ -608,26 +657,37 @@ export default function BirthReg() {
         </View>
 
         <View style={{ marginBottom: 10 }}>
-          <Text style={styles.label}>
-            Attendant of birth
-          </Text>
+          <Text style={styles.label}>Attendant of birth</Text>
 
-          <View style={styles.placeholder}>
-            <TextInput
-              placeholder=""
-              value={attendant}
-              onChangeText={(attendant) => setAttendant(attendant)}
-              maxLength={50}
-              style={{
-                width: "100%",
-              }}
-            ></TextInput>
+          <View style={{ marginBottom: 10 }}>
+            <Text style={styles.label}>Attendant</Text>
+
+            <View style={styles.placeholder}>
+              <Picker
+                selectedValue={attendant}
+                onValueChange={(itemValue, itemIndex) =>
+                  setAttendant(itemValue)
+                }
+                style={{ width: "100%" }}
+              >
+                <Picker.Item label="Select" value="" />
+                <Picker.Item label="Physician" value="Physician" />
+                <Picker.Item label="Nurse" value="Nurse" />
+                <Picker.Item label="Midwife" value="Midwife" />
+                <Picker.Item label=" Hilot (traditional Midwife)" value=" Hilot (traditional Midwife)" />
+              </Picker>
+            </View>
           </View>
         </View>
 
-        <Text style={styles.noteText}>Note: Upload first your proof of payment before submitting your application. Lack of needed information will cause delay or rejection.</Text>
+        <Text style={styles.noteText}>
+          Note: Upload first your proof of payment before submitting your
+          application. Lack of needed information will cause delay or rejection.
+        </Text>
         <View style={styles.selectButton}>
-          <Text style={styles.buttonText}>Proof of Payment(G-CASH RECEIPT)</Text>
+          <Text style={styles.buttonText}>
+            Proof of Payment(G-CASH RECEIPT)
+          </Text>
           <TouchableOpacity onPress={pickImage}>
             {payment.length > 0 ? (
               <Animatable.View
@@ -648,7 +708,6 @@ export default function BirthReg() {
                 <Ionicons name="ios-checkmark" size={24} color="white" />
               </View>
             )}
-
           </TouchableOpacity>
         </View>
 
@@ -948,9 +1007,10 @@ const styles = StyleSheet.create({
     borderColor: "black",
     borderRadius: 8,
     borderWidth: 1,
-    alignItems: "center",
     justifyContent: "center",
     paddingLeft: 10,
+    display: "grid",
+
   },
   placeholder2: {
     width: 150,
@@ -968,6 +1028,12 @@ const styles = StyleSheet.create({
     marginVertical: 8,
     textAlign: "justify",
   },
+  label1: {
+    fontSize: 13,
+    textAlign: 'justify',
+    marginBottom: 10,
+
+  },
   loadingModal: {
     flex: 1,
     justifyContent: "center",
@@ -983,5 +1049,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  selectedDateText: {
+    fontSize: 15,
+    fontWeight: "400",
+    marginVertical: 8,
+    textAlign: "justify",
+    paddingLeft: 10,
   },
 });

@@ -81,7 +81,7 @@ export default function tab1() {
             <TouchableOpacity
               style={styles.circularIcon}
               onPress={() => {
-                router.replace("/services");
+                router.replace("/projects");
               }}
             >
               <Image
@@ -96,7 +96,7 @@ export default function tab1() {
             <TouchableOpacity
               style={styles.circularIcon}
               onPress={() => {
-                router.replace("/services");
+                router.replace("/projects");
               }}
             >
               <Image
@@ -113,7 +113,7 @@ export default function tab1() {
             <TouchableOpacity
               style={styles.circularIcon}
               onPress={() => {
-                router.replace("/services");
+                router.replace("/council");
               }}
             >
               <Image
@@ -143,7 +143,7 @@ export default function tab1() {
             <TouchableOpacity
               style={styles.circularIcon}
               onPress={() => {
-                router.replace("/services");
+                router.replace("/projects");
               }}
             >
               <Image

@@ -46,10 +46,8 @@ const Faqs = () => {
                 backgroundColor="#93C49E" // Change the background color as needed
             />
             <View style={styles.header}>
-                <Text style={styles.faqText}>FAQs</Text>
+                <Text style={styles.faqText}>Frequently asked questions</Text>
             </View>
-
-            <Text style={styles.text}>Frequently asked questions</Text>
 
             <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
                 <FlatList
