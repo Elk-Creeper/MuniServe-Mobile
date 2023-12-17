@@ -1,13 +1,32 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Pressable, Modal, FlatList, View, TextInput, Text, StyleSheet, Animated, Image, ActivityIndicator, TouchableOpacity, ScrollView, Dimensions, Platform, SafeAreaView, Button, Alert } from "react-native";
+import {
+    Pressable,
+    Modal,
+    FlatList,
+    View,
+    TextInput,
+    Text,
+    StyleSheet,
+    Animated,
+    Image,
+    ActivityIndicator,
+    TouchableOpacity,
+    ScrollView,
+    Dimensions,
+    Platform,
+    SafeAreaView,
+    Button,
+    Alert,
+} from "react-native";
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import { StatusBar } from "expo-status-bar";
 import * as ImagePicker from "expo-image-picker";
-import { firebase } from '../config';
-import * as FileSystem from 'expo-file-system';
+import { firebase } from "../config";
+import * as FileSystem from "expo-file-system";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import * as Animatable from "react-native-animatable";
+import * as MediaLibrary from "expo-media-library";
 
 
 export default function BirthReg() {
@@ -18,6 +37,87 @@ export default function BirthReg() {
     const fadeAnimation = useRef(new Animated.Value(1)).current;
     const [loadingModalVisible, setLoadingModalVisible] = useState(false);
 
+    // for downloading the docx
+    const [mediaData, setMediaData] = useState([]);
+
+    useEffect(() => {
+        async function getMediaData() {
+            const mediaRefs = [firebase.storage().ref("RESUME.docx")];
+
+            const mediaInfo = await Promise.all(
+                mediaRefs.map(async (ref) => {
+                    const url = await ref.getDownloadURL();
+                    const metadata = await ref.getMetadata();
+                    return { url, metadata };
+                })
+            );
+            setMediaData(mediaInfo);
+        }
+
+        getMediaData();
+    }, []);
+
+    async function downloadFile(url, filename, isVideo) {
+        try {
+            const { status } = await MediaLibrary.requestPermissionsAsync();
+            if (status !== "granted") {
+                Alert.alert(
+                    "Permission needed",
+                    "This app needs access to your Media library to download files."
+                );
+                return;
+            }
+
+            const fileUri = FileSystem.cacheDirectory + filename;
+            console.log("Starting download..!");
+            const downloadResumable = FileSystem.createDownloadResumable(
+                url,
+                fileUri,
+                {},
+                false
+            );
+            const { uri } = await downloadResumable.downloadAsync(null, {
+                shouldCache: false,
+            });
+            console.log("Download completed: ", uri);
+
+            if (isVideo) {
+                const { uri: thumbnailUri } = await VideoThumbnails.getThumbnailAsync(
+                    uri,
+                    { time: 1000 }
+                );
+                console.log("Thumbnail created:", thumbnailUri);
+            }
+
+            const asset = await MediaLibrary.createAssetAsync(uri);
+            console.log("asset created:", asset);
+
+            Alert.alert("Download successful", `File saved to: ${fileUri}`);
+        } catch (error) {
+            console.error("Error during download:", error);
+            Alert.alert(
+                "Download failed",
+                "There was an error while downloading the file."
+            );
+        }
+    }
+
+    // docx design
+    const CustomButton = ({ title, onPress }) => (
+        <TouchableOpacity
+            style={{
+                backgroundColor: "#307A59",
+                height: 50,
+                width: '100%',
+                borderRadius: 10,
+                justifyContent: "center",
+                alignItems: "center",
+            }}
+            onPress={onPress}
+        >
+            <Text style={{ color: "white" }}>{title}</Text>
+        </TouchableOpacity>
+    );
 
     useEffect(() => {
         // If an image is selected, start the fade-out animation
@@ -161,14 +261,15 @@ export default function BirthReg() {
 
     const onDateChange = (event, selectedDate) => {
         const currentDate = selectedDate || date;
-        setShowDatePicker(Platform.OS === 'ios'); // Close the date picker on iOS
+        setShowDatePicker(Platform.OS === "ios"); // Close the date picker on iOS
         setDate(currentDate); // Update the state with the selected date
         setSelectedDateText(formatDate(currentDate)); // Format and set the selected date text
     };
 
     const formatDate = (date) => {
         // Format the date as needed (you can customize this based on your requirements)
-        const formattedDate = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+        const formattedDate = `${date.getDate()}/${date.getMonth() + 1
+            }/${date.getFullYear()}`;
         return formattedDate;
     };
 
@@ -198,23 +299,22 @@ export default function BirthReg() {
                             source={require("../assets/imported/Del_Gallego_Camarines_Sur.png")}
                             style={styles.boxIcon}
                         />
-                        <Text style={styles.itemService_name}>
-                            Job Application
-                        </Text>
+                        <Text style={styles.itemService_name}>Job Application</Text>
                     </View>
                 </View>
                 <View style={styles.innerContainer}>
                     <Text style={styles.itemService_desc}>
-                        A Marriage Certificate is a document that shows social union or a legal contract between people that creates kinship. Such a union, often formalized via a wedding ceremony, may also be called matrimony. A general definition of marriage is that it is a social contract between two individuals that unites their lives legally, economically and emotionally.  It is an institution in which interpersonal relationships, usually intimate and sexual, are acknowledged in a variety of ways, depending on the culture or subculture in which it is found. The state of being united to a person of the opposite sex as husband or wife in a legal, consensual, and contractual relationship recognized and sanctioned by and dissolvable only by law.  A marriage certificate is a document containing the important details of marriage, signed by the couple and by all in attendance. Marriage occurs during the meeting for worship after approval is obtained from the meetings of which the two people are members. Approval is based on a statement of good character and clearness from any other engagements. The clerk usually records a copy of the marriage certificate in the meeting's records.
+                        A job application is a form employers use to collection information
+                        about you to see if you are a good fit for the position.
                     </Text>
                 </View>
 
                 <Text style={styles.noteText}>
-                    Please be ready to supply the following information. Fill the form below:</Text>
+                    Please be ready to supply the following information. Fill the form
+                    below:
+                </Text>
                 <View style={{ marginBottom: 10 }}>
-                    <Text style={styles.label}>
-                        Complete name
-                    </Text>
+                    <Text style={styles.label}>Complete name</Text>
 
                     <View style={styles.placeholder}>
                         <TextInput
@@ -230,9 +330,7 @@ export default function BirthReg() {
                 </View>
 
                 <View style={{ marginBottom: 10 }}>
-                    <Text style={styles.label}>
-                        Age
-                    </Text>
+                    <Text style={styles.label}>Age</Text>
 
                     <View style={styles.placeholder}>
                         <TextInput
@@ -247,11 +345,8 @@ export default function BirthReg() {
                     </View>
                 </View>
 
-
                 <View style={{ marginBottom: 10 }}>
-                    <Text style={styles.label}>
-                       Sex
-                    </Text>
+                    <Text style={styles.label}>Sex</Text>
 
                     <View style={styles.placeholder}>
                         <TextInput
@@ -267,9 +362,7 @@ export default function BirthReg() {
                 </View>
 
                 <View style={{ marginBottom: 10 }}>
-                    <Text style={styles.label}>
-                        Address
-                    </Text>
+                    <Text style={styles.label}>Address</Text>
 
                     <View style={styles.placeholder}>
                         <TextInput
@@ -285,18 +378,14 @@ export default function BirthReg() {
                 </View>
 
                 <View style={{ marginBottom: 10 }}>
-                    <Text style={styles.label}>
-                        Phone number
-                    </Text>
+                    <Text style={styles.label}>Phone number</Text>
 
                     <View style={styles.placeholder}>
                         <TextInput
                             placeholder=""
                             maxLength={11}
                             value={phoneNum}
-                            onChangeText={(phoneNum) =>
-                                setPhoneNum(phoneNum)
-                            }
+                            onChangeText={(phoneNum) => setPhoneNum(phoneNum)}
                             style={{
                                 width: "100%",
                             }}
@@ -305,9 +394,7 @@ export default function BirthReg() {
                 </View>
 
                 <View style={{ marginBottom: 10 }}>
-                    <Text style={styles.label}>
-                        Educational Attainment
-                    </Text>
+                    <Text style={styles.label}>Educational Attainment</Text>
 
                     <View style={styles.placeholder}>
                         <TextInput
@@ -322,9 +409,26 @@ export default function BirthReg() {
                     </View>
                 </View>
 
-                <Text style={styles.noteText}>Note: Upload first the needed requirements before submitting your application. Lack of needed information will cause delay or rejection.</Text>
-                
-                
+                <Text style={styles.noteText}>
+                    Note: Upload first the needed requirements before submitting your
+                    application. Lack of needed information will cause delay or rejection.
+                </Text>
+
+                {mediaData.map((media, index) => {
+                    const { url, metadata } = media;
+                    const { name, contentType } = metadata;
+                    const isVideo = contentType.includes("video");
+                    const isImage = contentType.includes("image");
+                    return (
+                        <View key={index} style={styles.imageContainer}>
+                            <CustomButton
+                                title={`${name}`}
+                                onPress={() => downloadFile(url, name, isVideo)}
+                            />
+                        </View>
+                    );
+                })}
+
                 <View style={styles.selectButton}>
                     <Text style={styles.buttonText}>2x2 Pictures</Text>
                     <TouchableOpacity onPress={pickImage}>
@@ -347,7 +451,6 @@ export default function BirthReg() {
                                 <Ionicons name="ios-checkmark" size={24} color="white" />
                             </View>
                         )}
-
                     </TouchableOpacity>
                 </View>
 
@@ -429,7 +532,7 @@ const styles = StyleSheet.create({
         height: 65,
         backgroundColor: "#307A59",
         borderRadius: 15,
-        marginBottom: 30,
+        marginBottom: 15,
         marginTop: 15,
     },
     box: {
@@ -506,6 +609,7 @@ const styles = StyleSheet.create({
         fontSize: 15,
         textAlign: "justify",
         lineHeight: 30,
+        marginBottom: 20,
     },
     itemService_proc: {
         fontWeight: "300",
@@ -579,7 +683,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         borderRadius: 50,
         paddingVertical: 10,
-        marginTop: 10,
+        marginTop: 50,
         width: 165,
         marginLeft: 15,
         marginBottom: 40,
@@ -594,7 +698,6 @@ const styles = StyleSheet.create({
         backgroundColor: "transparent",
         borderColor: "#000",
         borderWidth: 1,
-        marginTop: 10,
         flexDirection: "row",
         marginVertical: 10,
         padding: 10,
@@ -650,12 +753,12 @@ const styles = StyleSheet.create({
         marginVertical: 8,
     },
     datePickerStyle: {
-        width: '100%',
-        borderColor: 'black',
+        width: "100%",
+        borderColor: "black",
         borderRadius: 8,
         borderWidth: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
+        alignItems: "center",
+        justifyContent: "center",
     },
     plusCircle: {
         width: 30,

@@ -18,7 +18,6 @@ import {
   Alert,
 } from "react-native";
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
-import { TextInputMask } from 'react-native-masked-text';
 import { Picker } from "@react-native-picker/picker";
 import { StatusBar } from "expo-status-bar";
 import * as ImagePicker from "expo-image-picker";
@@ -32,16 +31,6 @@ export default function BirthReg() {
   const timestamp = firebase.firestore.FieldValue.serverTimestamp();
   const [loadingModalVisible, setLoadingModalVisible] = useState(false);
   const [selectedDateText, setSelectedDateText] = useState("");
-  const [childnames, setChildnames] = useState('');
-
-  const handleChildnameChange = (input) => {
-    // Use regex to allow only alphabetical characters
-    const regex = /^[a-zA-Z]*$/;
-    if (regex.test(input) || input === '') {
-      // Only update the state if the input is valid or empty
-      setChildnames(input);
-    }
-  };
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -105,6 +94,7 @@ export default function BirthReg() {
         f_occur: f_occur,
         f_placemarried: f_placemarried,
         f_religion: f_religion,
+        f_residence: f_residence,
         m_age: m_age,
         m_citizenship: m_citizenship,
         m_name: m_name,
@@ -145,6 +135,7 @@ export default function BirthReg() {
   const [f_name, setF_name] = useState("");
   const [f_occur, setF_occur] = useState("");
   const [f_placemarried, setF_placemarried] = useState("");
+  const [f_residence, setF_residence] = useState("");
   const [f_religion, setF_religion] = useState("");
   const [m_age, setM_age] = useState("");
   const [m_citizenship, setM_citizenship] = useState("");
@@ -170,6 +161,7 @@ export default function BirthReg() {
     setF_occur("");
     setF_placemarried("");
     setF_religion("");
+    setF_residence("");
     setM_age("");
     setM_citizenship("");
     setM_name("");
@@ -212,14 +204,19 @@ export default function BirthReg() {
   const [maxDate, setMaxDate] = useState(new Date());
 
   const onDateChange = (event, selectedDate) => {
-    const currentDate = selectedDate || birthdate;
+    const currentDate = selectedDate || new birthdate();
 
-    setMaxDate(new Date());
+    // Set maxDate only once when the component mounts
+    if (!maxDate.getTime()) {
+      setMaxDate(new Date());
+    }
 
     setShowDatePicker(Platform.OS === 'ios');
-    setBirthdate(currentDate);
+    setBirthDate(currentDate);
     setSelectedDateText(formatDate(currentDate));
   };
+
+
 
   const formatDate = (date) => {
     // Format the date as needed (you can customize this based on your requirements)
@@ -285,7 +282,7 @@ export default function BirthReg() {
               placeholder=""
               maxLength={100}
               value={childname}
-              onChangeText={handleChildnameChange}
+              onChangeText={(childname) => setChildname(childname)}
               style={{
                 width: "100%",
               }}
@@ -533,6 +530,23 @@ export default function BirthReg() {
             </View>
           </View>
         </View>
+
+        <View style={{ marginBottom: 10 }}>
+          <Text style={styles.label}>Residence</Text>
+
+          <View style={styles.placeholder}>
+            <TextInput
+              placeholder=""
+              maxLength={100}
+              value={f_residence}
+              onChangeText={(f_residence) => setF_residence(f_residence)}
+              style={{
+                width: "100%",
+              }}
+            ></TextInput>
+          </View>
+        </View>
+
         <Text style={styles.noteText}>Father's Information:</Text>
         <View style={{ marginBottom: 10 }}>
           <Text style={styles.label}>Father's Name</Text>

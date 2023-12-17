@@ -46,17 +46,43 @@ export default function tab1() {
   // Define your department and personnel data
   const departments = [
     "Select Department",
-    "Civil Registrar",
-    "Mayor's Office",
-    "HR Office",
+    "Municipal Mayor's Office",
+    "Municipal Vice Mayor's Office",
+    "Sangguniang Bayan Office",
+    "Municipal Accountant's Office",
+    "Municipal Agricultural Office",
+    "Municipal Assessor's Office",
+    "Municipal Civil Registrar Office",
+    "Municipal Budget Office",
+    "Municipal Disaster Risk Reduction and Management Office",
+    "Municipal Engineering Office",
+    "Municipal Environment and Natural Resources Office",
+    "Municipal Health Office",
+    "Municipal Human Resource and Management Office",
+    "Municipal Planning and Development Office",
+    "Municipal Social Welfare and Development Office",
+    "Municipal Treasurer's Office",
   ];
 
   // Initialize personnelByDepartment with default values for all departments
   const personnelByDepartment = {
     "Select Department": ["Select Personnel"],
-    "Civil Registrar": ["Select Personnel", "Cesar Manalo", "Gina Maiwat", "Person 3"],
-    "Mayor's Office": ["Select Personnel","Melanie Abarientos", "Person 5"],
-    "HR Office": ["Select Personnel","Glaiza De Castro", "Joverlyn Barcenas", "Person 8"],
+    "Municipal Mayor's Office": ["Select Personnel", "Hon. Melanie Abarientos-Garcia"],
+    "Municipal Vice Mayor's Office": ["Select Personnel", "Hon. Florencia G. Bargo"],
+    "Sangguniang Bayan Office": ["Select Personnel", "Mr. Allan Ronquillo"],
+    "Municipal Accountant's Office": ["Select Personnel", "Ms. Deta P. Gaspar, CPA"],
+    "Municipal Agricultural Office": ["Select Personnel", "Engr. Alex B. Idanan"],
+    "Municipal Assessor's Office": ["Select Personnel", "Mr. Elberto R. Adulta"],
+    "Municipal Civil Registrar Office": ["Select Personnel", "Mr. Ceasar P. Manalo"],
+    "Municipal Budget Office": ["Select Personnel", "Mrs. Maria Elinar N. Ilagan"],
+    "Municipal Disaster Risk Reduction and Management Office": ["Select Personnel", "Mr. Laurence V. Rojo"],
+    "Municipal Engineering Office": ["Select Personnel", "Engr. Fernando P Lojo Jr."],
+    "Municipal Environment and Natural Resources Office": ["Select Personnel", "Mrs. Gina Maiwat"],
+    "Municipal Health Office": ["Select Personnel", "Dr. Jeffrey James B. Motos"],
+    "Municipal Human Resource and Management Office": ["Select Personnel", "Ms. Ma. Glaiza C. Bermudo"],
+    "Municipal Planning and Development Office": ["Select Personnel", "Eng. Paz C. Caguimbal"],
+    "Municipal Social Welfare and Development Office": ["Select Personnel", "Ms.Ana C. Mangubat, RSW"],
+    "Municipal Treasurer's Office": ["Select Personnel", "Mr. Dante A. Cadag"],
   };
 
   const handleDepartmentChange = (value) => {

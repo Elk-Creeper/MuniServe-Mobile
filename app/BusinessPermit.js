@@ -1,36 +1,160 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, Text, StyleSheet, Image, TouchableOpacity, Modal, Animated,ScrollView,FlatList,Pressable,Alert,TextInput, ActivityIndicator } from "react-native";
+import {
+    View,
+    Text,
+    StyleSheet,
+    Image,
+    TouchableOpacity,
+    Modal,
+    Animated,
+    ScrollView,
+    FlatList,
+    Pressable,
+    Alert,
+    TextInput,
+    ActivityIndicator,
+    Button
+} from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { firebase } from "../config";
 import * as FileSystem from "expo-file-system";
+import * as MediaLibrary from "expo-media-library";
+import * as VideoThumbnails from "expo-video-thumbnails";
+import { Video } from "expo-av";
 
-export default function tab4() {
-    const [selectedBusinessType, setSelectedBusinessType] = useState(null);
-    const [businessName, setBusinessName] = useState("");
-    const [barangayImages, setBarangayImages] = useState([]);
-    const [registrationImages, setRegistrationImages] = useState([]);
-    const [contractImages, setContractImages] = useState([]);
+export default function Tab4() {
+    const [barangayClearance1, setBarangayClearance1] = useState([]);
+    const [appForm1, setAppForm1] = useState([]);
+    const [dti, setDti] = useState([]);
+    const [sec, setSec] = useState([]);
+    const [lessor, setLessor] = useState([]);
+    const [tax, setTax] = useState([]);
+    const [publicLiability, setPublicLiability] = useState([]);
+    const [appForm2, setAppForm2] = useState([]);
+    const [barangayClearance2, setBarangayClearance2] = useState([]);
+    const [xerox, setXerox] = useState([]);
+    const [audited, setAudited] = useState([]);
+    const [publicLiability2, setPublicLiability2] = useState([]);
     const [uploading, setUploading] = useState(false);
     const [loadingModalVisible, setLoadingModalVisible] = useState(false);
 
     const [selectedApplicationType, setSelectedApplicationType] = useState(null);
     const timestamp = firebase.firestore.FieldValue.serverTimestamp();
-    
+
     const fadeAnimation = useRef(new Animated.Value(1)).current;
     const colorAnimation = useRef(new Animated.Value(0)).current;
 
+    // for downloading the docx
+    const [mediaData, setMediaData] = useState([]);
+
+    useEffect(() => {
+        async function getMediaData() {
+            const mediaRefs = [
+                firebase.storage().ref("Business Permit Form.docx"),
+            ];
+
+            const mediaInfo = await Promise.all(
+                mediaRefs.map(async (ref) => {
+                    const url = await ref.getDownloadURL();
+                    const metadata = await ref.getMetadata();
+                    return { url, metadata };
+                })
+            );
+            setMediaData(mediaInfo);
+        }
+
+        getMediaData();
+    }, []);
+
+    async function downloadFile(url, filename, isVideo) {
+        try {
+            const { status } = await MediaLibrary.requestPermissionsAsync();
+            if (status !== "granted") {
+                Alert.alert(
+                    "Permission needed",
+                    "This app needs access to your Media library to download files."
+                );
+                return;
+            }
+
+            const fileUri = FileSystem.cacheDirectory + filename;
+            console.log("Starting download..!");
+            const downloadResumable = FileSystem.createDownloadResumable(
+                url,
+                fileUri,
+                {},
+                false
+            );
+            const { uri } = await downloadResumable.downloadAsync(null, {
+                shouldCache: false,
+            });
+            console.log("Download completed: ", uri);
+
+            if (isVideo) {
+                const { uri: thumbnailUri } = await VideoThumbnails.getThumbnailAsync(
+                    uri,
+                    { time: 1000 }
+                );
+                console.log("Thumbnail created:", thumbnailUri);
+            }
+
+            const asset = await MediaLibrary.createAssetAsync(uri);
+            console.log("asset created:", asset);
+
+            Alert.alert("Download successful", `File saved to: ${fileUri}`);
+        } catch (error) {
+            console.error("Error during download:", error);
+            Alert.alert(
+                "Download failed",
+                "There was an error while downloading the file."
+            );
+        }
+    }
+
+    // docx design 
+    const CustomButton = ({ title, onPress }) => (
+        <TouchableOpacity
+            style={{
+                backgroundColor: "#307A59",
+                height: 50,
+                borderRadius: 10,
+                justifyContent: "center",
+                alignItems: "center",
+                marginBottom: 10,
+                marginTop: 15,
+            }}
+            onPress={onPress}
+        >
+            <Text style={{ color: "white" }}>{title}</Text>
+        </TouchableOpacity>
+    );
+
+
     useEffect(() => {
         // If an image is selected, start the fade-out animation
-        if (barangayImages.length > 0 && registrationImages.length > 0 && contractImages.length > 0) {
+        if (
+            appForm1.length > 0 &&
+            barangayClearance1.length > 0 &&
+            dti.length > 0 &&
+            sec.length > 0 &&
+            lessor.length > 0 &&
+            tax.length > 0 &&
+            publicLiability.length > 0 &&
+            appForm2.length > 0 &&
+            barangayClearance2.length > 0 &&
+            xerox.length > 0 &&
+            audited > 0 &&
+            publicLiability2.length > 0
+        ) {
             Animated.timing(fadeAnimation, {
                 toValue: 0,
                 duration: 500,
                 useNativeDriver: true,
             }).start();
         }
-    }, [barangayImages, registrationImages, contractImages, fadeAnimation]);
+    }, [appForm1, barangayClearance1, dti, sec, lessor, tax, publicLiability, appForm2, barangayClearance2, xerox, audited, publicLiability2, fadeAnimation]);
 
     const pickImage = async (category) => {
         try {
@@ -44,13 +168,54 @@ export default function tab4() {
 
             if (!result.canceled) {
                 // Add selected images to the respective arrays based on category
-                if (category === "barangay") {
-                    setBarangayImages([...barangayImages, ...result.assets.map((asset) => asset.uri)]);
-                } else if (category === "registration") {
-                    setRegistrationImages([...registrationImages, ...result.assets.map((asset) => asset.uri)]);
-                }
-                else if (category === "contract") {
-                    setContractImages([...contractImages, ...result.assets.map((asset) => asset.uri)]);
+                if (category === "app form 1") {
+                    setAppForm1([
+                        ...appForm1,
+                        ...result.assets.map((asset) => asset.uri),
+                    ]);
+                } else if (category === "barangay clearance 1") {
+                    setBarangayClearance1([
+                        ...barangayClearance1,
+                        ...result.assets.map((asset) => asset.uri),
+                    ]);
+                } else if (category === "dti") {
+                    setDti([...dti, ...result.assets.map((asset) => asset.uri)]);
+                } else if (category === "sec") {
+                    setSec([...sec, ...result.assets.map((asset) => asset.uri)]);
+                } else if (category === "lessor") {
+                    setLessor([...lessor, ...result.assets.map((asset) => asset.uri)]);
+                } else if (category === "tax") {
+                    setTax([...tax, ...result.assets.map((asset) => asset.uri)]);
+                } else if (category === "public liability") {
+                    setPublicLiability([
+                        ...publicLiability,
+                        ...result.assets.map((asset) => asset.uri),
+                    ]);
+                } else if (category === "app form 2") {
+                    setAppForm2([
+                        ...appForm2,
+                        ...result.assets.map((asset) => asset.uri),
+                    ]);
+                } else if (category === "barangay clearance 2") {
+                    setBarangayClearance2([
+                        ...barangayClearance2,
+                        ...result.assets.map((asset) => asset.uri),
+                    ]);
+                } else if (category === "xerox") {
+                    setXerox([
+                        ...xerox,
+                        ...result.assets.map((asset) => asset.uri),
+                    ]);
+                } else if (category === "audited") {
+                    setAudited([
+                        ...audited,
+                        ...result.assets.map((asset) => asset.uri),
+                    ]);
+                } else if (category === "public liability 2") {
+                    setPublicLiability2([
+                        ...publicLiability2,
+                        ...result.assets.map((asset) => asset.uri),
+                    ]);
                 }
             }
         } catch (error) {
@@ -64,19 +229,54 @@ export default function tab4() {
     };
 
     const removeImage = (category, index) => {
-        if (category === "barangay") {
-            const newImages = [...barangayImages];
+        if (category === "app form 1") {
+            const newImages = [...appForm1];
             newImages.splice(index, 1);
-            setBarangayImages(newImages);
-        } else if (category === "registration") {
-            const newImages = [...registrationImages];
+            setAppForm1(newImages);
+        } else if (category === "barangay clearance 1") {
+            const newImages = [...barangayClearance1];
             newImages.splice(index, 1);
-            setRegistrationImages(newImages);
-        }
-        else if (category === "contract") {
-            const newImages = [...contractImages];
+            setBarangayClearance1(newImages);
+        } else if (category === "dti") {
+            const newImages = [...dti];
             newImages.splice(index, 1);
-            setContractImages(newImages);
+            setDti(newImages);
+        } else if (category === "sec") {
+            const newImages = [...sec];
+            newImages.splice(index, 1);
+            setSec(newImages);
+        } else if (category === "lessor") {
+            const newImages = [...lessor];
+            newImages.splice(index, 1);
+            setLessor(newImages);
+        } else if (category === "tax") {
+            const newImages = [...tax];
+            newImages.splice(index, 1);
+            setTax(newImages);
+        } else if (category === "public liability") {
+            const newImages = [...publicLiability];
+            newImages.splice(index, 1);
+            setPublicLiability(newImages);
+        } else if (category === "app form 2") {
+            const newImages = [...appForm2];
+            newImages.splice(index, 1);
+            setAppForm2(newImages);
+        } else if (category === "barangay clearance 2") {
+            const newImages = [...barangayClearance2];
+            newImages.splice(index, 1);
+            setBarangayClearance2(newImages);
+        } else if (category === "xerox") {
+            const newImages = [...xerox];
+            newImages.splice(index, 1);
+            setXerox(newImages);
+        } else if (category === "audited") {
+            const newImages = [...audited];
+            newImages.splice(index, 1);
+            setAudited(newImages);
+        } else if (category === "public liability 2") {
+            const newImages = [...publicLiability2];
+            newImages.splice(index, 1);
+            setPublicLiability2(newImages);
         }
     };
 
@@ -86,13 +286,22 @@ export default function tab4() {
 
         try {
             const imageURLs = {
-                barangayImages: [],
-                registrationImages: [],
-                contractImages: [],
+                appForm1: [],
+                barangayClearance1: [],
+                dti: [],
+                sec: [],
+                lessor: [],
+                tax: [],
+                publicLiability: [],
+                appForm2: [],
+                barangayClearance2: [],
+                xerox: [],
+                audited: [],
+                publicLiability2: [],
             };
 
             // Loop through the selected images and upload each one
-            for (const uri of barangayImages) {
+            for (const uri of appForm1) {
                 const { uri: fileUri } = await FileSystem.getInfoAsync(uri);
                 const blob = await new Promise((resolve, reject) => {
                     const xhr = new XMLHttpRequest();
@@ -117,10 +326,10 @@ export default function tab4() {
                 const downloadURL = await snapshot.ref.getDownloadURL();
 
                 // Add the download URL to the appropriate array based on the category
-                imageURLs.barangayImages.push(downloadURL);
+                imageURLs.appForm1.push(downloadURL);
             }
 
-            for (const uri of registrationImages) {
+            for (const uri of barangayClearance1) {
                 const { uri: fileUri } = await FileSystem.getInfoAsync(uri);
                 const blob = await new Promise((resolve, reject) => {
                     const xhr = new XMLHttpRequest();
@@ -145,10 +354,10 @@ export default function tab4() {
                 const downloadURL = await snapshot.ref.getDownloadURL();
 
                 // Add the download URL to the appropriate array based on the category
-                imageURLs.registrationImages.push(downloadURL);
+                imageURLs.barangayClearance1.push(downloadURL);
             }
 
-            for (const uri of contractImages) {
+            for (const uri of dti) {
                 const { uri: fileUri } = await FileSystem.getInfoAsync(uri);
                 const blob = await new Promise((resolve, reject) => {
                     const xhr = new XMLHttpRequest();
@@ -173,18 +382,271 @@ export default function tab4() {
                 const downloadURL = await snapshot.ref.getDownloadURL();
 
                 // Add the download URL to the appropriate array based on the category
-                imageURLs.contractImages.push(downloadURL);
+                imageURLs.dti.push(downloadURL);
+            }
+
+            for (const uri of sec) {
+                const { uri: fileUri } = await FileSystem.getInfoAsync(uri);
+                const blob = await new Promise((resolve, reject) => {
+                    const xhr = new XMLHttpRequest();
+                    xhr.onload = () => {
+                        resolve(xhr.response);
+                    };
+                    xhr.onerror = (e) => {
+                        reject(new TypeError("Network request failed"));
+                    };
+                    xhr.responseType = "blob";
+                    xhr.open("GET", fileUri, true);
+                    xhr.send(null);
+                });
+
+                const filename = uri.substring(uri.lastIndexOf("/") + 1);
+                const ref = firebase.storage().ref().child(filename);
+
+                // Upload the image to Firebase Storage
+                const snapshot = await ref.put(blob);
+
+                // Get the download URL of the uploaded image
+                const downloadURL = await snapshot.ref.getDownloadURL();
+
+                // Add the download URL to the appropriate array based on the category
+                imageURLs.sec.push(downloadURL);
+            }
+
+            for (const uri of lessor) {
+                const { uri: fileUri } = await FileSystem.getInfoAsync(uri);
+                const blob = await new Promise((resolve, reject) => {
+                    const xhr = new XMLHttpRequest();
+                    xhr.onload = () => {
+                        resolve(xhr.response);
+                    };
+                    xhr.onerror = (e) => {
+                        reject(new TypeError("Network request failed"));
+                    };
+                    xhr.responseType = "blob";
+                    xhr.open("GET", fileUri, true);
+                    xhr.send(null);
+                });
+
+                const filename = uri.substring(uri.lastIndexOf("/") + 1);
+                const ref = firebase.storage().ref().child(filename);
+
+                // Upload the image to Firebase Storage
+                const snapshot = await ref.put(blob);
+
+                // Get the download URL of the uploaded image
+                const downloadURL = await snapshot.ref.getDownloadURL();
+
+                // Add the download URL to the appropriate array based on the category
+                imageURLs.lessor.push(downloadURL);
+            }
+
+            for (const uri of tax) {
+                const { uri: fileUri } = await FileSystem.getInfoAsync(uri);
+                const blob = await new Promise((resolve, reject) => {
+                    const xhr = new XMLHttpRequest();
+                    xhr.onload = () => {
+                        resolve(xhr.response);
+                    };
+                    xhr.onerror = (e) => {
+                        reject(new TypeError("Network request failed"));
+                    };
+                    xhr.responseType = "blob";
+                    xhr.open("GET", fileUri, true);
+                    xhr.send(null);
+                });
+
+                const filename = uri.substring(uri.lastIndexOf("/") + 1);
+                const ref = firebase.storage().ref().child(filename);
+
+                // Upload the image to Firebase Storage
+                const snapshot = await ref.put(blob);
+
+                // Get the download URL of the uploaded image
+                const downloadURL = await snapshot.ref.getDownloadURL();
+
+                // Add the download URL to the appropriate array based on the category
+                imageURLs.tax.push(downloadURL);
+            }
+
+            for (const uri of publicLiability) {
+                const { uri: fileUri } = await FileSystem.getInfoAsync(uri);
+                const blob = await new Promise((resolve, reject) => {
+                    const xhr = new XMLHttpRequest();
+                    xhr.onload = () => {
+                        resolve(xhr.response);
+                    };
+                    xhr.onerror = (e) => {
+                        reject(new TypeError("Network request failed"));
+                    };
+                    xhr.responseType = "blob";
+                    xhr.open("GET", fileUri, true);
+                    xhr.send(null);
+                });
+
+                const filename = uri.substring(uri.lastIndexOf("/") + 1);
+                const ref = firebase.storage().ref().child(filename);
+
+                // Upload the image to Firebase Storage
+                const snapshot = await ref.put(blob);
+
+                // Get the download URL of the uploaded image
+                const downloadURL = await snapshot.ref.getDownloadURL();
+
+                // Add the download URL to the appropriate array based on the category
+                imageURLs.publicLiability.push(downloadURL);
+            }
+
+            for (const uri of appForm2) {
+                const { uri: fileUri } = await FileSystem.getInfoAsync(uri);
+                const blob = await new Promise((resolve, reject) => {
+                    const xhr = new XMLHttpRequest();
+                    xhr.onload = () => {
+                        resolve(xhr.response);
+                    };
+                    xhr.onerror = (e) => {
+                        reject(new TypeError("Network request failed"));
+                    };
+                    xhr.responseType = "blob";
+                    xhr.open("GET", fileUri, true);
+                    xhr.send(null);
+                });
+
+                const filename = uri.substring(uri.lastIndexOf("/") + 1);
+                const ref = firebase.storage().ref().child(filename);
+
+                // Upload the image to Firebase Storage
+                const snapshot = await ref.put(blob);
+
+                // Get the download URL of the uploaded image
+                const downloadURL = await snapshot.ref.getDownloadURL();
+
+                // Add the download URL to the appropriate array based on the category
+                imageURLs.appForm2.push(downloadURL);
+            }
+
+            for (const uri of barangayClearance2) {
+                const { uri: fileUri } = await FileSystem.getInfoAsync(uri);
+                const blob = await new Promise((resolve, reject) => {
+                    const xhr = new XMLHttpRequest();
+                    xhr.onload = () => {
+                        resolve(xhr.response);
+                    };
+                    xhr.onerror = (e) => {
+                        reject(new TypeError("Network request failed"));
+                    };
+                    xhr.responseType = "blob";
+                    xhr.open("GET", fileUri, true);
+                    xhr.send(null);
+                });
+
+                const filename = uri.substring(uri.lastIndexOf("/") + 1);
+                const ref = firebase.storage().ref().child(filename);
+
+                // Upload the image to Firebase Storage
+                const snapshot = await ref.put(blob);
+
+                // Get the download URL of the uploaded image
+                const downloadURL = await snapshot.ref.getDownloadURL();
+
+                // Add the download URL to the appropriate array based on the category
+                imageURLs.barangayClearance2.push(downloadURL);
+            }
+
+            for (const uri of xerox) {
+                const { uri: fileUri } = await FileSystem.getInfoAsync(uri);
+                const blob = await new Promise((resolve, reject) => {
+                    const xhr = new XMLHttpRequest();
+                    xhr.onload = () => {
+                        resolve(xhr.response);
+                    };
+                    xhr.onerror = (e) => {
+                        reject(new TypeError("Network request failed"));
+                    };
+                    xhr.responseType = "blob";
+                    xhr.open("GET", fileUri, true);
+                    xhr.send(null);
+                });
+
+                const filename = uri.substring(uri.lastIndexOf("/") + 1);
+                const ref = firebase.storage().ref().child(filename);
+
+                // Upload the image to Firebase Storage
+                const snapshot = await ref.put(blob);
+
+                // Get the download URL of the uploaded image
+                const downloadURL = await snapshot.ref.getDownloadURL();
+
+                // Add the download URL to the appropriate array based on the category
+                imageURLs.xerox.push(downloadURL);
+            }
+
+            for (const uri of audited) {
+                const { uri: fileUri } = await FileSystem.getInfoAsync(uri);
+                const blob = await new Promise((resolve, reject) => {
+                    const xhr = new XMLHttpRequest();
+                    xhr.onload = () => {
+                        resolve(xhr.response);
+                    };
+                    xhr.onerror = (e) => {
+                        reject(new TypeError("Network request failed"));
+                    };
+                    xhr.responseType = "blob";
+                    xhr.open("GET", fileUri, true);
+                    xhr.send(null);
+                });
+
+                const filename = uri.substring(uri.lastIndexOf("/") + 1);
+                const ref = firebase.storage().ref().child(filename);
+
+                // Upload the image to Firebase Storage
+                const snapshot = await ref.put(blob);
+
+                // Get the download URL of the uploaded image
+                const downloadURL = await snapshot.ref.getDownloadURL();
+
+                // Add the download URL to the appropriate array based on the category
+                imageURLs.audited.push(downloadURL);
+            }
+
+            for (const uri of publicLiability2) {
+                const { uri: fileUri } = await FileSystem.getInfoAsync(uri);
+                const blob = await new Promise((resolve, reject) => {
+                    const xhr = new XMLHttpRequest();
+                    xhr.onload = () => {
+                        resolve(xhr.response);
+                    };
+                    xhr.onerror = (e) => {
+                        reject(new TypeError("Network request failed"));
+                    };
+                    xhr.responseType = "blob";
+                    xhr.open("GET", fileUri, true);
+                    xhr.send(null);
+                });
+
+                const filename = uri.substring(uri.lastIndexOf("/") + 1);
+                const ref = firebase.storage().ref().child(filename);
+
+                // Upload the image to Firebase Storage
+                const snapshot = await ref.put(blob);
+
+                // Get the download URL of the uploaded image
+                const downloadURL = await snapshot.ref.getDownloadURL();
+
+                // Add the download URL to the appropriate array based on the category
+                imageURLs.publicLiability2.push(downloadURL);
             }
 
             // Store the data in Firestore
-            const docRef = await firebase.firestore().collection("businessPermit").add({
-                typeOfApplication: selectedApplicationType,
-                typeOfBusiness: selectedBusinessType,
-                businessName: businessName,
-                ...imageURLs,
-                timestamp, // Move the timestamp field inside uploadMedia function
-                // Add other relevant fields as needed
-            });
+            const docRef = await firebase
+                .firestore()
+                .collection("businessPermit")
+                .add({
+                    typeOfApplication: selectedApplicationType,
+                    ...imageURLs,
+                    timestamp, // Move the timestamp field inside uploadMedia function
+                    // Add other relevant fields as needed
+                });
 
             console.log("Document written with ID: ", docRef.id);
 
@@ -198,20 +660,21 @@ export default function tab4() {
 
             // Clear the state and reset form values
             setSelectedApplicationType(null);
-            setSelectedBusinessType(null);
-            setBusinessName("");
-            setBarangayImages([]);
-            setRegistrationImages([]);
-            setContractImages([]);
+            setAppForm1([]);
+            setBarangayClearance1([]);
+            setDti([]);
+            setSec([]);
+            setLessor([]);
+            setTax([]);
+            setPublicLiability([]);
+            setAppForm2([]);
+            setBarangayClearance2([]);
+            setXerox([]);
+            setAudited([]);
+            setPublicLiability2([]);
             resetForm();
         } catch (error) {
             // Show an error alert
-            Alert.alert(
-                "Error",
-                "There was an error uploading images. Please try again.",
-                [{ text: "OK", onPress: () => console.log("OK Pressed") }],
-                { cancelable: false }
-            );
         } finally {
             setUploading(false);
             setLoadingModalVisible(false); // Hide loading modal
@@ -228,7 +691,6 @@ export default function tab4() {
             useNativeDriver: true, // Set to false for color animation
         }).start();
     };
-
 
     const [serve, setServe] = useState([]);
     const MuniServe = firebase.firestore().collection("services");
@@ -253,11 +715,11 @@ export default function tab4() {
             } catch (error) {
                 console.error("Error fetching data: ", error);
                 Alert.alert(
-                "Error",
-                "There was an error uploading images. Please try again.",
-                [{ text: "OK", onPress: () => console.log("OK Pressed") }],
-                { cancelable: false }
-            );
+                    "Error",
+                    "There was an error uploading images. Please try again.",
+                    [{ text: "OK", onPress: () => console.log("OK Pressed") }],
+                    { cancelable: false }
+                );
             }
         };
 
@@ -267,7 +729,7 @@ export default function tab4() {
     return (
         <View style={styles.container}>
             <StatusBar backgroundColor="#93C49E" />
-           
+
             {/* Loading Modal */}
             <Modal
                 animationType="slide"
@@ -299,27 +761,35 @@ export default function tab4() {
             </View>
 
             <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
-            
-                            <View style={styles.boxes1}>
-                                <View style={styles.boxAcc}>
-                                    <Image
-                                        source={require("../assets/imported/Del_Gallego_Camarines_Sur.png")}
-                                        style={styles.boxIcon}
-                                    />
-                                    <Text style={styles.itemService_name}>
-                                        Business Permit
-                                    </Text>
-                                </View>
-                            </View>
-                            <View style={styles.innerContainer}>
-                                <Text style={styles.itemService_desc}>
-                        A legal document that offers proof of compliance with certain city or state laws regulating structural appearances and safety as well as the sale of products. Business permits regulate safety, structure and appearance of the business community. They act as proof that your business follows certain laws and ordinances. Requirements vary by jurisdiction, and failure to comply often results in fines or even having your business shut down. Research the permits you need before you start any work, setup or property purchase. That way, you can make sure compliance is in order and avoid the additional expenses and delays of fixing things later.  This annual BOSS gathers under one roof all the government agencies to set up desks for permits or clearances needed to renew and apply for a business permit.  
-                                </Text>
-                            </View>
-                        
+                <View style={styles.boxes1}>
+                    <View style={styles.boxAcc}>
+                        <Image
+                            source={require("../assets/imported/Del_Gallego_Camarines_Sur.png")}
+                            style={styles.boxIcon}
+                        />
+                        <Text style={styles.itemService_name}>Business Permit</Text>
+                    </View>
+                </View>
+                <View style={styles.innerContainer}>
+                    <Text style={styles.itemService_desc}>
+                        A legal document that offers proof of compliance with certain city
+                        or state laws regulating structural appearances and safety as well
+                        as the sale of products. Business permits regulate safety, structure
+                        and appearance of the business community. They act as proof that
+                        your business follows certain laws and ordinances. Requirements vary
+                        by jurisdiction, and failure to comply often results in fines or
+                        even having your business shut down. Research the permits you need
+                        before you start any work, setup or property purchase. That way, you
+                        can make sure compliance is in order and avoid the additional
+                        expenses and delays of fixing things later. This annual BOSS gathers
+                        under one roof all the government agencies to set up desks for
+                        permits or clearances needed to renew and apply for a business
+                        permit.
+                    </Text>
+                </View>
 
                 <Text style={styles.noteText}>
-                    Direction: Select the application type then fill up the information needed.
+                    Direction: Select the application type then download and fill up the application form below.
                 </Text>
 
                 <View style={styles.choices}>
@@ -335,13 +805,8 @@ export default function tab4() {
                         ]}
                         onPress={() => handleApplicationTypeSelection("new")}
                     >
-                        <Image
-                            source={require("../assets/imported/form.png")}
-                            style={styles.form}
-                        />
-                        <Text style={styles.selectionText}>
-                            New Applications
-                        </Text>
+                        <Image source={require("../assets/imported/form.png")} style={styles.form} />
+                        <Text style={styles.selectionText}>New Applications</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity
@@ -356,54 +821,27 @@ export default function tab4() {
                         ]}
                         onPress={() => handleApplicationTypeSelection("renew")}
                     >
-                        <Image
-                            source={require("../assets/imported/form.png")}
-                            style={styles.form}
-                        />
-                        <Text style={styles.selectionText}>
-                            Renewal of Permit
-                        </Text>
+                        <Image source={require("../assets/imported/form.png")} style={styles.form} />
+                        <Text style={styles.selectionText}>Renewal of Permit</Text>
                     </TouchableOpacity>
-
                 </View>
 
-                {selectedApplicationType === 'new' && (
+                {selectedApplicationType === "new" && (
                     <>
-                        <View style={{ marginBottom: 10 }}>
-                            <Text style={styles.label}>
-                                Type of Business
-                            </Text>
-
-                            <View style={styles.placeholder}>
-                                <TextInput
-                                    placeholder=""
-                                    value={selectedBusinessType}
-                                    onChangeText={(selectedBusinessType) => setSelectedBusinessType(selectedBusinessType)}
-                                    maxLength={100}
-                                    style={{
-                                        width: "100%",
-                                    }}
-                                ></TextInput>
-                            </View>
-                        </View>
-
-                        <View style={{ marginBottom: 10 }}>
-                            <Text style={styles.label}>
-                                Business Name
-                            </Text>
-
-                            <View style={styles.placeholder}>
-                                <TextInput
-                                    placeholder=""
-                                    value={businessName}
-                                    onChangeText={(businessName) => setBusinessName(businessName)}
-                                    maxLength={100}
-                                    style={{
-                                        width: "100%",
-                                    }}
-                                ></TextInput>
-                            </View>
-                        </View>
+                        {mediaData.map((media, index) => {
+                            const { url, metadata } = media;
+                            const { name, contentType } = metadata;
+                            const isVideo = contentType.includes("video");
+                            const isImage = contentType.includes("image");
+                            return (
+                                <View key={index} style={styles.imageContainer}>
+                                    <CustomButton
+                                        title={`${name}`}
+                                        onPress={() => downloadFile(url, name, isVideo)}
+                                    />
+                                </View>
+                            );
+                        })}
 
                         <Text style={styles.noteText}>
                             Note: Upload the requirements needed before submitting your
@@ -412,23 +850,18 @@ export default function tab4() {
                         </Text>
 
                         <View style={styles.selectButton}>
-                            <Text style={styles.buttonText}>Barangay Business Clerance</Text>
-                            <TouchableOpacity onPress={() => pickImage("barangay")}>
-                                {barangayImages.length > 0 ? (
-                                    <Animated.View
-                                        style={{
-                                            ...styles.plusCircle,
-                                            opacity: fadeAnimation,
-                                        }}
-                                    >
-                                        <Ionicons name="ios-add" size={24} color="white" />
-                                    </Animated.View>
+                            <Text style={styles.buttonText}>
+                                Application form (2 copies, Notarized)
+                            </Text>
+                            <TouchableOpacity onPress={() => pickImage("app form 1")}>
+                                {appForm1.length > 0 ? (
+                                    <Animated.View></Animated.View>
                                 ) : (
                                     <View style={styles.plusCircle}>
                                         <Ionicons name="ios-add" size={24} color="white" />
                                     </View>
                                 )}
-                                {barangayImages.length > 0 && (
+                                {appForm1.length > 0 && (
                                     <View style={styles.checkCircle}>
                                         <Ionicons name="ios-checkmark" size={24} color="white" />
                                     </View>
@@ -439,59 +872,17 @@ export default function tab4() {
                         <View style={styles.imageContainer}>
                             <FlatList
                                 horizontal
-                                data={barangayImages}
+                                data={appForm1}
                                 keyExtractor={(item, index) => index.toString()}
                                 renderItem={({ item, index }) => (
                                     <View style={styles.uploadedImageContainer}>
-                                        <Image source={{ uri: item }} style={styles.uploadedImage} />
+                                        <Image
+                                            source={{ uri: item }}
+                                            style={styles.uploadedImage}
+                                        />
                                         <TouchableOpacity
                                             style={styles.removeImageButton}
-                                            onPress={() => removeImage("barangay", index)}
-                                        >
-                                            <Ionicons name="ios-close" size={20} color="#fff" />
-                                        </TouchableOpacity>
-                                    </View>
-                                )}
-                            />
-                        </View>
-
-
-                        <View style={styles.selectButton}>
-                            <Text style={styles.buttonText}>Proof of Registration</Text>
-                            <TouchableOpacity onPress={() => pickImage("registration")}>
-                                {registrationImages.length > 0 ? (
-                                    <Animated.View
-                                        style={{
-                                            ...styles.plusCircle,
-                                            opacity: fadeAnimation,
-                                        }}
-                                    >
-                                        <Ionicons name="ios-add" size={24} color="white" />
-                                    </Animated.View>
-                                ) : (
-                                    <View style={styles.plusCircle}>
-                                        <Ionicons name="ios-add" size={24} color="white" />
-                                    </View>
-                                )}
-                                {registrationImages.length > 0 && (
-                                    <View style={styles.checkCircle}>
-                                        <Ionicons name="ios-checkmark" size={24} color="white" />
-                                    </View>
-                                )}
-                            </TouchableOpacity>
-                        </View>
-
-                        <View style={styles.imageContainer}>
-                            <FlatList
-                                horizontal
-                                data={registrationImages}
-                                keyExtractor={(item, index) => index.toString()}
-                                renderItem={({ item, index }) => (
-                                    <View style={styles.uploadedImageContainer}>
-                                        <Image source={{ uri: item }} style={styles.uploadedImage} />
-                                        <TouchableOpacity
-                                            style={styles.removeImageButton}
-                                            onPress={() => removeImage("registration", index)}
+                                            onPress={() => removeImage("app form 1", index)}
                                         >
                                             <Ionicons name="ios-close" size={20} color="#fff" />
                                         </TouchableOpacity>
@@ -501,23 +892,20 @@ export default function tab4() {
                         </View>
 
                         <View style={styles.selectButton}>
-                            <Text style={styles.buttonText}>Contract of lease</Text>
-                            <TouchableOpacity onPress={() => pickImage("contract")}>
-                                {contractImages.length > 0 ? (
-                                    <Animated.View
-                                        style={{
-                                            ...styles.plusCircle,
-                                            opacity: fadeAnimation,
-                                        }}
-                                    >
-                                        <Ionicons name="ios-add" size={24} color="white" />
-                                    </Animated.View>
+                            <Text style={styles.buttonText}>
+                                Original Barangay Business Clearance
+                            </Text>
+                            <TouchableOpacity
+                                onPress={() => pickImage("barangay clearance 1")}
+                            >
+                                {barangayClearance1.length > 0 ? (
+                                    <Animated.View></Animated.View>
                                 ) : (
                                     <View style={styles.plusCircle}>
                                         <Ionicons name="ios-add" size={24} color="white" />
                                     </View>
                                 )}
-                                {contractImages.length > 0 && (
+                                {barangayClearance1.length > 0 && (
                                     <View style={styles.checkCircle}>
                                         <Ionicons name="ios-checkmark" size={24} color="white" />
                                     </View>
@@ -528,14 +916,17 @@ export default function tab4() {
                         <View style={styles.imageContainer}>
                             <FlatList
                                 horizontal
-                                data={contractImages}
+                                data={barangayClearance1}
                                 keyExtractor={(item, index) => index.toString()}
                                 renderItem={({ item, index }) => (
                                     <View style={styles.uploadedImageContainer}>
-                                        <Image source={{ uri: item }} style={styles.uploadedImage} />
+                                        <Image
+                                            source={{ uri: item }}
+                                            style={styles.uploadedImage}
+                                        />
                                         <TouchableOpacity
                                             style={styles.removeImageButton}
-                                            onPress={() => removeImage("contract", index)}
+                                            onPress={() => removeImage("barangay clearance 1", index)}
                                         >
                                             <Ionicons name="ios-close" size={20} color="#fff" />
                                         </TouchableOpacity>
@@ -544,47 +935,235 @@ export default function tab4() {
                             />
                         </View>
 
+                        <View style={styles.selectButton}>
+                            <Text style={styles.buttonText}>
+                                DTI Registration (Single Proprietor)
+                            </Text>
+                            <TouchableOpacity onPress={() => pickImage("dti")}>
+                                {dti.length > 0 ? (
+                                    <Animated.View></Animated.View>
+                                ) : (
+                                    <View style={styles.plusCircle}>
+                                        <Ionicons name="ios-add" size={24} color="white" />
+                                    </View>
+                                )}
+                                {dti.length > 0 && (
+                                    <View style={styles.checkCircle}>
+                                        <Ionicons name="ios-checkmark" size={24} color="white" />
+                                    </View>
+                                )}
+                            </TouchableOpacity>
+                        </View>
+
+                        <View style={styles.imageContainer}>
+                            <FlatList
+                                horizontal
+                                data={dti}
+                                keyExtractor={(item, index) => index.toString()}
+                                renderItem={({ item, index }) => (
+                                    <View style={styles.uploadedImageContainer}>
+                                        <Image
+                                            source={{ uri: item }}
+                                            style={styles.uploadedImage}
+                                        />
+                                        <TouchableOpacity
+                                            style={styles.removeImageButton}
+                                            onPress={() => removeImage("dti", index)}
+                                        >
+                                            <Ionicons name="ios-close" size={20} color="#fff" />
+                                        </TouchableOpacity>
+                                    </View>
+                                )}
+                            />
+                        </View>
+
+                        <View style={styles.selectButton}>
+                            <Text style={styles.buttonText}>
+                                SEC Registration (Corporation)
+                            </Text>
+                            <TouchableOpacity onPress={() => pickImage("sec")}>
+                                {sec.length > 0 ? (
+                                    <Animated.View></Animated.View>
+                                ) : (
+                                    <View style={styles.plusCircle}>
+                                        <Ionicons name="ios-add" size={24} color="white" />
+                                    </View>
+                                )}
+                                {sec.length > 0 && (
+                                    <View style={styles.checkCircle}>
+                                        <Ionicons name="ios-checkmark" size={24} color="white" />
+                                    </View>
+                                )}
+                            </TouchableOpacity>
+                        </View>
+
+                        <View style={styles.imageContainer}>
+                            <FlatList
+                                horizontal
+                                data={sec}
+                                keyExtractor={(item, index) => index.toString()}
+                                renderItem={({ item, index }) => (
+                                    <View style={styles.uploadedImageContainer}>
+                                        <Image
+                                            source={{ uri: item }}
+                                            style={styles.uploadedImage}
+                                        />
+                                        <TouchableOpacity
+                                            style={styles.removeImageButton}
+                                            onPress={() => removeImage("sec", index)}
+                                        >
+                                            <Ionicons name="ios-close" size={20} color="#fff" />
+                                        </TouchableOpacity>
+                                    </View>
+                                )}
+                            />
+                        </View>
+
+                        <View style={styles.selectButton}>
+                            <Text style={styles.buttonText}>
+                                Lessor’s Permit (If Renting){" "}
+                            </Text>
+                            <TouchableOpacity onPress={() => pickImage("lessor")}>
+                                {lessor.length > 0 ? (
+                                    <Animated.View></Animated.View>
+                                ) : (
+                                    <View style={styles.plusCircle}>
+                                        <Ionicons name="ios-add" size={24} color="white" />
+                                    </View>
+                                )}
+                                {lessor.length > 0 && (
+                                    <View style={styles.checkCircle}>
+                                        <Ionicons name="ios-checkmark" size={24} color="white" />
+                                    </View>
+                                )}
+                            </TouchableOpacity>
+                        </View>
+
+                        <View style={styles.imageContainer}>
+                            <FlatList
+                                horizontal
+                                data={lessor}
+                                keyExtractor={(item, index) => index.toString()}
+                                renderItem={({ item, index }) => (
+                                    <View style={styles.uploadedImageContainer}>
+                                        <Image
+                                            source={{ uri: item }}
+                                            style={styles.uploadedImage}
+                                        />
+                                        <TouchableOpacity
+                                            style={styles.removeImageButton}
+                                            onPress={() => removeImage("lessor", index)}
+                                        >
+                                            <Ionicons name="ios-close" size={20} color="#fff" />
+                                        </TouchableOpacity>
+                                    </View>
+                                )}
+                            />
+                        </View>
+
+                        <View style={styles.selectButton}>
+                            <Text style={styles.buttonText}>
+                                Tax Declaration of Property (If Owned)
+                            </Text>
+                            <TouchableOpacity onPress={() => pickImage("tax")}>
+                                {tax.length > 0 ? (
+                                    <Animated.View></Animated.View>
+                                ) : (
+                                    <View style={styles.plusCircle}>
+                                        <Ionicons name="ios-add" size={24} color="white" />
+                                    </View>
+                                )}
+                                {tax.length > 0 && (
+                                    <View style={styles.checkCircle}>
+                                        <Ionicons name="ios-checkmark" size={24} color="white" />
+                                    </View>
+                                )}
+                            </TouchableOpacity>
+                        </View>
+
+                        <View style={styles.imageContainer}>
+                            <FlatList
+                                horizontal
+                                data={tax}
+                                keyExtractor={(item, index) => index.toString()}
+                                renderItem={({ item, index }) => (
+                                    <View style={styles.uploadedImageContainer}>
+                                        <Image
+                                            source={{ uri: item }}
+                                            style={styles.uploadedImage}
+                                        />
+                                        <TouchableOpacity
+                                            style={styles.removeImageButton}
+                                            onPress={() => removeImage("tax", index)}
+                                        >
+                                            <Ionicons name="ios-close" size={20} color="#fff" />
+                                        </TouchableOpacity>
+                                    </View>
+                                )}
+                            />
+                        </View>
+
+                        <View style={styles.selectButton}>
+                            <Text style={styles.buttonText}>
+                                Public Liability Insurance SPA for Authorized Representatives
+                                with I.D.
+                            </Text>
+                            <TouchableOpacity onPress={() => pickImage("public liability")}>
+                                {publicLiability.length > 0 ? (
+                                    <Animated.View></Animated.View>
+                                ) : (
+                                    <View style={styles.plusCircle}>
+                                        <Ionicons name="ios-add" size={24} color="white" />
+                                    </View>
+                                )}
+                                {publicLiability.length > 0 && (
+                                    <View style={styles.checkCircle}>
+                                        <Ionicons name="ios-checkmark" size={24} color="white" />
+                                    </View>
+                                )}
+                            </TouchableOpacity>
+                        </View>
+
+                        <View style={styles.imageContainer}>
+                            <FlatList
+                                horizontal
+                                data={publicLiability}
+                                keyExtractor={(item, index) => index.toString()}
+                                renderItem={({ item, index }) => (
+                                    <View style={styles.uploadedImageContainer}>
+                                        <Image
+                                            source={{ uri: item }}
+                                            style={styles.uploadedImage}
+                                        />
+                                        <TouchableOpacity
+                                            style={styles.removeImageButton}
+                                            onPress={() => removeImage("public liability", index)}
+                                        >
+                                            <Ionicons name="ios-close" size={20} color="#fff" />
+                                        </TouchableOpacity>
+                                    </View>
+                                )}
+                            />
+                        </View>
                     </>
                 )}
 
-                {selectedApplicationType === 'renew' && (
+                {selectedApplicationType === "renew" && (
                     <>
-
-                        <View style={{ marginBottom: 10 }}>
-                            <Text style={styles.label}>
-                                Type of Business
-                            </Text>
-
-                            <View style={styles.placeholder}>
-                                <TextInput
-                                    placeholder=""
-                                    value={selectedBusinessType}
-                                    onChangeText={(selectedBusinessType) => setSelectedBusinessType(selectedBusinessType)}
-                                    maxLength={100}
-                                    style={{
-                                        width: "100%",
-                                    }}
-                                ></TextInput>
-                            </View>
-                        </View>
-
-                        <View style={{ marginBottom: 10 }}>
-                            <Text style={styles.label}>
-                                Business Name
-                            </Text>
-
-                            <View style={styles.placeholder}>
-                                <TextInput
-                                    placeholder=""
-                                    value={businessName}
-                                    onChangeText={(businessName) => setBusinessName(businessName)}
-                                    maxLength={100}
-                                    style={{
-                                        width: "100%",
-                                    }}
-                                ></TextInput>
-                            </View>
-                        </View>
+                        {mediaData.map((media, index) => {
+                            const { url, metadata } = media;
+                            const { name, contentType } = metadata;
+                            const isVideo = contentType.includes("video");
+                            const isImage = contentType.includes("image");
+                            return (
+                                <View key={index} style={styles.imageContainer}>
+                                    <CustomButton
+                                        title={`${name}`}
+                                        onPress={() => downloadFile(url, name, isVideo)}
+                                    />
+                                </View>
+                            );
+                        })}
 
                         <Text style={styles.noteText}>
                             Note: Upload the requirements needed before submitting your
@@ -593,23 +1172,16 @@ export default function tab4() {
                         </Text>
 
                         <View style={styles.selectButton}>
-                            <Text style={styles.buttonText}>Barangay Business Clerance</Text>
-                            <TouchableOpacity onPress={() => pickImage("barangay")}>
-                                {barangayImages.length > 0 ? (
-                                    <Animated.View
-                                        style={{
-                                            ...styles.plusCircle,
-                                            opacity: fadeAnimation,
-                                        }}
-                                    >
-                                        <Ionicons name="ios-add" size={24} color="white" />
-                                    </Animated.View>
+                            <Text style={styles.buttonText}>Application form (2 copies)</Text>
+                            <TouchableOpacity onPress={() => pickImage("app form 2")}>
+                                {appForm2.length > 0 ? (
+                                    <Animated.View></Animated.View>
                                 ) : (
                                     <View style={styles.plusCircle}>
                                         <Ionicons name="ios-add" size={24} color="white" />
                                     </View>
                                 )}
-                                {barangayImages.length > 0 && (
+                                {appForm2.length > 0 && (
                                     <View style={styles.checkCircle}>
                                         <Ionicons name="ios-checkmark" size={24} color="white" />
                                     </View>
@@ -620,14 +1192,17 @@ export default function tab4() {
                         <View style={styles.imageContainer}>
                             <FlatList
                                 horizontal
-                                data={barangayImages}
+                                data={appForm2}
                                 keyExtractor={(item, index) => index.toString()}
                                 renderItem={({ item, index }) => (
                                     <View style={styles.uploadedImageContainer}>
-                                        <Image source={{ uri: item }} style={styles.uploadedImage} />
+                                        <Image
+                                            source={{ uri: item }}
+                                            style={styles.uploadedImage}
+                                        />
                                         <TouchableOpacity
                                             style={styles.removeImageButton}
-                                            onPress={() => removeImage("barangay", index)}
+                                            onPress={() => removeImage("app form 2", index)}
                                         >
                                             <Ionicons name="ios-close" size={20} color="#fff" />
                                         </TouchableOpacity>
@@ -637,23 +1212,20 @@ export default function tab4() {
                         </View>
 
                         <View style={styles.selectButton}>
-                            <Text style={styles.buttonText}>Basis for computing Taxes</Text>
-                            <TouchableOpacity onPress={() => pickImage("registration")}>
-                                {registrationImages.length > 0 ? (
-                                    <Animated.View
-                                        style={{
-                                            ...styles.plusCircle,
-                                            opacity: fadeAnimation,
-                                        }}
-                                    >
-                                        <Ionicons name="ios-add" size={24} color="white" />
-                                    </Animated.View>
+                            <Text style={styles.buttonText}>
+                                Original Barangay Business Clearance
+                            </Text>
+                            <TouchableOpacity
+                                onPress={() => pickImage("barangay clearance 2")}
+                            >
+                                {barangayClearance2.length > 0 ? (
+                                    <Animated.View></Animated.View>
                                 ) : (
                                     <View style={styles.plusCircle}>
                                         <Ionicons name="ios-add" size={24} color="white" />
                                     </View>
                                 )}
-                                {registrationImages.length > 0 && (
+                                {barangayClearance2.length > 0 && (
                                     <View style={styles.checkCircle}>
                                         <Ionicons name="ios-checkmark" size={24} color="white" />
                                     </View>
@@ -664,14 +1236,17 @@ export default function tab4() {
                         <View style={styles.imageContainer}>
                             <FlatList
                                 horizontal
-                                data={registrationImages}
+                                data={barangayClearance2}
                                 keyExtractor={(item, index) => index.toString()}
                                 renderItem={({ item, index }) => (
                                     <View style={styles.uploadedImageContainer}>
-                                        <Image source={{ uri: item }} style={styles.uploadedImage} />
+                                        <Image
+                                            source={{ uri: item }}
+                                            style={styles.uploadedImage}
+                                        />
                                         <TouchableOpacity
                                             style={styles.removeImageButton}
-                                            onPress={() => removeImage("registration", index)}
+                                            onPress={() => removeImage("barangay clearance 2", index)}
                                         >
                                             <Ionicons name="ios-close" size={20} color="#fff" />
                                         </TouchableOpacity>
@@ -681,23 +1256,18 @@ export default function tab4() {
                         </View>
 
                         <View style={styles.selectButton}>
-                            <Text style={styles.buttonText}>Contract of lease</Text>
-                            <TouchableOpacity onPress={() => pickImage("contract")}>
-                                {contractImages.length > 0 ? (
-                                    <Animated.View
-                                        style={{
-                                            ...styles.plusCircle,
-                                            opacity: fadeAnimation,
-                                        }}
-                                    >
-                                        <Ionicons name="ios-add" size={24} color="white" />
-                                    </Animated.View>
+                            <Text style={styles.buttonText}>
+                                Xerox Copy of previous Business Permit and Receipt
+                            </Text>
+                            <TouchableOpacity onPress={() => pickImage("xerox")}>
+                                {xerox.length > 0 ? (
+                                    <Animated.View></Animated.View>
                                 ) : (
                                     <View style={styles.plusCircle}>
                                         <Ionicons name="ios-add" size={24} color="white" />
                                     </View>
                                 )}
-                                {contractImages.length > 0 && (
+                                {xerox.length > 0 && (
                                     <View style={styles.checkCircle}>
                                         <Ionicons name="ios-checkmark" size={24} color="white" />
                                     </View>
@@ -708,14 +1278,17 @@ export default function tab4() {
                         <View style={styles.imageContainer}>
                             <FlatList
                                 horizontal
-                                data={contractImages}
+                                data={xerox}
                                 keyExtractor={(item, index) => index.toString()}
                                 renderItem={({ item, index }) => (
                                     <View style={styles.uploadedImageContainer}>
-                                        <Image source={{ uri: item }} style={styles.uploadedImage} />
+                                        <Image
+                                            source={{ uri: item }}
+                                            style={styles.uploadedImage}
+                                        />
                                         <TouchableOpacity
                                             style={styles.removeImageButton}
-                                            onPress={() => removeImage("contract", index)}
+                                            onPress={() => removeImage("xerox", index)}
                                         >
                                             <Ionicons name="ios-close" size={20} color="#fff" />
                                         </TouchableOpacity>
@@ -724,6 +1297,91 @@ export default function tab4() {
                             />
                         </View>
 
+                        <View style={styles.selectButton}>
+                            <Text style={styles.buttonText}>
+                                Audited Financial Statement and/or Monthly or Quarterly VAT
+                                Returns
+                            </Text>
+                            <TouchableOpacity onPress={() => pickImage("audited")}>
+                                {audited.length > 0 ? (
+                                    <Animated.View></Animated.View>
+                                ) : (
+                                    <View style={styles.plusCircle}>
+                                        <Ionicons name="ios-add" size={24} color="white" />
+                                    </View>
+                                )}
+                                {audited.length > 0 && (
+                                    <View style={styles.checkCircle}>
+                                        <Ionicons name="ios-checkmark" size={24} color="white" />
+                                    </View>
+                                )}
+                            </TouchableOpacity>
+                        </View>
+
+                        <View style={styles.imageContainer}>
+                            <FlatList
+                                horizontal
+                                data={audited}
+                                keyExtractor={(item, index) => index.toString()}
+                                renderItem={({ item, index }) => (
+                                    <View style={styles.uploadedImageContainer}>
+                                        <Image
+                                            source={{ uri: item }}
+                                            style={styles.uploadedImage}
+                                        />
+                                        <TouchableOpacity
+                                            style={styles.removeImageButton}
+                                            onPress={() => removeImage("audited", index)}
+                                        >
+                                            <Ionicons name="ios-close" size={20} color="#fff" />
+                                        </TouchableOpacity>
+                                    </View>
+                                )}
+                            />
+                        </View>
+
+                        <View style={styles.selectButton}>
+                            <Text style={styles.buttonText}>
+                                Public Liability Insurance SPA for Authorized Representatives
+                                with I.D.
+                            </Text>
+                            <TouchableOpacity onPress={() => pickImage("public liability 2")}>
+                                {publicLiability2.length > 0 ? (
+                                    <Animated.View></Animated.View>
+                                ) : (
+                                    <View style={styles.plusCircle}>
+                                        <Ionicons name="ios-add" size={24} color="white" />
+                                    </View>
+                                )}
+                                {publicLiability2.length > 0 && (
+                                    <View style={styles.checkCircle}>
+                                        <Ionicons name="ios-checkmark" size={24} color="white" />
+                                    </View>
+                                )}
+                            </TouchableOpacity>
+                        </View>
+
+                        <View style={styles.imageContainer}>
+                            <FlatList
+                                horizontal
+                                data={publicLiability2}
+                                keyExtractor={(item, index) => index.toString()}
+                                renderItem={({ item, index }) => (
+                                    <View style={styles.uploadedImageContainer}>
+                                        <Image
+                                            source={{ uri: item }}
+                                            style={styles.uploadedImage}
+                                        />
+                                        <TouchableOpacity
+                                            style={styles.removeImageButton}
+                                            onPress={() => removeImage("public liability 2", index)}
+                                        >
+                                            <Ionicons name="ios-close" size={20} color="#fff" />
+                                        </TouchableOpacity>
+                                    </View>
+                                )}
+                            />
+                        </View>
                     </>
                 )}
 
@@ -735,37 +1393,52 @@ export default function tab4() {
                             if (!selectedApplicationType) {
                                 // Show an alert if no category is selected
                                 Alert.alert(
-                                    'Error',
-                                    'Please choose an application type before submitting.',
-                                    [{ text: 'OK', onPress: () => console.log('OK Pressed') }],
+                                    "Error",
+                                    "Please choose an application type before submitting.",
+                                    [{ text: "OK", onPress: () => console.log("OK Pressed") }],
                                     { cancelable: false }
                                 );
-                            } else if (selectedApplicationType === 'new') {
+                            } else if (selectedApplicationType === "new") {
                                 // Check if any information is typed
-                                if (barangayImages.length === 0 || registrationImages.length === 0 || contractImages.length === 0) {
+                                if (
+                                    appForm1.length === 0 ||
+                                    barangayClearance1.length === 0 ||
+                                    dti.length === 0 ||
+                                    sec.length === 0 ||
+                                    lessor.length === 0 ||
+                                    tax.length === 0 ||
+                                    publicLiability.length === 0
+                                ) {
                                     // Show an alert if any of the required fields is empty
                                     Alert.alert(
-                                        'Error',
-                                        'Please upload all required documents before submitting.',
-                                        [{ text: 'OK', onPress: () => console.log('OK Pressed') }],
+                                        "Error",
+                                        "Please upload all required documents before submitting.",
+                                        [{ text: "OK", onPress: () => console.log("OK Pressed") }],
                                         { cancelable: false }
                                     );
-                                } else {                              
+                                } else {
                                     uploadMedia();
                                 }
-                            } else if (selectedApplicationType === 'renew') {
+                            } else if (selectedApplicationType === "renew") {
                                 // Check if any information is typed
-                                if (barangayImages.length === 0 || registrationImages.length === 0 || contractImages.length === 0) {
+                                if (
+                                    appForm2.length === 0 ||
+                                    barangayClearance2.length === 0 ||
+                                    xerox.length === 0 ||
+                                    audited.length === 0 ||
+                                    publicLiability2.length === 0
+                                ) {
                                     // Show an alert if any of the required fields is empty
                                     Alert.alert(
-                                        'Error',
-                                        'Please upload all required documents before submitting.',
-                                        [{ text: 'OK', onPress: () => console.log('OK Pressed') }],
+                                        "Error",
+                                        "Please upload all required documents before submitting.",
+                                        [{ text: "OK", onPress: () => console.log("OK Pressed") }],
                                         { cancelable: false }
                                     );
-                                }
+                                } else {
                                     uploadMedia();
                                 }
+                            }
                         }}
                     >
                         <Text style={styles.submitText}>Submit</Text>
@@ -892,7 +1565,7 @@ const styles = StyleSheet.create({
         justifyContent: "space-between", // Space between children
         alignItems: "center", // Center vertically
         width: "100%",
-        height: 50,
+        height: 60,
         backgroundColor: "transparent",
         borderColor: "#307A59",
         borderWidth: 1,
@@ -901,7 +1574,6 @@ const styles = StyleSheet.create({
         marginVertical: 10,
         padding: 10,
     },
-
     buttonText: {
         flex: 1, // Take up available space
         color: "#000",
@@ -935,6 +1607,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         marginRight: 10, // Adjust margin as needed
         marginBottom: 30,
+        marginTop: 30,
     },
     uploadedImageContainer: {
         position: "relative",
@@ -971,9 +1644,9 @@ const styles = StyleSheet.create({
         margin: 5,
     },
     form: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        resizeMode: 'contain',
+        justifyContent: "center",
+        alignItems: "center",
+        resizeMode: "contain",
         flex: 1,
         width: 50,
         height: 50,
@@ -1003,5 +1676,8 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         backgroundColor: "rgba(0, 0, 0, 0.5)",
+    },
+    buttonDocx: {
+        backgroundColor: "#307A59",
     },
 });

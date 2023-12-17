@@ -126,6 +126,7 @@ export default function BirthReg() {
 
     const resetForm = () => {
         setHname("");
+        setWname("");
         setDate(new Date());
         setDate("");
         setMarriage("");
@@ -166,13 +167,21 @@ export default function BirthReg() {
     }, []);
 
     const [showDatePicker, setShowDatePicker] = useState(false);
+    const [maxDate, setMaxDate] = useState(new Date());
 
     const onDateChange = (event, selectedDate) => {
-        const currentDate = selectedDate || date;
-        setShowDatePicker(Platform.OS === 'ios'); // Close the date picker on iOS
-        setDate(currentDate); // Update the state with the selected date
-        setSelectedDateText(formatDate(currentDate)); // Format and set the selected date text
+        const currentDate = selectedDate || new Date();
+
+        // Set maxDate only once when the component mounts
+        if (!maxDate.getTime()) {
+            setMaxDate(new Date());
+        }
+
+        setShowDatePicker(Platform.OS === 'ios');
+        setDate(currentDate);
+        setSelectedDateText(formatDate(currentDate));
     };
+
 
     const formatDate = (date) => {
         // Format the date as needed (you can customize this based on your requirements)
@@ -273,6 +282,7 @@ export default function BirthReg() {
                             mode="date"
                             display="default"
                             onChange={onDateChange}
+                            maximumDate={maxDate}
                         />
                     )}
                 </View>

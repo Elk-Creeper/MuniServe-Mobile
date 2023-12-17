@@ -177,7 +177,7 @@ export default function tab1() {
             <TouchableOpacity
               style={styles.redContainer}
               onPress={() => {
-                router.push("/");
+                router.push("/BusinessPermit");
               }}
             >
               <View style={styles.serviceContainer}>
@@ -192,7 +192,7 @@ export default function tab1() {
             <TouchableOpacity
               style={styles.yellowContainer}
               onPress={() => {
-                router.push("/");
+                router.push("/JobApplication");
               }}
             >
               <View style={styles.serviceContainer}>
