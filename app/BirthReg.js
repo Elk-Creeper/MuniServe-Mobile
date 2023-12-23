@@ -32,6 +32,12 @@ export default function BirthReg() {
   const [loadingModalVisible, setLoadingModalVisible] = useState(false);
   const [selectedDateText, setSelectedDateText] = useState("");
 
+  const [userUid, setUserUid] = useState(null);
+  const [userName, setUserName] = useState(null);
+  const [userEmail, setUserEmail] = useState(null);
+  const [userBarangay, setUserBarangay] = useState(null);
+  const [userContact, setUserContact] = useState(null);
+
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All, //All, Image, Videos
@@ -44,6 +50,34 @@ export default function BirthReg() {
       setImage(result.assets[0].uri);
     }
   };
+
+  useEffect(() => {
+    const getUserInfo = async () => {
+      try {
+        const user = firebase.auth().currentUser;
+        if (user) {
+          setUserUid(user.uid);
+          // Fetch user's name from Firestore using UID
+          const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
+          if (userDoc.exists) {
+            setUserName(userDoc.data().firstName);
+            setUserEmail(userDoc.data().email);
+            setUserBarangay(userDoc.data().barangay);
+            setUserContact(userDoc.data().contact);
+
+          } else {
+            console.log("User data not found in Firestore");
+          }
+        } else {
+          console.log("User not authenticated");
+        }
+      } catch (error) {
+        console.error("Error getting user info:", error);
+      }
+    };
+
+    getUserInfo();
+  }, []);
 
   // upload media files
   const uploadMedia = async () => {
@@ -79,8 +113,13 @@ export default function BirthReg() {
       const birthreg = MuniServe.collection("birth_reg");
 
       await birthreg.add({
+        userUid: userUid,
+        userName: userName,
+        userEmail: userEmail,
+        userContact: userContact,
+        userBarangay: userBarangay,
         attendant: attendant,
-        c_birthdate: birthdate,
+        birthdate: birthdate,
         c_birthorder: birthorder,
         c_birthplace: birthplace,
         c_sex: sex,
@@ -204,7 +243,7 @@ export default function BirthReg() {
   const [maxDate, setMaxDate] = useState(new Date());
 
   const onDateChange = (event, selectedDate) => {
-    const currentDate = selectedDate || new birthdate();
+    const currentDate = selectedDate || new Date();
 
     // Set maxDate only once when the component mounts
     if (!maxDate.getTime()) {
@@ -212,18 +251,16 @@ export default function BirthReg() {
     }
 
     setShowDatePicker(Platform.OS === 'ios');
-    setBirthDate(currentDate);
+    setBirthdate(currentDate);
     setSelectedDateText(formatDate(currentDate));
   };
 
-
-
   const formatDate = (date) => {
     // Format the date as needed (you can customize this based on your requirements)
-    const formattedDate = `${date.getDate()}/${date.getMonth() + 1
-      }/${date.getFullYear()}`;
+    const formattedDate = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
     return formattedDate;
   };
+
 
   return (
     <View style={styles.container}>
@@ -292,14 +329,14 @@ export default function BirthReg() {
 
         <View style={{ marginBottom: 10 }}>
           <Text style={styles.label}>
-            Birth Date
+            Date of Birth
           </Text>
 
           <TouchableOpacity
             onPress={() => setShowDatePicker(true)}
             style={styles.placeholder}
           >
-            <Text style={styles.selectedDateText}>{selectedDateText}</Text>
+            <Text>{selectedDateText}</Text>
           </TouchableOpacity>
 
           {showDatePicker && (

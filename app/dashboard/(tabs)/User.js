@@ -1,20 +1,64 @@
-import React from "react";
-import { View, Text, StyleSheet, Image, TouchableOpacity, TextInput, ScrollView } from "react-native";
+import { View, Text, StyleSheet, Image, TouchableOpacity, Alert, ScrollView } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons"; // Import the Ionicons library for the bell icon
 import { Link, useRouter } from "expo-router";
-import { useEffect, useRef, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
-
+import { firebase } from "../../../config";
+import React, { useState, useEffect } from "react";
 
 export default function tab4() {
   const router = useRouter();
-  const navigation = useNavigation();
+
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+
+  useEffect(() => {
+    firebase
+      .firestore()
+      .collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .get()
+      .then((snapshot) => {
+        if (snapshot.exists) {
+          setName(snapshot.data());
+          setEmail(snapshot.data());
+        } else {
+          console.log("User does not exist");
+        }
+      });
+  }, []);
+
+  const handleLogout = () => {
+    Alert.alert(
+      "Log Out",
+      "Are you sure you want to log out?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Log Out",
+          onPress: () => {
+            // Perform log out logic here
+            // For example, you can use firebase.auth().signOut()
+            // and then navigate to the login screen
+            firebase.auth().signOut().then(() => {
+              router.push("/login"); // Navigate to the login screen
+            }).catch((error) => {
+              console.error("Error logging out:", error);
+            });
+          },
+        },
+      ],
+      { cancelable: false }
+    );
+  };
 
   return (
     <View style={styles.container}>
       <StatusBar
-        backgroundColor="#93C49E" // Change the background color as needed
+        backgroundColor="#93C49E"
       />
       <View style={styles.header}>
         <View style={styles.titleContainer}>
@@ -40,8 +84,8 @@ export default function tab4() {
               style={styles.profileImage}
             />
             <View style={styles.userInfo}>
-              <Text style={styles.userName}>Hi, Raiza Jane</Text>
-              <Text style={styles.userPhone}>+63094567890</Text>
+              <Text style={styles.userName}>Hi, {name.firstName}</Text>
+              <Text style={styles.userPhone}>{email.email}</Text>
             </View>
           </View>
         </View>
@@ -49,7 +93,7 @@ export default function tab4() {
         <View style={styles.boxes1}>
           <TouchableOpacity
             onPress={() => {
-              router.replace("/faqs");
+              router.push("/faqs");
             }}
           >
             <View style={styles.boxAcc}>
@@ -61,10 +105,11 @@ export default function tab4() {
             </View>
           </TouchableOpacity>
         </View>
+        
         <View style={styles.boxes2}>
           <TouchableOpacity
             onPress={() => {
-              router.replace("/about");
+              router.push("/about");
             }}
           >
             <View style={styles.boxAcc}>
@@ -76,10 +121,11 @@ export default function tab4() {
             </View>
           </TouchableOpacity>
         </View>
+
         <View style={styles.boxes3}>
           <TouchableOpacity
             onPress={() => {
-              router.replace("/contact");
+              router.push("/contact");
             }}
           >
             <View style={styles.boxAcc}>
@@ -91,10 +137,11 @@ export default function tab4() {
             </View>
           </TouchableOpacity>
         </View>
+
         <View style={styles.boxes4}>
           <TouchableOpacity
             onPress={() => {
-              router.replace("/settings");
+              router.push("/settings");
             }}
           >
             <View style={styles.boxAcc}>
@@ -106,8 +153,12 @@ export default function tab4() {
             </View>
           </TouchableOpacity>
         </View>
+
         <View style={styles.boxes5}>
-          <TouchableOpacity>
+          <TouchableOpacity 
+          onPress={() => {
+            router.push("/rateApp");
+          }}>         
             <View style={styles.boxAcc}>
               <Image
                 source={require("../../../assets/icons/rate.png")}
@@ -117,8 +168,9 @@ export default function tab4() {
             </View>
           </TouchableOpacity>
         </View>
+
         <View style={styles.boxes6}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={handleLogout}>
             <View style={styles.boxAcc}>
               <Image
                 source={require("../../../assets/icons/Logout.png")}
@@ -204,7 +256,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   userPhone: {
-    fontSize: 20,
+    fontSize: 15,
     color: "white",
     marginTop: 4,
   },

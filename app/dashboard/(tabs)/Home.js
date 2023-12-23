@@ -1,4 +1,3 @@
-import React from "react";
 import {
   View,
   Text,
@@ -6,26 +5,41 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
-  Dimensions,
-  Platform,
+  BackHandler,
+  Alert,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons"; // Import the Ionicons library for the bell icon
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Link, useRouter } from "expo-router";
-import { useEffect, useRef, useState } from "react";
-import { useNavigation } from "@react-navigation/native";
+import React, { useState, useEffect } from "react";
+import { firebase } from "../../../config";
 
 export default function tab1() {
   const router = useRouter();
-  const navigation = useNavigation();
 
-      const [name, setName] = useState("");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+
+  useEffect(() => {
+    firebase
+      .firestore()
+      .collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .get()
+      .then((snapshot) => {
+        if (snapshot.exists) {
+          setName(snapshot.data());
+          setEmail(snapshot.data());
+        } else {
+          console.log("User does not exist");
+        }
+      });
+  }, []);
 
   return (
     <View style={styles.container}>
       <StatusBar
-        backgroundColor="#93C49E" // Change the background color as needed
+        backgroundColor="#93C49E"
       />
       <View style={styles.header}>
         <View style={styles.titleContainer}>
@@ -55,8 +69,8 @@ export default function tab1() {
               style={styles.profileImage}
             />
             <View style={styles.userInfo}>
-              <Text style={styles.userName}>Hi, Raiza Jane</Text>
-              <Text style={styles.userPhone}>+63094567890</Text>
+              <Text style={styles.userName}>Hi, {name.firstName}</Text>
+              <Text style={styles.userPhone}>{email.email}</Text>
             </View>
           </View>
         </View>
@@ -66,7 +80,7 @@ export default function tab1() {
             <TouchableOpacity
               style={styles.circularIcon}
               onPress={() => {
-                router.replace("/services");
+                router.push("/services");
               }}
             >
               <Image
@@ -81,7 +95,7 @@ export default function tab1() {
             <TouchableOpacity
               style={styles.circularIcon}
               onPress={() => {
-                router.replace("/projects");
+                router.push("/projects");
               }}
             >
               <Image
@@ -96,7 +110,7 @@ export default function tab1() {
             <TouchableOpacity
               style={styles.circularIcon}
               onPress={() => {
-                router.replace("/projects");
+                router.push("/projects");
               }}
             >
               <Image
@@ -113,7 +127,7 @@ export default function tab1() {
             <TouchableOpacity
               style={styles.circularIcon}
               onPress={() => {
-                router.replace("/council");
+                router.push("/council");
               }}
             >
               <Image
@@ -128,7 +142,7 @@ export default function tab1() {
             <TouchableOpacity
               style={styles.circularIcon}
               onPress={() => {
-                router.replace("/history");
+                router.push("/history");
               }}
             >
               <Image
@@ -143,7 +157,7 @@ export default function tab1() {
             <TouchableOpacity
               style={styles.circularIcon}
               onPress={() => {
-                router.replace("/projects");
+                router.push("/projects");
               }}
             >
               <Image
@@ -279,7 +293,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   userPhone: {
-    fontSize: 20,
+    fontSize: 15,
     color: "white",
     marginTop: 4,
   },

@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import {
   View,
   Text,
@@ -11,6 +10,7 @@ import {
   Button,
   Alert
 } from "react-native";
+import React, { useState, useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons, FontAwesome } from "@expo/vector-icons"; // Import the Ionicons library for the bell icon
 import { Picker } from "@react-native-picker/picker";
@@ -22,7 +22,14 @@ export default function tab1() {
   const [name, setName] = useState("");
   const [selectedDepartment, setSelectedDepartment] = useState("");
   const [selectedPersonnel, setSelectedPersonnel] = useState("");
-  const [showPersonnelDropdown, setShowPersonnelDropdown] = useState(false);
+  const [showPersonnelDropdown, setShowPersonnelDropdown] = useState(false); 
+
+  //for storing the user info
+  const [userUid, setUserUid] = useState(null);
+  const [userName, setUserName] = useState(null);
+  const [userEmail, setUserEmail] = useState(null);
+  const [userBarangay, setUserBarangay] = useState(null);
+  const [userContact, setUserContact] = useState(null);
 
   // State for date and time input values
   const [selectedDate, setSelectedDate] = useState(null);
@@ -211,12 +218,45 @@ export default function tab1() {
     setWordCount(0);
   };
 
+  useEffect(() => {
+    const getUserInfo = async () => {
+      try {
+        const user = firebase.auth().currentUser;
+        if (user) {
+          setUserUid(user.uid);
+          // Fetch user's name from Firestore using UID
+          const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
+          if (userDoc.exists) {
+            setUserName(userDoc.data().firstName);
+            setUserEmail(userDoc.data().email);
+            setUserBarangay(userDoc.data().barangay);
+            setUserContact(userDoc.data().contact);
+
+          } else {
+            console.log("User data not found in Firestore");
+          }
+        } else {
+          console.log("User not authenticated");
+        }
+      } catch (error) {
+        console.error("Error getting user info:", error);
+      }
+    };
+
+    getUserInfo();
+  }, []);
+
   const storeAppointmentData = async () => {
     try {
       const MuniServe = firebase.firestore();
       const appointmentsRef = MuniServe.collection("appointments");
 
       await appointmentsRef.add({
+        userUid: userUid,
+        userName: userName,
+        userEmail: userEmail,
+        userContact: userContact,
+        userBarangay: userBarangay,
         name: name,
         department: selectedDepartment,
         personnel: selectedPersonnel,

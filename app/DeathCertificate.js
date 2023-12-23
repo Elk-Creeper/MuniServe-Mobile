@@ -15,6 +15,12 @@ export default function BirthReg() {
     const [selectedDateText, setSelectedDateText] = useState("");
     const [loadingModalVisible, setLoadingModalVisible] = useState(false);
 
+    const [userUid, setUserUid] = useState(null);
+    const [userName, setUserName] = useState(null);
+    const [userEmail, setUserEmail] = useState(null);
+    const [userBarangay, setUserBarangay] = useState(null);
+    const [userContact, setUserContact] = useState(null);
+
     const pickImage = async () => {
         try {
             let result = await ImagePicker.launchImageLibraryAsync({
@@ -36,6 +42,34 @@ export default function BirthReg() {
             );
         }
     };
+
+    useEffect(() => {
+        const getUserInfo = async () => {
+            try {
+                const user = firebase.auth().currentUser;
+                if (user) {
+                    setUserUid(user.uid);
+                    // Fetch user's name from Firestore using UID
+                    const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
+                    if (userDoc.exists) {
+                        setUserName(userDoc.data().firstName);
+                        setUserEmail(userDoc.data().email);
+                        setUserBarangay(userDoc.data().barangay);
+                        setUserContact(userDoc.data().contact);
+
+                    } else {
+                        console.log("User data not found in Firestore");
+                    }
+                } else {
+                    console.log("User not authenticated");
+                }
+            } catch (error) {
+                console.error("Error getting user info:", error);
+            }
+        };
+
+        getUserInfo();
+    }, []);
 
     const uploadMedia = async () => {
         setLoadingModalVisible(true);
@@ -66,6 +100,11 @@ export default function BirthReg() {
             const deathCert = MuniServe.collection("deathCert");
 
             await deathCert.add({
+                userUid: userUid,
+                userName: userName,
+                userEmail: userEmail,
+                userContact: userContact,
+                userBarangay: userBarangay,
                 name: name,
                 date: date,
                 place: place,

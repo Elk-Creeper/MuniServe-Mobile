@@ -1,8 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import {
-    Pressable,
-    Modal,
-    FlatList,
     View,
     TextInput,
     Text,
@@ -12,10 +9,7 @@ import {
     ActivityIndicator,
     TouchableOpacity,
     ScrollView,
-    Dimensions,
     Platform,
-    SafeAreaView,
-    Button,
     Alert,
 } from "react-native";
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
@@ -24,18 +18,22 @@ import { StatusBar } from "expo-status-bar";
 import * as ImagePicker from "expo-image-picker";
 import { firebase } from "../config";
 import * as FileSystem from "expo-file-system";
-import DateTimePicker from "@react-native-community/datetimepicker";
 import * as Animatable from "react-native-animatable";
 import * as MediaLibrary from "expo-media-library";
 
-
-export default function BirthReg() {
+export default function JobApplication() {
     const [image, setImage] = useState(null);
     const [uploading, setUploading] = useState(false);
     const timestamp = firebase.firestore.FieldValue.serverTimestamp();
     const [selectedDateText, setSelectedDateText] = useState("");
     const fadeAnimation = useRef(new Animated.Value(1)).current;
     const [loadingModalVisible, setLoadingModalVisible] = useState(false);
+    
+    const [userUid, setUserUid] = useState(null);
+    const [userName, setUserName] = useState(null);
+    const [userEmail, setUserEmail] = useState(null);
+    const [userBarangay, setUserBarangay] = useState(null);
+    const [userContact, setUserContact] = useState(null);
 
     // for downloading the docx
     const [mediaData, setMediaData] = useState([]);
@@ -152,6 +150,36 @@ export default function BirthReg() {
         }
     };
 
+    useEffect(() => {
+        const getUserInfo = async () => {
+            try {
+                const user = firebase.auth().currentUser;
+                if (user) {
+                    setUserUid(user.uid);
+                    // Fetch user's name from Firestore using UID
+                    const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
+                    if (userDoc.exists) {
+                        setUserName(userDoc.data().firstName);
+                        setUserEmail(userDoc.data().email);
+                        setUserBarangay(userDoc.data().barangay);
+                        setUserContact(userDoc.data().contact);
+
+                    } else {
+                        console.log("User data not found in Firestore");
+                    }
+                } else {
+                    console.log("User not authenticated");
+                }
+            } catch (error) {
+                console.error("Error getting user info:", error);
+            }
+        };
+
+        getUserInfo();
+        // ... other useEffect logic
+
+    }, []);
+
     // upload media files
     const uploadMedia = async () => {
         setLoadingModalVisible(true);
@@ -186,6 +214,11 @@ export default function BirthReg() {
             const job = MuniServe.collection("job");
 
             await job.add({
+                userUid: userUid,
+                userName: userName,
+                userEmail: userEmail,
+                userContact: userContact,
+                userBarangay: userBarangay,
                 name: name,
                 age: age,
                 sex: sex,
@@ -335,7 +368,7 @@ export default function BirthReg() {
                     <View style={styles.placeholder}>
                         <TextInput
                             placeholder=""
-                            maxLength={50}
+                            maxLength={2}
                             value={age}
                             onChangeText={(age) => setAge(age)}
                             style={{
@@ -345,21 +378,24 @@ export default function BirthReg() {
                     </View>
                 </View>
 
-                <View style={{ marginBottom: 10 }}>
-                    <Text style={styles.label}>Sex</Text>
+               
+                    <View style={{ marginBottom: 10 }}>
+                        <Text style={styles.label}>Sex</Text>
 
-                    <View style={styles.placeholder}>
-                        <TextInput
-                            placeholder=""
-                            maxLength={6}
-                            value={sex}
-                            onChangeText={(sex) => setSex(sex)}
-                            style={{
-                                width: "100%",
-                            }}
-                        ></TextInput>
+                        <View style={styles.placeholder}>
+                            <Picker
+                                selectedValue={sex}
+                                onValueChange={(itemValue, itemIndex) =>
+                                    setSex(itemValue)
+                                }
+                                style={{ width: "100%" }}
+                            >
+                                <Picker.Item label="Select" value="" />
+                                <Picker.Item label="Female" value="Female" />
+                                <Picker.Item label="Male" value="Male" />
+                            </Picker>
+                        </View>
                     </View>
-                </View>
 
                 <View style={{ marginBottom: 10 }}>
                     <Text style={styles.label}>Address</Text>
@@ -418,7 +454,6 @@ export default function BirthReg() {
                     const { url, metadata } = media;
                     const { name, contentType } = metadata;
                     const isVideo = contentType.includes("video");
-                    const isImage = contentType.includes("image");
                     return (
                         <View key={index} style={styles.imageContainer}>
                             <CustomButton
@@ -519,14 +554,6 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         fontSize: 20,
     },
-    serveText: {
-        fontSize: 18,
-        fontWeight: "bold",
-        color: "black",
-        textAlign: "left",
-        marginTop: 15,
-        marginBottom: 15,
-    },
     boxes1: {
         width: "100%",
         height: 65,
@@ -550,10 +577,6 @@ const styles = StyleSheet.create({
         width: 40,
         height: 40,
     },
-    containers: {
-        alignItems: "center",
-        justifyContent: "center",
-    },
     inputContainer: {
         flexDirection: "row",
         alignItems: "center",
@@ -572,25 +595,6 @@ const styles = StyleSheet.create({
     input: {
         flex: 1,
         fontSize: 17,
-    },
-    loginButton: {
-        backgroundColor: "#307A59",
-        justifyContent: "center",
-        alignItems: "center",
-        borderRadius: 50,
-        paddingVertical: 10,
-        marginTop: 20,
-        width: 165,
-    },
-    loginButtonText: {
-        color: "white",
-        fontSize: 15,
-    },
-    serveContainer: {
-        padding: 15,
-        borderRadius: 15,
-        margin: 5,
-        marginHorizontal: 10,
     },
     innerContainer: {
         alignContent: "center",
@@ -611,14 +615,7 @@ const styles = StyleSheet.create({
         lineHeight: 30,
         marginBottom: 20,
     },
-    itemService_proc: {
-        fontWeight: "300",
-        fontSize: 15,
-        textAlign: "justify",
-        lineHeight: 30,
-    },
     imageContainer: {
-        marginTop: 20,
         alignItems: "center",
     },
     imageName: {
@@ -630,24 +627,6 @@ const styles = StyleSheet.create({
         width: 200,
         height: 200,
         resizeMode: "cover",
-    },
-    closeButton: {
-        position: "absolute",
-        top: 30,
-        right: 10,
-        backgroundColor: "#307A59",
-        borderRadius: 100,
-        padding: 5,
-        width: 30,
-        height: 30,
-        justifyContent: "center",
-        alignItems: "center",
-        textAlign: "center",
-    },
-    closeButtonText: {
-        fontSize: 18,
-        color: "white",
-        textAlign: "center",
     },
     regText: {
         fontSize: 25,
@@ -686,7 +665,6 @@ const styles = StyleSheet.create({
         marginTop: 50,
         width: 165,
         marginLeft: 15,
-        marginBottom: 40,
     },
     selectButton: {
         borderRadius: 10,
@@ -699,7 +677,6 @@ const styles = StyleSheet.create({
         borderColor: "#000",
         borderWidth: 1,
         flexDirection: "row",
-        marginVertical: 10,
         padding: 10,
     },
     buttonText: {

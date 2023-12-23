@@ -1,24 +1,26 @@
 import {
     View,
     Text,
-    FlatList,
     StyleSheet,
-    ScrollView,
     TextInput,
     TouchableOpacity,
-    Alert, // Import Alert
+    Alert,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
-import { initializeApp } from "firebase/app";
-import { getFirestore, collection, addDoc } from"firebase/firestore";
-import { firebase } from '../config';
-
+import { getFirestore, collection, addDoc } from "firebase/firestore";
+import { firebase, app } from "../config"; // Make sure to import the 'app' variable
 
 const Contact = () => {
     const [c_sub, setAddSubject] = useState("");
     const [c_mess, setAddMessage] = useState("");
     const [charCount, setCharCount] = useState(200); // Initial character count
+
+    const [userUid, setUserUid] = useState(null);
+    const [userName, setUserName] = useState(null);
+    const [userEmail, setUserEmail] = useState(null);
+    const [userBarangay, setUserBarangay] = useState(null);
+    const [userContact, setUserContact] = useState(null);
 
     const resetForm = () => {
         setAddSubject("");
@@ -31,6 +33,34 @@ const Contact = () => {
         setCharCount(usedChars);
     };
 
+    useEffect(() => {
+        const getUserInfo = async () => {
+            try {
+                const user = firebase.auth().currentUser;
+                if (user) {
+                    setUserUid(user.uid);
+                    // Fetch user's name from Firestore using UID
+                    const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
+                    if (userDoc.exists) {
+                        setUserName(userDoc.data().firstName);
+                        setUserEmail(userDoc.data().email);
+                        setUserBarangay(userDoc.data().barangay);
+                        setUserContact(userDoc.data().contact);
+
+                    } else {
+                        console.log("User data not found in Firestore");
+                    }
+                } else {
+                    console.log("User not authenticated");
+                }
+            } catch (error) {
+                console.error("Error getting user info:", error);
+            }
+        };
+
+        getUserInfo();
+    }, []);
+
     const contactForm = async () => {
         try {
             const MuniServe = getFirestore(app);
@@ -39,6 +69,11 @@ const Contact = () => {
             await addDoc(contact, {
                 c_sub: c_sub,
                 c_mess: c_mess,
+                userUid: userUid,
+                userName: userName,
+                userEmail: userEmail,
+                userContact: userContact,
+                userBarangay: userBarangay,
             });
 
             // Data is stored in Firestore

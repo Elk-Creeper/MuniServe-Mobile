@@ -232,7 +232,6 @@ export default function Tab4() {
                       />
                       <Text style={styles.appText}>Appointment</Text>
                       <Text style={styles.itemCreatedAt}>
-                        {" "}
                         {item.createdAt}
                       </Text>
                     </View>
@@ -404,7 +403,7 @@ const styles = StyleSheet.create({
     marginBottom: 270,
   },
   itemCreatedAt: {
-    marginLeft: 70,
+    marginLeft: 60,
     marginTop: 3,
     fontSize: 13,
     color: "#597ae8",

@@ -38,7 +38,14 @@ export default function Tab4() {
     const [audited, setAudited] = useState([]);
     const [publicLiability2, setPublicLiability2] = useState([]);
     const [uploading, setUploading] = useState(false);
-    const [loadingModalVisible, setLoadingModalVisible] = useState(false);
+    const [loadingModalVisible, setLoadingModalVisible] = useState(false); 
+
+    // for storing user info
+    const [userUid, setUserUid] = useState(null);
+    const [userName, setUserName] = useState(null);
+    const [userEmail, setUserEmail] = useState(null);
+    const [userBarangay, setUserBarangay] = useState(null);
+    const [userContact, setUserContact] = useState(null);
 
     const [selectedApplicationType, setSelectedApplicationType] = useState(null);
     const timestamp = firebase.firestore.FieldValue.serverTimestamp();
@@ -228,6 +235,34 @@ export default function Tab4() {
         }
     };
 
+    useEffect(() => {
+        const getUserInfo = async () => {
+            try {
+                const user = firebase.auth().currentUser;
+                if (user) {
+                    setUserUid(user.uid);
+                    // Fetch user's name from Firestore using UID
+                    const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
+                    if (userDoc.exists) {
+                        setUserName(userDoc.data().firstName);
+                        setUserEmail(userDoc.data().email);
+                        setUserBarangay(userDoc.data().barangay);
+                        setUserContact(userDoc.data().contact);
+
+                    } else {
+                        console.log("User data not found in Firestore");
+                    }
+                } else {
+                    console.log("User not authenticated");
+                }
+            } catch (error) {
+                console.error("Error getting user info:", error);
+            }
+        };
+
+        getUserInfo();
+    }, []);
+
     const removeImage = (category, index) => {
         if (category === "app form 1") {
             const newImages = [...appForm1];
@@ -286,6 +321,11 @@ export default function Tab4() {
 
         try {
             const imageURLs = {
+                userUid: userUid,
+                userName: userName,
+                userEmail: userEmail,
+                userContact: userContact,
+                userBarangay: userBarangay,
                 appForm1: [],
                 barangayClearance1: [],
                 dti: [],

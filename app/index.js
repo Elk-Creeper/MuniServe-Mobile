@@ -6,15 +6,17 @@ import {
   SafeAreaView,
   Pressable,
   TouchableOpacity,
+  StyleSheet,
 } from "react-native";
-import React, { useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import { Link, useRouter } from "expo-router";
 import { twJoin } from "tailwind-merge";
+import React, { useState, useEffect } from 'react';
 
 export default function onboarding() {
   const router = useRouter();
   const [curIdx, setCurIdx] = useState(0);
+  
   const screens = [
     <View className="justify-center items-center w-screen">
       <Image
@@ -64,6 +66,7 @@ export default function onboarding() {
       </View>
     </View>,
   ];
+
   return (
     <SafeAreaView className="flex-1 justify-center items-center bg-white">
       <Text className="font-bold text-2xl tracking-[3px] mt-10">
@@ -102,22 +105,59 @@ export default function onboarding() {
         })}
       </View>
 
-      <View className="justify-center w-full">
-        <TouchableOpacity
-          onPress={() => {
-            router.push("/signup");
-          }}
-          className="bg-green-900 justify-center items-center  mx-10 rounded-lg py-3"
-        >
-          <Text className="text-xl text-white">Sign Up</Text>
-        </TouchableOpacity>
-        <View className="flex-row mt-3 self-center">
-          <Text>Already a member?</Text>
-          <Link href = {"/login"} className="text-blue-600 ml-2">
-            Login here
-          </Link>
+      <TouchableOpacity onPress={() => {
+        router.push("/register");
+      }}>
+        <View style={styles.box}>
+            <Text style={styles.regText}>Register Now</Text>
         </View>
+      </TouchableOpacity>
+
+      <View style={styles.texts}>
+        <Text
+          style={{
+            fontWeight: "500",
+            fontSize: 16,
+            textAlign: "center",
+            marginTop: 20,
+          }}
+        >
+          Already have an account?
+        </Text>
+        <TouchableOpacity onPress={() => {
+          router.push("/login");
+        }}>
+          <View style={styles.box2}>
+            <Text style={styles.logText}>  Login Now</Text>
+          </View>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  texts: {
+    flexDirection: "row",
+    marginLeft: 10,
+  },
+  box: {
+    backgroundColor: "#307A59",
+    height: 60,
+    width: 290,
+    borderRadius: 10,
+  },
+  regText: {
+    color: "#fff",
+    fontSize: 20,
+    fontWeight: "light",
+    textAlign: "center",
+    marginTop: 15
+  },
+  logText: {
+    color: "#0174BE",
+    marginTop: 22,
+    fontWeight: '500',
+  },
+});
+

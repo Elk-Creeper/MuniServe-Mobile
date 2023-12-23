@@ -13,5 +13,5 @@
     "app/dashboard/(tabs)/Appointment.js",
     "app/dashboard/(tabs)/Transaction.js",
     "app/services.js"
-, "app/dashboard/(tabs)/News.js", "app/dashboard/(tabs)/News.tsx"  ]
+, "app/dashboard/(tabs)/News.js", "app/dashboard/(tabs)/News.tsx", "app/index.js", "app/dashboard/(tabs)/Home.js", "app/dashboard/(tabs)/User.js"  ]
 }
