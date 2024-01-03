@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { Pressable, Modal, FlatList, View, TextInput, Text, StyleSheet, Image, TouchableOpacity, ActivityIndicator, ScrollView, Dimensions, Platform, SafeAreaView, Button, Alert } from "react-native";
+import { View, TextInput, Text, StyleSheet, Image, TouchableOpacity, ActivityIndicator, ScrollView, SafeAreaView, Alert } from "react-native";
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
-import { Picker } from "@react-native-picker/picker";
 import { StatusBar } from "expo-status-bar";
 import * as ImagePicker from "expo-image-picker";
 import { firebase } from '../config';
 import * as FileSystem from 'expo-file-system';
 import DateTimePicker from "@react-native-community/datetimepicker";
 
-export default function BirthReg() {
+export default function DeathCert() {
     const [image, setImage] = useState(null);
     const [uploading, setUploading] = useState(false);
     const timestamp = firebase.firestore.FieldValue.serverTimestamp();
@@ -76,6 +75,54 @@ export default function BirthReg() {
         setUploading(true);
 
         try {
+            // Check for null or empty values in required fields
+            const requiredFields = [
+                name,
+                place,
+                rname,
+                address,
+                copies,
+                purpose,
+            ];
+
+            if (requiredFields.some((field) => !field || field.trim() === '')) {
+                Alert.alert(
+                    "Incomplete Form",
+                    "Please fill in all required fields.",
+                );
+                return;
+            }
+
+            // Validate the date
+            if (!selectedDateText) {
+                Alert.alert("Invalid Date", "Please select a valid date.");
+                return;
+            }
+
+            // Validate the number of copies
+            const parsedCopies = parseInt(copies);
+            if (isNaN(parsedCopies) || parsedCopies <= 0) {
+                Alert.alert("Invalid Number of Copies", "Please enter a valid number of copies.");
+                return;
+            }
+
+            // Validate the name and rname fields
+            if (!/^[a-zA-Z.]+$/.test(name)) {
+                Alert.alert("Invalid Characters", "Name should only contain letters and dots.");
+                return;
+            }
+
+            if (!/^[a-zA-Z.]+$/.test(rname)) {
+                Alert.alert("Invalid Characters", "Requesting party name should only contain letters and dots.");
+                return;
+            }
+
+            // Check if the user has selected an image
+            if (!image) {
+                Alert.alert("Missing Image", "Please select an image for proof of payment.");
+                return;
+            }
+
             const { uri } = await FileSystem.getInfoAsync(image);
             const blob = await new Promise((resolve, reject) => {
                 const xhr = new XMLHttpRequest();
@@ -110,26 +157,25 @@ export default function BirthReg() {
                 place: place,
                 rname: rname,
                 address: address,
-                copies: copies,
+                copies: parsedCopies,
                 purpose: purpose,
                 payment: downloadURL,
                 status: "Pending",
                 createdAt: timestamp,
             });
 
-            setUploading(false);
             setImage(null);
             resetForm();
             Alert.alert("Success", "Form filled successfully.");
         } catch (error) {
             console.error(error);
-            setUploading(false);
             Alert.alert("Error", "Form filling failed.");
         } finally {
+            setUploading(false);
             setLoadingModalVisible(false);
         }
     };
-
+    
     // Data add
     const [name, setName] = useState("");
     const [date, setDate] = useState(new Date());

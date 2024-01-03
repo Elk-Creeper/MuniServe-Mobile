@@ -176,8 +176,6 @@ export default function JobApplication() {
         };
 
         getUserInfo();
-        // ... other useEffect logic
-
     }, []);
 
     // upload media files
@@ -186,7 +184,35 @@ export default function JobApplication() {
         setUploading(true);
 
         try {
+            // Validate required fields
+            const requiredFields = [name, age, sex, address, phoneNum, educ];
+            if (requiredFields.some(field => !field)) {
+                Alert.alert("Incomplete Form", "Please fill in all required fields.");
+                return;
+            }
+            // Validate name
+            if (!/^[a-zA-Z.\s]+$/.test(name)) {
+                Alert.alert(
+                    "Invalid Name",
+                    "Name should only contain letters, dots, and spaces."
+                );
+                return;
+            }
+
+            // Validate phone number
+            if (!/^\d{11}$/.test(phoneNum)) {
+                Alert.alert("Invalid Phone Number", "Phone number must be exactly 11 digits.");
+                return;
+            }
+
+            // Check if image is provided
+            if (!image) {
+                Alert.alert("Missing Image", "Please upload an image.");
+                return;
+            }
+
             const { uri } = await FileSystem.getInfoAsync(image);
+
             const blob = await new Promise((resolve, reject) => {
                 const xhr = new XMLHttpRequest();
                 xhr.onload = () => {
@@ -240,9 +266,10 @@ export default function JobApplication() {
             Alert.alert("Error", "Form filling failed.");
         } finally {
             setUploading(false);
-            setLoadingModalVisible(false); // Hide loading modal
+            setLoadingModalVisible(false);
         }
     };
+
 
     // Data add
     const [name, setName] = useState("");
@@ -370,6 +397,7 @@ export default function JobApplication() {
                             placeholder=""
                             maxLength={2}
                             value={age}
+                            keyboardType="number-pad"
                             onChangeText={(age) => setAge(age)}
                             style={{
                                 width: "100%",
@@ -379,11 +407,11 @@ export default function JobApplication() {
                 </View>
 
                
-                    <View style={{ marginBottom: 10 }}>
-                        <Text style={styles.label}>Sex</Text>
+                <View style={{ marginBottom: 10 }}>
+                    <Text style={styles.label}>Sex</Text>
 
-                        <View style={styles.placeholder}>
-                            <Picker
+                    <View style={styles.placeholder}>
+                        <Picker
                                 selectedValue={sex}
                                 onValueChange={(itemValue, itemIndex) =>
                                     setSex(itemValue)
@@ -393,9 +421,9 @@ export default function JobApplication() {
                                 <Picker.Item label="Select" value="" />
                                 <Picker.Item label="Female" value="Female" />
                                 <Picker.Item label="Male" value="Male" />
-                            </Picker>
-                        </View>
+                        </Picker>
                     </View>
+                </View>
 
                 <View style={{ marginBottom: 10 }}>
                     <Text style={styles.label}>Address</Text>
@@ -414,13 +442,14 @@ export default function JobApplication() {
                 </View>
 
                 <View style={{ marginBottom: 10 }}>
-                    <Text style={styles.label}>Phone number</Text>
+                    <Text style={styles.label}>Phone Number</Text>
 
                     <View style={styles.placeholder}>
                         <TextInput
                             placeholder=""
                             maxLength={11}
                             value={phoneNum}
+                            keyboardType="number-pad"
                             onChangeText={(phoneNum) => setPhoneNum(phoneNum)}
                             style={{
                                 width: "100%",

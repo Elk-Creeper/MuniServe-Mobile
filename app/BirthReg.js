@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from "react";
 import {
-  Pressable,
-  Modal,
-  FlatList,
   View,
   TextInput,
   Text,
@@ -11,10 +8,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   ScrollView,
-  Dimensions,
   Platform,
-  SafeAreaView,
-  Button,
   Alert,
 } from "react-native";
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
@@ -85,6 +79,50 @@ export default function BirthReg() {
     setUploading(true);
 
     try {
+      // Validate other required fields
+      if (
+        !childname.trim() ||
+        !birthdate ||
+        !birthplace.trim() ||
+        !sex ||
+        !typeofbirth ||
+        (typeofbirth !== 'Single' && !multiple) ||
+        !weight.trim() ||
+        !birthorder.trim() ||
+        !m_name.trim() ||
+        !m_citizenship.trim() ||
+        !m_religion ||
+        !m_occur.trim() ||
+        !m_age.trim() ||
+        !m_totchild.trim() ||
+        !f_name.trim() ||
+        !f_citizenship.trim() ||
+        !f_religion ||
+        !f_occur.trim() ||
+        !f_age.trim() ||
+        !f_residence.trim() ||
+        !f_placemarried.trim() ||
+        !attendant
+      ) {
+        Alert.alert("Incomplete Form", "Please fill in all required fields.");
+        return;
+      }
+
+      // Validate childname
+      if (!/^[a-zA-Z.\s]+$/.test(childname)) {
+        Alert.alert(
+          "Invalid Input",
+          "Name of newborn child should only contain letters, dots, and spaces."
+        );
+        return;
+      }
+
+      // Check if image is provided
+      if (!image) {
+        Alert.alert("Missing Image", "Please upload an image.");
+        return;
+      }
+
       const { uri } = await FileSystem.getInfoAsync(image);
       const blob = await new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
@@ -709,10 +747,6 @@ export default function BirthReg() {
 
         <View style={{ marginBottom: 10 }}>
           <Text style={styles.label}>Attendant of birth</Text>
-
-          <View style={{ marginBottom: 10 }}>
-            <Text style={styles.label}>Attendant</Text>
-
             <View style={styles.placeholder}>
               <Picker
                 selectedValue={attendant}
@@ -728,7 +762,6 @@ export default function BirthReg() {
                 <Picker.Item label=" Hilot (traditional Midwife)" value=" Hilot (traditional Midwife)" />
               </Picker>
             </View>
-          </View>
         </View>
 
         <Text style={styles.noteText}>

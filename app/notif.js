@@ -23,65 +23,19 @@ export default function Tab4() {
     const [transactionData, setTransactionData] = useState([]);
 
     useEffect(() => {
-        const transactionPage = firebase.firestore().collection("birth_reg");
-        const unsubscribeAppointment = transactionPage.onSnapshot(
-            (querySnapshot) => {
-                const transactions = []; // Use a different variable name
-                const currentTime = new Date();
+        const currentUser = firebase.auth().currentUser;
+        const currentUserUid = currentUser ? currentUser.uid : null;
 
-                querySnapshot.forEach((doc) => {
-                    const { status, createdAt } = doc.data();
-
-                    if (createdAt && createdAt.toDate() instanceof Function) {
-                        const createdAtDate = createdAt.toDate();
-                        const timeDiffInMilliseconds =
-                            currentTime - createdAtDate.getTime();
-                        const timeDiffInMinutes = Math.floor(
-                            timeDiffInMilliseconds / (1000 * 60)
-                        );
-
-                        let formattedCreatedAt;
-                        if (timeDiffInMinutes < 1) {
-                            formattedCreatedAt = "Just now";
-                        } else if (timeDiffInMinutes < 60) {
-                            formattedCreatedAt = `${timeDiffInMinutes}m ago`;
-                        } else if (timeDiffInMinutes < 1440) {
-                            const hours = Math.floor(timeDiffInMinutes / 60);
-                            formattedCreatedAt = `${hours} ${hours === 1 ? "h" : "hrs"} ago`;
-                        } else if (timeDiffInMinutes < 43200) {
-                            const days = Math.floor(timeDiffInMinutes / 1440);
-                            formattedCreatedAt = `${days} ${days === 1 ? "day" : "days"} ago`;
-                        } else if (timeDiffInMinutes < 525600) {
-                            const months = Math.floor(timeDiffInMinutes / 43200);
-                            formattedCreatedAt = `${months} ${months === 1 ? "month" : "months"
-                                } ago`;
-                        } else {
-                            const years = Math.floor(timeDiffInMinutes / 525600);
-                            formattedCreatedAt = `${years} ${years === 1 ? "year" : "years"
-                                } ago`;
-                        }
-
-                        transactions.push({
-                            id: doc.id,
-                            status,
-                            createdAt: formattedCreatedAt,
-                        });
-                    } else {
-                        console.warn(
-                            "Skipping document with missing or invalid createdAt:",
-                            doc.id
-                        );
-                    }
-                });
-                setTransactionData(transactions);
-            }
-        );
+        if (!currentUserUid) {
+            // Handle the case when the user is not authenticated
+            return;
+        }
 
         const appointmentPage = firebase.firestore().collection("appointments");
-        const unsubscribeTransaction = appointmentPage.onSnapshot(
-            // Change to appointmentPage
-            (querySnapshot) => {
-                const appointments = []; // Use a different variable name
+        const unsubscribeTransaction = appointmentPage
+            .where("userUid", "==", currentUserUid)
+            .onSnapshot((querySnapshot) => {
+                const appointments = [];
                 const currentTime = new Date();
 
                 querySnapshot.forEach((doc) => {
@@ -144,12 +98,11 @@ export default function Tab4() {
                         );
                     }
                 });
+
                 setAppointmentData(appointments);
-            }
-        );
+            });
 
         return () => {
-            unsubscribeAppointment();
             unsubscribeTransaction();
         };
     }, []);

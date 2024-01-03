@@ -18,7 +18,7 @@ export default function tab1() {
   const router = useRouter();
 
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [contact, setContact] = useState("");
 
   useEffect(() => {
     firebase
@@ -29,7 +29,7 @@ export default function tab1() {
       .then((snapshot) => {
         if (snapshot.exists) {
           setName(snapshot.data());
-          setEmail(snapshot.data());
+          setContact(snapshot.data());
         } else {
           console.log("User does not exist");
         }
@@ -54,7 +54,7 @@ export default function tab1() {
         </View>
         <TouchableOpacity
           onPress={() => {
-            router.replace("/notif");
+            router.push("/notif");
           }}
         >
           <Ionicons name="notifications-outline" size={24} color="black" />
@@ -70,7 +70,7 @@ export default function tab1() {
             />
             <View style={styles.userInfo}>
               <Text style={styles.userName}>Hi, {name.firstName}</Text>
-              <Text style={styles.userPhone}>{email.email}</Text>
+              <Text style={styles.userPhone}>{contact.contact}</Text>
             </View>
           </View>
         </View>

@@ -14,91 +14,130 @@ import { useRouter } from "expo-router";
 const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [initialAuthCheckComplete, setInitialAuthCheckComplete] = useState(false);
     const router = useRouter();
 
     useEffect(() => {
-        const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
+        const unsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
+            console.log("onAuthStateChanged", user);
+
+            if (!initialAuthCheckComplete) {
+                setInitialAuthCheckComplete(true);
+                return;
+            }
+
             if (user) {
-                router.replace("/dashboard/(tabs)/Home");
+                // Check if the login action triggered the listener
+                if (user.metadata.creationTime === user.metadata.lastSignInTime) {
+                    // This is the first sign-in after registration, do nothing
+                    return;
+                }
+                // Check if user is verified before navigating to the home page
+                if (user.emailVerified) {
+                    // User is verified, handle login
+                    handleLogin(user);
+                } else {
+                    // User is not verified, handle verification
+                    alert("Please verify your email before logging in.");
+                }
             }
         });
 
-        return () => unsubscribe(); // Cleanup the subscription on component unmount
-    }, []);
+        return () => unsubscribe();
+    }, [initialAuthCheckComplete]);
 
-    const loginUser = async (email, password) => {
+    const handleLogin = (user) => {
+        console.log("handleLogin", user);
+        router.replace("/dashboard/(tabs)/Home");
+    };
+
+    const loginUser = async () => {
         try {
             await firebase.auth().signInWithEmailAndPassword(email, password);
+
+            const user = firebase.auth().currentUser;
+
+            console.log("loginUser", user);
+
+            if (user) {
+                if (user.emailVerified) {
+                    // User is verified, handle login
+                    handleLogin(user);
+                } else {
+                    alert("Please verify your email before logging in.");
+                    // Optionally, you can also resend the verification email here
+                }
+            }
         } catch (error) {
+            console.error("loginUser error", error);
             alert(error.message);
         }
     };
 
-    
-return (
-    <View style={styles.container1}>
-     <StatusBar backgroundColor="#93C49E" />
-        <View style={styles.header}>
-            <View style={styles.titleContainer}>
-                <Image
-                    source={require("../assets/imported/Del_Gallego_Camarines_Sur.png")}
-                    style={styles.imageStyle}
-                />
-                <Text style={styles.titleText}>
-                    <Text style={styles.blackText}>MUNI</Text>
-                    <Text style={styles.greenText}>SERVE</Text>
-                </Text>
+    return (
+        <View style={styles.container1}>
+            <StatusBar backgroundColor="#93C49E" />
+            <View style={styles.header}>
+                <View style={styles.titleContainer}>
+                    <Image
+                        source={require("../assets/imported/Del_Gallego_Camarines_Sur.png")}
+                        style={styles.imageStyle}
+                    />
+                    <Text style={styles.titleText}>
+                        <Text style={styles.blackText}>MUNI</Text>
+                        <Text style={styles.greenText}>SERVE</Text>
+                    </Text>
+                </View>
             </View>
-        </View>
 
-        <View style={styles.container2}>
-            <Text style={styles.regText}>Welcome back!</Text>
-            <View style={{ marginTop: 100 }}>
-                <TextInput
-                    style={styles.textInput}
-                    placeholder="Email"
-                    onChangeText={(email) => setEmail(email)}
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                />
-                <TextInput
-                    style={styles.textInput}
-                    placeholder="Password"
-                    onChangeText={(password) => setPassword(password)}
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                    secureTextEntry={true}
-                />
-            </View>
-            <TouchableOpacity
-                onPress={() => loginUser(email, password)}
-                style={styles.button}
-            >
-                <Text style={{ fontWeight: "600", fontSize: 23, color: "white" }}>
-                    Login
-                </Text>
-            </TouchableOpacity>
-
-            <View style={styles.texts}>
-                <Text
-                    style={{
-                        fontWeight: "500",
-                        fontSize: 16,
-                        textAlign: "center",
-                        marginTop: 20,
-                    }}
-                >Don't have an account?
-                </Text>
-                <TouchableOpacity onPress={() => {
-                    router.push("/register");
-                }}>
-                    <View style={styles.box}>
-                        <Text style={styles.itemService_name}>  Register Now</Text>
-                    </View>
+            <View style={styles.container2}>
+                <Text style={styles.regText}>Welcome back!</Text>
+                <View style={{ marginTop: 100 }}>
+                    <TextInput
+                        style={styles.textInput}
+                        placeholder="Email"
+                        onChangeText={(email) => setEmail(email)}
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                    />
+                    <TextInput
+                        style={styles.textInput}
+                        placeholder="Password"
+                        onChangeText={(password) => setPassword(password)}
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                        secureTextEntry={true}
+                    />
+                </View>
+                <TouchableOpacity
+                    onPress={() => loginUser(email, password)}
+                    style={styles.button}
+                >
+                    <Text style={{ fontWeight: "600", fontSize: 23, color: "white" }}>
+                        Login
+                    </Text>
                 </TouchableOpacity>
+
+                <View style={styles.texts}>
+                    <Text
+                        style={{
+                            fontWeight: "500",
+                            fontSize: 16,
+                            textAlign: "center",
+                            marginTop: 20,
+                        }}
+                    >Don't have an account?
+                    </Text>
+                    <TouchableOpacity onPress={() => {
+                        router.push("/register");
+                    }}>
+                        <View style={styles.box}>
+                            <Text style={styles.itemService_name}>  Register Now</Text>
+                        </View>
+                    </TouchableOpacity>
+                </View>
             </View>
         </View>
-    </View>
     );
 };
 
@@ -181,7 +220,7 @@ const styles = StyleSheet.create({
     },
     itemService_name: {
         color: "#0174BE",
-        marginTop: 20,    
+        marginTop: 20,
         fontWeight: '500',
         fontSize: 16,
     },

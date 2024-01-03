@@ -10,7 +10,7 @@ export default function tab4() {
   const router = useRouter();
 
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [contact, setContact] = useState("");
 
   useEffect(() => {
     firebase
@@ -21,7 +21,7 @@ export default function tab4() {
       .then((snapshot) => {
         if (snapshot.exists) {
           setName(snapshot.data());
-          setEmail(snapshot.data());
+          setContact(snapshot.data());
         } else {
           console.log("User does not exist");
         }
@@ -85,7 +85,7 @@ export default function tab4() {
             />
             <View style={styles.userInfo}>
               <Text style={styles.userName}>Hi, {name.firstName}</Text>
-              <Text style={styles.userPhone}>{email.email}</Text>
+              <Text style={styles.userPhone}>{contact.contact}</Text>
             </View>
           </View>
         </View>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Pressable, Modal, FlatList, View, TextInput, Text, StyleSheet, Animated, Image, ActivityIndicator, TouchableOpacity, ScrollView, Dimensions, Platform, SafeAreaView, Button, Alert } from "react-native";
+import { View, TextInput, Text, StyleSheet, Animated, Image, ActivityIndicator, TouchableOpacity, ScrollView, Platform, Alert } from "react-native";
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import { StatusBar } from "expo-status-bar";
@@ -10,7 +10,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import * as Animatable from "react-native-animatable";
 
 
-export default function BirthReg() {
+export default function MarriageCert() {
     const [image, setImage] = useState(null);
     const [uploading, setUploading] = useState(false);
     const timestamp = firebase.firestore.FieldValue.serverTimestamp();
@@ -91,6 +91,44 @@ export default function BirthReg() {
         setUploading(true);
 
         try {
+            // Validate required fields
+            const requiredFields = [hname, wname, marriage, rname, address, copies, purpose];
+
+            if (requiredFields.some(field => !field)) {
+                Alert.alert("Incomplete Form", "Please fill in all required fields.");
+                return;
+            }
+
+            // Validate name fields
+            const nameFields = [hname, rname, wname];
+
+            if (nameFields.some(name => !/^[a-zA-Z.\s]+$/.test(name.trim()))) {
+                Alert.alert(
+                    "Invalid Name",
+                    "Name fields should only contain letters, dots, and spaces."
+                );
+                return;
+            }
+
+            // Validate the date
+            if (!selectedDateText) {
+                Alert.alert("Invalid Date", "Please select a valid date.");
+                return;
+            }
+
+            // Validate the number of copies
+            const parsedCopies = parseInt(copies);
+            if (isNaN(parsedCopies) || parsedCopies <= 0) {
+                Alert.alert("Invalid Number of Copies", "Please enter a valid number of copies.");
+                return;
+            }
+
+            // Check if the user has selected an image
+            if (!image) {
+                Alert.alert("Missing Image", "Please select an image for proof of payment.");
+                return;
+            }
+
             const { uri } = await FileSystem.getInfoAsync(image);
             const blob = await new Promise((resolve, reject) => {
                 const xhr = new XMLHttpRequest();
@@ -151,6 +189,7 @@ export default function BirthReg() {
         }
     };
 
+
     // Data add
     const [hname, setHname] = useState("");
     const [wname, setWname] = useState("");
@@ -166,13 +205,11 @@ export default function BirthReg() {
         setHname("");
         setWname("");
         setDate(new Date());
-        setDate("");
         setMarriage("");
         setRname("");
         setAddress("");
         setCopies("");
         setPurpose("");
-
         setSelectedDateText("");
     };
 
@@ -219,7 +256,6 @@ export default function BirthReg() {
         setDate(currentDate);
         setSelectedDateText(formatDate(currentDate));
     };
-
 
     const formatDate = (date) => {
         // Format the date as needed (you can customize this based on your requirements)
@@ -304,7 +340,7 @@ export default function BirthReg() {
 
                 <View style={{ marginBottom: 10 }}>
                     <Text style={styles.label}>
-                        Date of marriage
+                        Date of death
                     </Text>
 
                     <TouchableOpacity
@@ -413,7 +449,7 @@ export default function BirthReg() {
                             onChangeText={(purpose) => setPurpose(purpose)}
                             maxLength={300}
                             style={{
-                                width: "100%",
+                                width: "100%", textAlignVertical: "top",
                             }}
                         ></TextInput>
                     </View>

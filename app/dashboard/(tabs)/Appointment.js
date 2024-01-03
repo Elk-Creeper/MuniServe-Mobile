@@ -248,6 +248,23 @@ export default function tab1() {
 
   const storeAppointmentData = async () => {
     try {
+      // Validate required fields
+      const requiredFields = [name, selectedDepartment, selectedPersonnel, selectedDate, selectedTime, textMessage];
+
+      if (requiredFields.some(field => !field)) {
+        Alert.alert("Incomplete Form", "Please fill in all required fields.");
+        return;
+      }
+
+      // Validate name
+      if (!/^[a-zA-Z.\s]+$/.test(name)) {
+        Alert.alert(
+          "Invalid Name",
+          "Name should only contain letters, dots, and spaces."
+        );
+        return;
+      }
+
       const MuniServe = firebase.firestore();
       const appointmentsRef = MuniServe.collection("appointments");
 
@@ -275,6 +292,7 @@ export default function tab1() {
       Alert.alert("Error", "Appointment booking failed.");
     }
   };
+
 
   return (
     <View style={styles.container}>
