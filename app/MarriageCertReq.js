@@ -1,155 +1,29 @@
 import React, { useState, useEffect, useRef } from "react";
-import {
-    View,
-    TextInput,
-    Text,
-    StyleSheet,
-    Animated,
-    Image,
-    ActivityIndicator,
-    TouchableOpacity,
-    ScrollView,
-    Platform,
-    Alert,
-} from "react-native";
+import { View, TextInput, Text, StyleSheet, Animated, Image, ActivityIndicator, TouchableOpacity, ScrollView, Platform, Alert } from "react-native";
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import { StatusBar } from "expo-status-bar";
 import * as ImagePicker from "expo-image-picker";
-import { firebase } from "../config";
-import * as FileSystem from "expo-file-system";
+import { firebase } from '../config';
+import * as FileSystem from 'expo-file-system';
+import DateTimePicker from "@react-native-community/datetimepicker";
 import * as Animatable from "react-native-animatable";
-import * as MediaLibrary from "expo-media-library";
 
-export default function JobApplication() {
+
+export default function MarriageCertReq() {
     const [image, setImage] = useState(null);
     const [uploading, setUploading] = useState(false);
     const timestamp = firebase.firestore.FieldValue.serverTimestamp();
+    const [selectedDateText, setSelectedDateText] = useState("");
     const fadeAnimation = useRef(new Animated.Value(1)).current;
     const [loadingModalVisible, setLoadingModalVisible] = useState(false);
-    
+
     const [userUid, setUserUid] = useState(null);
     const [userName, setUserName] = useState(null);
     const [userEmail, setUserEmail] = useState(null);
     const [userBarangay, setUserBarangay] = useState(null);
     const [userContact, setUserContact] = useState(null);
 
-    // for downloading the docx
-    const [mediaData, setMediaData] = useState([]);
-
-    useEffect(() => {
-        async function getMediaData() {
-            const mediaRefs = [firebase.storage().ref("RESUME.docx")];
-
-            const mediaInfo = await Promise.all(
-                mediaRefs.map(async (ref) => {
-                    const url = await ref.getDownloadURL();
-                    const metadata = await ref.getMetadata();
-                    return { url, metadata };
-                })
-            );
-            setMediaData(mediaInfo);
-        }
-
-        getMediaData();
-    }, []);
-
-    async function downloadFile(url, filename, isVideo) {
-        try {
-            const { status } = await MediaLibrary.requestPermissionsAsync();
-            if (status !== "granted") {
-                Alert.alert(
-                    "Permission needed",
-                    "This app needs access to your Media library to download files."
-                );
-                return;
-            }
-
-            const fileUri = FileSystem.cacheDirectory + filename;
-            console.log("Starting download..!");
-            const downloadResumable = FileSystem.createDownloadResumable(
-                url,
-                fileUri,
-                {},
-                false
-            );
-            const { uri } = await downloadResumable.downloadAsync(null, {
-                shouldCache: false,
-            });
-            console.log("Download completed: ", uri);
-
-            if (isVideo) {
-                const { uri: thumbnailUri } = await VideoThumbnails.getThumbnailAsync(
-                    uri,
-                    { time: 1000 }
-                );
-                console.log("Thumbnail created:", thumbnailUri);
-            }
-
-            const asset = await MediaLibrary.createAssetAsync(uri);
-            console.log("asset created:", asset);
-
-            Alert.alert("Download successful", `File saved to: ${fileUri}`);
-        } catch (error) {
-            console.error("Error during download:", error);
-            Alert.alert(
-                "Download failed",
-                "There was an error while downloading the file."
-            );
-        }
-    }
-
-    // docx design
-    const CustomButton = ({ title, onPress }) => (
-        <TouchableOpacity
-            style={{
-                backgroundColor: "#307A59",
-                height: 50,
-                width: '100%',
-                borderRadius: 10,
-                justifyContent: "center",
-                alignItems: "center",
-            }}
-            onPress={onPress}
-        >
-            <Text style={{ color: "white" }}>{title}</Text>
-        </TouchableOpacity>
-    );
-
-    useEffect(() => {
-        // If an image is selected, start the fade-out animation
-        if (pictures.length > 0) {
-            Animated.timing(fadeAnimation, {
-                toValue: 0,
-                duration: 500,
-                useNativeDriver: true,
-            }).start();
-        }
-    }, [pictures, fadeAnimation]);
-
-    const pickImage = async () => {
-        try {
-            let result = await ImagePicker.launchImageLibraryAsync({
-                mediaTypes: ImagePicker.MediaTypeOptions.All, //All, Image, Videos
-                allowsEditing: false,
-                aspect: [4, 3],
-                quality: 1,
-            });
-
-            if (!result.canceled) {
-                setImage(result.assets[0].uri);
-            }
-        } catch (error) {
-            Alert.alert(
-                "Error",
-                "There was an error picking images. Please try again.",
-                [{ text: "OK", onPress: () => console.log("OK Pressed") }],
-                { cancelable: false }
-            );
-        }
-    };
-
-    //to get user identity
     useEffect(() => {
         const getUserInfo = async () => {
             try {
@@ -178,6 +52,39 @@ export default function JobApplication() {
         getUserInfo();
     }, []);
 
+    useEffect(() => {
+        // If an image is selected, start the fade-out animation
+        if (payment.length > 0) {
+            Animated.timing(fadeAnimation, {
+                toValue: 0,
+                duration: 500,
+                useNativeDriver: true,
+            }).start();
+        }
+    }, [payment, fadeAnimation]);
+
+    const pickImage = async () => {
+        try {
+            let result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.All, //All, Image, Videos
+                allowsEditing: false,
+                aspect: [4, 3],
+                quality: 1,
+            });
+
+            if (!result.canceled) {
+                setImage(result.assets[0].uri);
+            }
+        } catch (error) {
+            Alert.alert(
+                "Error",
+                "There was an error picking images. Please try again.",
+                [{ text: "OK", onPress: () => console.log("OK Pressed") }],
+                { cancelable: false }
+            );
+        }
+    };
+
     // upload media files
     const uploadMedia = async () => {
         setLoadingModalVisible(true);
@@ -185,34 +92,44 @@ export default function JobApplication() {
 
         try {
             // Validate required fields
-            const requiredFields = [name, age, sex, address, phoneNum, educ];
+            const requiredFields = [hname, wname, marriage, rname, address, copies, purpose];
+
             if (requiredFields.some(field => !field)) {
                 Alert.alert("Incomplete Form", "Please fill in all required fields.");
                 return;
             }
-            // Validate name
-            if (!/^[a-zA-Z.\s]+$/.test(name)) {
+
+            // Validate name fields
+            const nameFields = [hname, rname, wname];
+
+            if (nameFields.some(name => !/^[a-zA-Z.\s]+$/.test(name.trim()))) {
                 Alert.alert(
                     "Invalid Name",
-                    "Name should only contain letters, dots, and spaces."
+                    "Name fields should only contain letters, dots, and spaces."
                 );
                 return;
             }
 
-            // Validate phone number
-            if (!/^\d{11}$/.test(phoneNum)) {
-                Alert.alert("Invalid Phone Number", "Phone number must be exactly 11 digits.");
+            // Validate the date
+            if (!selectedDateText) {
+                Alert.alert("Invalid Date", "Please select a valid date.");
                 return;
             }
 
-            // Check if image is provided
+            // Validate the number of copies
+            const parsedCopies = parseInt(copies);
+            if (isNaN(parsedCopies) || parsedCopies <= 0) {
+                Alert.alert("Invalid Number of Copies", "Please enter a valid number of copies.");
+                return;
+            }
+
+            // Check if the user has selected an image
             if (!image) {
-                Alert.alert("Missing Image", "Please upload an image.");
+                Alert.alert("Missing Image", "Please select an image for proof of payment.");
                 return;
             }
 
             const { uri } = await FileSystem.getInfoAsync(image);
-
             const blob = await new Promise((resolve, reject) => {
                 const xhr = new XMLHttpRequest();
                 xhr.onload = () => {
@@ -237,21 +154,23 @@ export default function JobApplication() {
 
             // Store the download URL in Firestore
             const MuniServe = firebase.firestore();
-            const job = MuniServe.collection("job");
+            const marriageCert = MuniServe.collection("marriageCert");
 
-            await job.add({
+            await marriageCert.add({
                 userUid: userUid,
                 userName: userName,
                 userEmail: userEmail,
                 userContact: userContact,
                 userBarangay: userBarangay,
-                name: name,
-                age: age,
-                sex: sex,
+                hname: hname,
+                wname: wname,
+                date: date,
+                marriage: marriage,
+                rname: rname,
                 address: address,
-                phoneNum: phoneNum,
-                educ: educ,
-                pictures: downloadURL, // Store the download URL here
+                copies: copies,
+                purpose: purpose,
+                payment: downloadURL, // Store the download URL here
                 status: "Pending", // Set the initial status to "Pending"
                 createdAt: timestamp,
             });
@@ -266,27 +185,32 @@ export default function JobApplication() {
             Alert.alert("Error", "Form filling failed.");
         } finally {
             setUploading(false);
-            setLoadingModalVisible(false);
+            setLoadingModalVisible(false); // Hide loading modal
         }
     };
 
 
     // Data add
-    const [name, setName] = useState("");
-    const [age, setAge] = useState("");
-    const [sex, setSex] = useState("");
+    const [hname, setHname] = useState("");
+    const [wname, setWname] = useState("");
+    const [date, setDate] = useState(new Date());
+    const [marriage, setMarriage] = useState("");
+    const [rname, setRname] = useState("");
     const [address, setAddress] = useState("");
-    const [phoneNum, setPhoneNum] = useState("");
-    const [educ, setEduc] = useState("");
-    const [pictures, setPictures] = useState("");
+    const [copies, setCopies] = useState("");
+    const [purpose, setPurpose] = useState("");
+    const [payment, setPayment] = useState("");
 
     const resetForm = () => {
-        setName("");
-        setAge("");
-        setSex("");
+        setHname("");
+        setWname("");
+        setDate(new Date());
+        setMarriage("");
+        setRname("");
         setAddress("");
-        setPhoneNum("");
-        setEduc("");
+        setCopies("");
+        setPurpose("");
+        setSelectedDateText("");
     };
 
     const [serve, setServe] = useState([]);
@@ -317,6 +241,28 @@ export default function JobApplication() {
         fetchData();
     }, []);
 
+    const [showDatePicker, setShowDatePicker] = useState(false);
+    const [maxDate, setMaxDate] = useState(new Date());
+
+    const onDateChange = (event, selectedDate) => {
+        const currentDate = selectedDate || new Date();
+
+        // Set maxDate only once when the component mounts
+        if (!maxDate.getTime()) {
+            setMaxDate(new Date());
+        }
+
+        setShowDatePicker(Platform.OS === 'ios');
+        setDate(currentDate);
+        setSelectedDateText(formatDate(currentDate));
+    };
+
+    const formatDate = (date) => {
+        // Format the date as needed (you can customize this based on your requirements)
+        const formattedDate = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+        return formattedDate;
+    };
+
     return (
         <View style={styles.container}>
             <StatusBar backgroundColor="#93C49E" />
@@ -343,29 +289,30 @@ export default function JobApplication() {
                             source={require("../assets/imported/Del_Gallego_Camarines_Sur.png")}
                             style={styles.boxIcon}
                         />
-                        <Text style={styles.itemService_name}>Job Application</Text>
+                        <Text style={styles.itemService_name}>
+                            Marriage Certificate
+                        </Text>
                     </View>
                 </View>
                 <View style={styles.innerContainer}>
                     <Text style={styles.itemService_desc}>
-                        A job application is a form employers use to collection information
-                        about you to see if you are a good fit for the position.
+                        A Marriage Certificate is a document that shows social union or a legal contract between people that creates kinship. Such a union, often formalized via a wedding ceremony, may also be called matrimony. A general definition of marriage is that it is a social contract between two individuals that unites their lives legally, economically and emotionally.  It is an institution in which interpersonal relationships, usually intimate and sexual, are acknowledged in a variety of ways, depending on the culture or subculture in which it is found. The state of being united to a person of the opposite sex as husband or wife in a legal, consensual, and contractual relationship recognized and sanctioned by and dissolvable only by law.  A marriage certificate is a document containing the important details of marriage, signed by the couple and by all in attendance. Marriage occurs during the meeting for worship after approval is obtained from the meetings of which the two people are members. Approval is based on a statement of good character and clearness from any other engagements. The clerk usually records a copy of the marriage certificate in the meeting's records.
                     </Text>
                 </View>
 
                 <Text style={styles.noteText}>
-                    Please be ready to supply the following information. Fill the form
-                    below:
-                </Text>
+                    Please be ready to supply the following information. Fill the form below:</Text>
                 <View style={{ marginBottom: 10 }}>
-                    <Text style={styles.label}>Complete name</Text>
+                    <Text style={styles.label}>
+                        Complete name of the husband
+                    </Text>
 
                     <View style={styles.placeholder}>
                         <TextInput
                             placeholder=""
                             maxLength={50}
-                            value={name}
-                            onChangeText={(name) => setName(name)}
+                            value={hname}
+                            onChangeText={(hname) => setHname(hname)}
                             style={{
                                 width: "100%",
                             }}
@@ -374,15 +321,16 @@ export default function JobApplication() {
                 </View>
 
                 <View style={{ marginBottom: 10 }}>
-                    <Text style={styles.label}>Age</Text>
+                    <Text style={styles.label}>
+                        Complete name of the wife
+                    </Text>
 
                     <View style={styles.placeholder}>
                         <TextInput
                             placeholder=""
-                            maxLength={2}
-                            value={age}
-                            keyboardType="number-pad"
-                            onChangeText={(age) => setAge(age)}
+                            maxLength={50}
+                            value={wname}
+                            onChangeText={(wname) => setWname(wname)}
                             style={{
                                 width: "100%",
                             }}
@@ -390,34 +338,78 @@ export default function JobApplication() {
                     </View>
                 </View>
 
-               
                 <View style={{ marginBottom: 10 }}>
-                    <Text style={styles.label}>Sex</Text>
+                    <Text style={styles.label}>
+                        Date of death
+                    </Text>
+
+                    <TouchableOpacity
+                        onPress={() => setShowDatePicker(true)}
+                        style={styles.placeholder}
+                    >
+                        <Text>{selectedDateText}</Text>
+                    </TouchableOpacity>
+
+                    {showDatePicker && (
+                        <DateTimePicker
+                            value={date}
+                            mode="date"
+                            display="default"
+                            onChange={onDateChange}
+                            maximumDate={maxDate}
+                        />
+                    )}
+                </View>
+
+                <View style={{ marginBottom: 10 }}>
+                    <Text style={styles.label}>
+                        Place of marriage
+                    </Text>
 
                     <View style={styles.placeholder}>
-                        <Picker
-                                selectedValue={sex}
-                                onValueChange={(itemValue, itemIndex) =>
-                                    setSex(itemValue)
-                                }
-                                style={{ width: "100%" }}
-                            >
-                                <Picker.Item label="Select" value="" />
-                                <Picker.Item label="Female" value="Female" />
-                                <Picker.Item label="Male" value="Male" />
-                        </Picker>
+                        <TextInput
+                            placeholder=""
+                            maxLength={50}
+                            value={marriage}
+                            onChangeText={(marriage) => setMarriage(marriage)}
+                            style={{
+                                width: "100%",
+                            }}
+                        ></TextInput>
                     </View>
                 </View>
 
                 <View style={{ marginBottom: 10 }}>
-                    <Text style={styles.label}>Address</Text>
+                    <Text style={styles.label}>
+                        Complete name of the requesting party
+                    </Text>
+
+                    <View style={styles.placeholder}>
+                        <TextInput
+                            placeholder=""
+                            maxLength={100}
+                            value={rname}
+                            onChangeText={(rname) => setRname(rname)}
+                            style={{
+                                width: "100%",
+                            }}
+                        ></TextInput>
+                    </View>
+                </View>
+
+                <View style={{ marginBottom: 10 }}>
+                    <Text style={styles.label}>
+                        Complete address of the requesting party
+                    </Text>
 
                     <View style={styles.placeholder}>
                         <TextInput
                             placeholder=""
                             maxLength={100}
                             value={address}
-                            onChangeText={(address) => setAddress(address)}
+                            onChangeText={(address) =>
+                                setAddress(address)
+                            }
                             style={{
                                 width: "100%",
                             }}
@@ -426,15 +418,16 @@ export default function JobApplication() {
                 </View>
 
                 <View style={{ marginBottom: 10 }}>
-                    <Text style={styles.label}>Phone Number</Text>
+                    <Text style={styles.label}>
+                        Number of copies needed
+                    </Text>
 
                     <View style={styles.placeholder}>
                         <TextInput
                             placeholder=""
-                            maxLength={11}
-                            value={phoneNum}
-                            keyboardType="number-pad"
-                            onChangeText={(phoneNum) => setPhoneNum(phoneNum)}
+                            value={copies}
+                            onChangeText={(copies) => setCopies(copies)}
+                            maxLength={10}
                             style={{
                                 width: "100%",
                             }}
@@ -443,44 +436,35 @@ export default function JobApplication() {
                 </View>
 
                 <View style={{ marginBottom: 10 }}>
-                    <Text style={styles.label}>Educational Attainment</Text>
+                    <Text style={styles.label}>
+                        Purpose of the certification
+                    </Text>
 
-                    <View style={styles.placeholder}>
+                    <View style={styles.placeholder3}>
                         <TextInput
                             placeholder=""
-                            value={educ}
-                            onChangeText={(educ) => setEduc(educ)}
-                            maxLength={100}
+                            multiline={true}
+                            numberOfLines={5}
+                            value={purpose}
+                            onChangeText={(purpose) => setPurpose(purpose)}
+                            maxLength={300}
                             style={{
-                                width: "100%",
+                                width: "100%", textAlignVertical: "top",
                             }}
                         ></TextInput>
                     </View>
                 </View>
 
-                <Text style={styles.noteText}>
-                    Note: Upload first the needed requirements before submitting your
-                    application. Lack of needed information will cause delay or rejection.
+                <Text style={styles.noteText}>Note: Upload first your proof of payment before submitting your application. Lack of needed information will cause delay or rejection.</Text>
+                
+                <Text style={styles.noteText2}>
+                    FEE FOR REGISTRATION: 110 PESOS
                 </Text>
-
-                {mediaData.map((media, index) => {
-                    const { url, metadata } = media;
-                    const { name, contentType } = metadata;
-                    const isVideo = contentType.includes("video");
-                    return (
-                        <View key={index} style={styles.imageContainer}>
-                            <CustomButton
-                                title={`${name}`}
-                                onPress={() => downloadFile(url, name, isVideo)}
-                            />
-                        </View>
-                    );
-                })}
-
+                
                 <View style={styles.selectButton}>
-                    <Text style={styles.buttonText}>2x2 Pictures</Text>
+                    <Text style={styles.buttonText}>Proof of Payment(G-CASH RECEIPT)</Text>
                     <TouchableOpacity onPress={pickImage}>
-                        {pictures.length > 0 ? (
+                        {payment.length > 0 ? (
                             <Animatable.View
                                 style={{
                                     ...styles.plusCircle,
@@ -494,11 +478,12 @@ export default function JobApplication() {
                                 <Ionicons name="ios-add" size={24} color="white" />
                             </View>
                         )}
-                        {pictures.length > 0 && (
+                        {payment.length > 0 && (
                             <View style={styles.checkCircle}>
                                 <Ionicons name="ios-checkmark" size={24} color="white" />
                             </View>
                         )}
+
                     </TouchableOpacity>
                 </View>
 
@@ -506,7 +491,7 @@ export default function JobApplication() {
                     {image && (
                         <Image
                             source={{ uri: image }}
-                            style={{ width: 200, height: 200 }}
+                            style={{ width: 300, height: 300 }}
                         />
                     )}
                     <TouchableOpacity
@@ -567,12 +552,20 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         fontSize: 20,
     },
+    serveText: {
+        fontSize: 18,
+        fontWeight: "bold",
+        color: "black",
+        textAlign: "left",
+        marginTop: 15,
+        marginBottom: 15,
+    },
     boxes1: {
         width: "100%",
         height: 65,
         backgroundColor: "#307A59",
         borderRadius: 15,
-        marginBottom: 15,
+        marginBottom: 30,
         marginTop: 15,
     },
     box: {
@@ -589,6 +582,10 @@ const styles = StyleSheet.create({
         marginLeft: 15,
         width: 40,
         height: 40,
+    },
+    containers: {
+        alignItems: "center",
+        justifyContent: "center",
     },
     inputContainer: {
         flexDirection: "row",
@@ -609,6 +606,25 @@ const styles = StyleSheet.create({
         flex: 1,
         fontSize: 17,
     },
+    loginButton: {
+        backgroundColor: "#307A59",
+        justifyContent: "center",
+        alignItems: "center",
+        borderRadius: 50,
+        paddingVertical: 10,
+        marginTop: 20,
+        width: 165,
+    },
+    loginButtonText: {
+        color: "white",
+        fontSize: 15,
+    },
+    serveContainer: {
+        padding: 15,
+        borderRadius: 15,
+        margin: 5,
+        marginHorizontal: 10,
+    },
     innerContainer: {
         alignContent: "center",
         flexDirection: "column",
@@ -626,9 +642,15 @@ const styles = StyleSheet.create({
         fontSize: 15,
         textAlign: "justify",
         lineHeight: 30,
-        marginBottom: 20,
+    },
+    itemService_proc: {
+        fontWeight: "300",
+        fontSize: 15,
+        textAlign: "justify",
+        lineHeight: 30,
     },
     imageContainer: {
+        marginTop: 20,
         alignItems: "center",
     },
     imageName: {
@@ -641,16 +663,42 @@ const styles = StyleSheet.create({
         height: 200,
         resizeMode: "cover",
     },
+    closeButton: {
+        position: "absolute",
+        top: 30,
+        right: 10,
+        backgroundColor: "#307A59",
+        borderRadius: 100,
+        padding: 5,
+        width: 30,
+        height: 30,
+        justifyContent: "center",
+        alignItems: "center",
+        textAlign: "center",
+    },
+    closeButtonText: {
+        fontSize: 18,
+        color: "white",
+        textAlign: "center",
+    },
     regText: {
         fontSize: 25,
         textAlign: "center",
     },
     noteText: {
-        fontSize: 15,
+        fontSize: 17,
         textAlign: "justify",
         marginTop: 5,
-        marginBottom: 10,
-        fontWeight: "400",
+        marginBottom: 5,
+        fontWeight: "500",
+    },
+    noteText2: {
+        fontSize: 17,
+        textAlign: "justify",
+        marginTop: 5,
+        marginBottom: 5,
+        fontWeight: "500",
+        color: "#945",
     },
     boxContainer: {
         flexDirection: "row",
@@ -675,9 +723,10 @@ const styles = StyleSheet.create({
         alignItems: "center",
         borderRadius: 50,
         paddingVertical: 10,
-        marginTop: 50,
+        marginTop: 10,
         width: 165,
         marginLeft: 15,
+        marginBottom: 40,
     },
     selectButton: {
         borderRadius: 10,
@@ -689,7 +738,9 @@ const styles = StyleSheet.create({
         backgroundColor: "transparent",
         borderColor: "#000",
         borderWidth: 1,
+        marginTop: 10,
         flexDirection: "row",
+        marginVertical: 10,
         padding: 10,
     },
     buttonText: {
@@ -743,12 +794,12 @@ const styles = StyleSheet.create({
         marginVertical: 8,
     },
     datePickerStyle: {
-        width: "100%",
-        borderColor: "black",
+        width: '100%',
+        borderColor: 'black',
         borderRadius: 8,
         borderWidth: 1,
-        alignItems: "center",
-        justifyContent: "center",
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     plusCircle: {
         width: 30,

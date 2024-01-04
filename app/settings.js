@@ -1,9 +1,7 @@
 import {
     View,
     Text,
-    FlatList,
     StyleSheet,
-    ScrollView,
     Image,
     TouchableOpacity,
 } from "react-native";
@@ -38,6 +36,7 @@ const Settings = () => {
             </View>
 
             <Text style={styles.text}>About MuniServe</Text>
+            
             <TouchableOpacity onPress={() => {
                 router.push("/privacy");
             }}>

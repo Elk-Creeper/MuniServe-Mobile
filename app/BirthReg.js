@@ -25,6 +25,8 @@ export default function BirthReg() {
   const timestamp = firebase.firestore.FieldValue.serverTimestamp();
   const [loadingModalVisible, setLoadingModalVisible] = useState(false);
   const [selectedDateText, setSelectedDateText] = useState("");
+  const [selectedDatePlaceText, setSelectedDatePlaceText] = useState("");
+
 
   const [userUid, setUserUid] = useState(null);
   const [userName, setUserName] = useState(null);
@@ -78,41 +80,22 @@ export default function BirthReg() {
     setLoadingModalVisible(true);
     setUploading(true);
 
-    try {
-      // Validate other required fields
-      if (
-        !childname.trim() ||
-        !birthdate ||
-        !birthplace.trim() ||
-        !sex ||
-        !typeofbirth ||
-        (typeofbirth !== 'Single' && !multiple) ||
-        !weight.trim() ||
-        !birthorder.trim() ||
-        !m_name.trim() ||
-        !m_citizenship.trim() ||
-        !m_religion ||
-        !m_occur.trim() ||
-        !m_age.trim() ||
-        !m_totchild.trim() ||
-        !f_name.trim() ||
-        !f_citizenship.trim() ||
-        !f_religion ||
-        !f_occur.trim() ||
-        !f_age.trim() ||
-        !f_residence.trim() ||
-        !f_placemarried.trim() ||
-        !attendant
-      ) {
+    try { 
+      // Validation checks
+      if (!c_fname || !c_mname || !c_lname || !birthdate || !birthplace || !sex || !typeofbirth || !weight ||
+        !m_name || !m_citizenship || !m_religion || !bornAlive || !childStillLiving ||
+        !childAliveButNowDead || !m_occur || !m_age || !m_residence || !f_name ||
+        !f_citizenship || !f_religion || !f_occur || !f_age || !f_residence || !mpDate ||
+        !mpPlace || !attendant) {
         Alert.alert("Incomplete Form", "Please fill in all required fields.");
         return;
       }
 
-      // Validate childname
-      if (!/^[a-zA-Z.\s]+$/.test(childname)) {
+      // Validate child's name components
+      if (!/^[a-zA-Z.\s]+$/.test(c_fname) || !/^[a-zA-Z.\s]+$/.test(c_mname) || !/^[a-zA-Z.\s]+$/.test(c_lname)) {
         Alert.alert(
           "Invalid Input",
-          "Name of newborn child should only contain letters, dots, and spaces."
+          "Name of the newborn child should only contain letters, dots, and spaces."
         );
         return;
       }
@@ -164,20 +147,26 @@ export default function BirthReg() {
         c_typeofbirth: typeofbirth,
         c_multiple: multiple,
         c_weight: weight,
-        childname: childname,
+        c_fname : c_fname,
+        c_mname : c_mname,
+        c_lname : c_lname,
         f_age: f_age,
         f_citizenship: f_citizenship,
         f_name: f_name,
         f_occur: f_occur,
-        f_placemarried: f_placemarried,
         f_religion: f_religion,
         f_residence: f_residence,
         m_age: m_age,
         m_citizenship: m_citizenship,
         m_name: m_name,
+        bornAlive : bornAlive,
+        childStillLiving: childStillLiving,
+        childAliveButNowDead: childAliveButNowDead,
         m_occur: m_occur,
         m_religion: m_religion,
-        m_totchild: m_totchild,
+        m_residence: m_residence,
+        mpDate : mpDate,
+        mpPlace : mpPlace,
         payment: downloadURL, // Store the download URL here
         status: "Pending", // Set the initial status to "Pending"
         createdAt: timestamp,
@@ -206,7 +195,9 @@ export default function BirthReg() {
   const [typeofbirth, setTypeofbirth] = useState("");
   const [multiple, setMultiple] = useState("");
   const [weight, setWeight] = useState("");
-  const [childname, setChildname] = useState("");
+  const [c_fname, setC_fname] = useState("");
+  const [c_mname, setC_mname] = useState("");
+  const [c_lname, setC_lname] = useState("");
   const [f_age, setF_age] = useState("");
   const [f_citizenship, setF_citizenship] = useState("");
   const [f_name, setF_name] = useState("");
@@ -217,9 +208,15 @@ export default function BirthReg() {
   const [m_age, setM_age] = useState("");
   const [m_citizenship, setM_citizenship] = useState("");
   const [m_name, setM_name] = useState("");
+  const [bornAlive, setBornAlive] = useState("");
+  const [childStillLiving, setChildStillLiving] = useState("");
+  const [childAliveButNowDead, setChildAliveButNowDead] = useState("");
   const [m_occur, setM_occur] = useState("");
   const [m_religion, setM_religion] = useState("");
   const [m_totchild, setM_totchild] = useState("");
+  const [m_residence, setM_residence] = useState("");
+  const [mpDate, setMpDate] = useState(new Date());
+  const [mpPlace, setMpPlace] = useState("");
   const [payment, setPayment] = useState("");
 
   const resetForm = () => {
@@ -231,7 +228,9 @@ export default function BirthReg() {
     setTypeofbirth("");
     setMultiple("");
     setWeight("");
-    setChildname("");
+    setC_fname("");
+    setC_mname("");
+    setC_lname("");
     setF_age("");
     setF_citizenship("");
     setF_name("");
@@ -242,11 +241,18 @@ export default function BirthReg() {
     setM_age("");
     setM_citizenship("");
     setM_name("");
+    setBornAlive("");
+    setChildStillLiving("");
+    setChildAliveButNowDead("");
     setM_occur("");
     setM_religion("");
     setM_totchild("");
+    setM_residence("");
+    setMpDate(new Date());
+    setMpPlace("");
 
     setSelectedDateText("");
+    setSelectedDatePlaceText("");
   };
 
   const [serve, setServe] = useState([]);
@@ -278,6 +284,8 @@ export default function BirthReg() {
   }, []);
 
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showDatePlacePicker, setShowDatePlacePicker] = useState(false);
+
   const [maxDate, setMaxDate] = useState(new Date());
 
   const onDateChange = (event, selectedDate) => {
@@ -291,6 +299,19 @@ export default function BirthReg() {
     setShowDatePicker(Platform.OS === 'ios');
     setBirthdate(currentDate);
     setSelectedDateText(formatDate(currentDate));
+  };
+
+  const onDatePlaceChange = (event, selectedDate) => {
+    const currentDate = selectedDate || new Date();
+
+    // Set maxDate only once when the component mounts
+    if (!maxDate.getTime()) {
+      setMaxDate(new Date());
+    }
+
+    setShowDatePlacePicker(Platform.OS === 'ios');
+    setMpDate(currentDate);
+    setSelectedDatePlaceText(formatDate(currentDate));
   };
 
   const formatDate = (date) => {
@@ -350,14 +371,46 @@ export default function BirthReg() {
         <Text style={styles.noteText}>Child's Information</Text>
         
         <View style={{ marginBottom: 10 }}>
-          <Text style={styles.label}>Name of newborn child</Text>
+          <Text style={styles.label}>FIRST NAME</Text>
 
           <View style={styles.placeholder}>
             <TextInput
               placeholder=""
               maxLength={100}
-              value={childname}
-              onChangeText={(childname) => setChildname(childname)}
+              value={c_fname}
+              onChangeText={(c_fname) => setC_fname(c_fname)}
+              style={{
+                width: "100%",
+              }}
+            ></TextInput>
+          </View>
+        </View>
+
+        <View style={{ marginBottom: 10 }}>
+          <Text style={styles.label}>MIDDLE NAME</Text>
+
+          <View style={styles.placeholder}>
+            <TextInput
+              placeholder=""
+              maxLength={100}
+              value={c_mname}
+              onChangeText={(c_mname) => setC_mname(c_mname)}
+              style={{
+                width: "100%",
+              }}
+            ></TextInput>
+          </View>
+        </View>
+
+        <View style={{ marginBottom: 10 }}>
+          <Text style={styles.label}>LAST NAME</Text>
+
+          <View style={styles.placeholder}>
+            <TextInput
+              placeholder=""
+              maxLength={100}
+              value={c_lname}
+              onChangeText={(c_lname) => setC_lname(c_lname)}
               style={{
                 width: "100%",
               }}
@@ -367,7 +420,7 @@ export default function BirthReg() {
 
         <View style={{ marginBottom: 10 }}>
           <Text style={styles.label}>
-            Date of Birth
+            DATE OF BIRTH
           </Text>
 
           <TouchableOpacity
@@ -389,7 +442,7 @@ export default function BirthReg() {
         </View>
 
         <View style={{ marginBottom: 10 }}>
-          <Text style={styles.label}>Birth Place</Text>
+          <Text style={styles.label}>PLACE OF BIRTH</Text>
           <View style={styles.placeholder}>
             <TextInput
               placeholder=""
@@ -405,7 +458,7 @@ export default function BirthReg() {
 
         <View style={styles.boxContainer}>
           <View style={{ marginBottom: 10 }}>
-            <Text style={styles.label}>Sex</Text>
+            <Text style={styles.label}>SEX</Text>
 
             <View style={styles.placeholder2}>
               <Picker
@@ -421,7 +474,7 @@ export default function BirthReg() {
           </View>
 
           <View style={{ marginBottom: 10 }}>
-            <Text style={styles.label}>Type of birth</Text>
+            <Text style={styles.label}>TYPE OF BIRTH</Text>
 
             <View style={styles.placeholder2}>
               <Picker
@@ -441,7 +494,7 @@ export default function BirthReg() {
 
           {typeofbirth !== 'Single' && (
             <View style={{ marginBottom: 10 }}>
-              <Text style={styles.label}>If multiple birth, child was</Text>
+              <Text style={styles.label}>IF MULTIPLE BIRTH, CHILD WAS</Text>
 
               <View style={styles.placeholder}>
                 <Picker
@@ -455,14 +508,30 @@ export default function BirthReg() {
                   <Picker.Item label="Third" value="Third" />
                 </Picker>
               </View>
+
+            <View style={{ marginBottom: 10 }}>
+              <Text style={styles.label}>BIRTH ORDER</Text>
+
+             <View style={styles.placeholder}>
+                <Picker
+                  selectedValue={birthorder}
+                  onValueChange={(itemValue, itemIndex) => setBirthorder(itemValue)}
+                  style={{ width: "100%" }}
+                >
+                  <Picker.Item label="Select" value="" />
+                  <Picker.Item label="First" value="First" />
+                  <Picker.Item label="Second" value="Second" />
+                  <Picker.Item label="Third" value="Third" />
+                </Picker>
+              </View>
+            </View>
             </View>
           )}
 
-        <View style={styles.boxContainer}>
           <View style={{ marginBottom: 10 }}>
-            <Text style={styles.label}>Weight at Birth</Text>
+            <Text style={styles.label}>WEIGHT AT BIRTH (grams)</Text>
 
-            <View style={styles.placeholder2}>
+            <View style={styles.placeholder}>
               <TextInput
                 placeholder=""
                 maxLength={6}
@@ -474,26 +543,10 @@ export default function BirthReg() {
               ></TextInput>
             </View>
           </View>
-          <View style={{ marginBottom: 10 }}>
-            <Text style={styles.label}>Birth Order</Text>
-
-            <View style={styles.placeholder2}>
-              <TextInput
-                placeholder=""
-                maxLength={20}
-                value={birthorder}
-                onChangeText={(birthorder) => setBirthorder(birthorder)}
-                style={{
-                  width: "100%",
-                }}
-              ></TextInput>
-            </View>
-          </View>
-        </View>
 
         <Text style={styles.noteText}>Mother's Information:</Text>
         <View style={{ marginBottom: 10 }}>
-          <Text style={styles.label}>Mother's Maiden Name</Text>
+          <Text style={styles.label}>MAIDEN NAME (first, middle, last)</Text>
 
           <View style={styles.placeholder}>
             <TextInput
@@ -509,7 +562,7 @@ export default function BirthReg() {
         </View>
         <View style={styles.boxContainer}>
           <View style={{ marginBottom: 10 }}>
-            <Text style={styles.label}>Citizenship</Text>
+            <Text style={styles.label}>CITIZENSHIP</Text>
 
             <View style={styles.placeholder2}>
               <TextInput
@@ -526,7 +579,7 @@ export default function BirthReg() {
             </View>
           </View>
           <View style={{ marginBottom: 10 }}>
-            <Text style={styles.label}>Religion</Text>
+            <Text style={styles.label}>RELIGION</Text>
 
             <View style={styles.placeholder2}>
               <Picker
@@ -558,8 +611,57 @@ export default function BirthReg() {
             </View>
           </View>
         </View>
+
         <View style={{ marginBottom: 10 }}>
-          <Text style={styles.label}>Occupation</Text>
+          <Text style={styles.label}>TOTAL NUMBER OF CHILDREN BORN ALIVE</Text>
+
+          <View style={styles.placeholder}>
+            <TextInput
+              placeholder=""
+              maxLength={50}
+              value={bornAlive}
+              onChangeText={(bornAlive) => setBornAlive(bornAlive)}
+              style={{
+                width: "100%",
+              }}
+            ></TextInput>
+          </View>
+        </View>
+
+        <View style={{ marginBottom: 10 }}>
+          <Text style={styles.label}>NO. OF CHILDREN STILL LIVING INCLUDING THIS BIRTH</Text>
+
+          <View style={styles.placeholder}>
+            <TextInput
+              placeholder=""
+              maxLength={50}
+              value={childStillLiving}
+              onChangeText={(childStillLiving) => setChildStillLiving(childStillLiving)}
+              style={{
+                width: "100%",
+              }}
+            ></TextInput>
+          </View>
+        </View>
+
+        <View style={{ marginBottom: 10 }}>
+          <Text style={styles.label}>NO. OF CHILDREN BORN ALIVE BUT ARE NOW DEAD</Text>
+
+          <View style={styles.placeholder}>
+            <TextInput
+              placeholder=""
+              maxLength={50}
+              value={childAliveButNowDead}
+              onChangeText={(childAliveButNowDead) => setChildAliveButNowDead(childAliveButNowDead)}
+              style={{
+                width: "100%",
+              }}
+            ></TextInput>
+          </View>
+        </View>
+
+        <View style={{ marginBottom: 10 }}>
+          <Text style={styles.label}>OCCUPATION</Text>
 
           <View style={styles.placeholder}>
             <TextInput
@@ -573,11 +675,11 @@ export default function BirthReg() {
             ></TextInput>
           </View>
         </View>
-        <View style={styles.boxContainer}>
-          <View style={{ marginBottom: 10 }}>
-            <Text style={styles.label}>Age at the time of birth</Text>
 
-            <View style={styles.placeholder2}>
+          <View style={{ marginBottom: 10 }}>
+            <Text style={styles.label}>AGE AT THE TIME OF THIS BIRTH</Text>
+
+            <View style={styles.placeholder}>
               <TextInput
                 placeholder=""
                 maxLength={6}
@@ -589,32 +691,16 @@ export default function BirthReg() {
               ></TextInput>
             </View>
           </View>
-          <View style={{ marginBottom: 10 }}>
-            <Text style={styles.label}>Total of children</Text>
-
-            <View style={styles.placeholder2}>
-              <TextInput
-                placeholder=""
-                maxLength={20}
-                value={m_totchild}
-                onChangeText={(m_totchild) => setM_totchild(m_totchild)}
-                style={{
-                  width: "100%",
-                }}
-              ></TextInput>
-            </View>
-          </View>
-        </View>
 
         <View style={{ marginBottom: 10 }}>
-          <Text style={styles.label}>Residence</Text>
+          <Text style={styles.label}>RESIDENCE (brgy, municipality, province, country)</Text>
 
           <View style={styles.placeholder}>
             <TextInput
               placeholder=""
               maxLength={100}
-              value={f_residence}
-              onChangeText={(f_residence) => setF_residence(f_residence)}
+              value={m_residence}
+              onChangeText={(m_residence) => setM_residence(m_residence)}
               style={{
                 width: "100%",
               }}
@@ -624,7 +710,7 @@ export default function BirthReg() {
 
         <Text style={styles.noteText}>Father's Information:</Text>
         <View style={{ marginBottom: 10 }}>
-          <Text style={styles.label}>Father's Name</Text>
+          <Text style={styles.label}>NAME (first, middle, last)</Text>
 
           <View style={styles.placeholder}>
             <TextInput
@@ -640,7 +726,7 @@ export default function BirthReg() {
         </View>
         <View style={styles.boxContainer}>
           <View style={{ marginBottom: 10 }}>
-            <Text style={styles.label}>Citizenship</Text>
+            <Text style={styles.label}>CITIZENSHIP</Text>
 
             <View style={styles.placeholder2}>
               <TextInput
@@ -657,7 +743,7 @@ export default function BirthReg() {
             </View>
           </View>
           <View style={{ marginBottom: 10 }}>
-            <Text style={styles.label}>Religion</Text>
+            <Text style={styles.label}>RELIGION</Text>
 
             <View style={styles.placeholder2}>
               <Picker
@@ -690,7 +776,7 @@ export default function BirthReg() {
           </View>
         </View>
         <View style={{ marginBottom: 10 }}>
-          <Text style={styles.label}>Occupation</Text>
+          <Text style={styles.label}>OCCUPATION</Text>
 
           <View style={styles.placeholder}>
             <TextInput
@@ -705,7 +791,7 @@ export default function BirthReg() {
           </View>
         </View>
         <View style={{ marginBottom: 10 }}>
-          <Text style={styles.label}>Age at the time of birth</Text>
+          <Text style={styles.label}>AGE AT THE TIME OF BIRTH</Text>
 
           <View style={styles.placeholder}>
             <TextInput
@@ -720,23 +806,63 @@ export default function BirthReg() {
           </View>
         </View>
 
-        <Text style={styles.noteText}>Additional Information:</Text>
+        <View style={{ marginBottom: 10 }}>
+          <Text style={styles.label}>RESIDENCE (brgy, municipality, province, country)</Text>
+
+          <View style={styles.placeholder}>
+            <TextInput
+              placeholder=""
+              maxLength={100}
+              value={f_residence}
+              onChangeText={(f_residence) => setF_residence(f_residence)}
+              style={{
+                width: "100%",
+              }}
+            ></TextInput>
+          </View>
+        </View>
+
+        <Text style={styles.noteText}>MARRIAGE OF PARENTS</Text>
+        <Text style={styles.label1}>
+          (If not married, accomplish Affidavit of Acknowledgement/Admission
+          of Paternity.)
+        </Text>
+
         <View style={{ marginBottom: 10 }}>
           <Text style={styles.label}>
-            Date and Place of Marriage of Parents
+            DATE
           </Text>
-          <Text style={styles.label1}>
-            (If not married, accomplish Affidavit of Acknowledgement/Admission
-            of Paternity.)
+
+          <TouchableOpacity
+            onPress={() => setShowDatePlacePicker(true)}
+            style={styles.placeholder}
+          >
+            <Text>{selectedDatePlaceText}</Text>
+          </TouchableOpacity>
+
+          {showDatePlacePicker && (
+            <DateTimePicker
+              value={mpDate}
+              mode="date"
+              display="default"
+              onChange={onDatePlaceChange}
+              maximumDate={maxDate}
+            />
+          )}
+        </View>
+
+        <View style={{ marginBottom: 10 }}>
+          <Text style={styles.label}>
+            PLACE
           </Text>
 
           <View style={styles.placeholder}>
             <TextInput
               placeholder=""
               maxLength={20}
-              value={f_placemarried}
-              onChangeText={(f_placemarried) =>
-                setF_placemarried(f_placemarried)
+              value={mpPlace}
+              onChangeText={(mpPlace) =>
+                setMpPlace(mpPlace)
               }
               style={{
                 width: "100%",
@@ -746,7 +872,7 @@ export default function BirthReg() {
         </View>
 
         <View style={{ marginBottom: 10 }}>
-          <Text style={styles.label}>Attendant of birth</Text>
+          <Text style={styles.label}>ATTENDANT</Text>
             <View style={styles.placeholder}>
               <Picker
                 selectedValue={attendant}
@@ -768,6 +894,11 @@ export default function BirthReg() {
           Note: Upload first your proof of payment before submitting your
           application. Lack of needed information will cause delay or rejection.
         </Text>
+
+        <Text style={styles.noteText2}>
+          FEE FOR REGISTRATION: 50 PESOS
+        </Text>
+
         <View style={styles.selectButton}>
           <Text style={styles.buttonText}>
             Proof of Payment(G-CASH RECEIPT)
@@ -1000,6 +1131,14 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     fontWeight: "500",
   },
+  noteText2: {
+    fontSize: 17,
+    textAlign: "justify",
+    marginTop: 5,
+    marginBottom: 5,
+    fontWeight: "500",
+    color: "#945",
+  },
   boxContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -1133,12 +1272,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
-  selectedDateText: {
-    fontSize: 15,
-    fontWeight: "400",
-    marginVertical: 8,
-    textAlign: "justify",
-    paddingLeft: 10,
   },
 });

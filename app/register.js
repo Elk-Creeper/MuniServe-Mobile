@@ -155,6 +155,7 @@ const Registration = () => {
                             <Picker.Item label="Palaspas" value="Palaspas" />
                             <Picker.Item label="Pamplona" value="Pamplona" />
                             <Picker.Item label="Pasay" value="Pasay" />
+                            <Picker.Item label="Peñafrancia" value="Peñafrancia" />
                             <Picker.Item label="Pinagdapian" value="Pinagdapian" />
                             <Picker.Item label="Pinugusan" value="Pinugusan" />
                             <Picker.Item label="Poblacion Zone 1" value="Poblacion Zone 1" />
@@ -166,7 +167,6 @@ const Registration = () => {
                             <Picker.Item label="San Pablo" value="San Pablo" />
                             <Picker.Item label="Santa Rita 1" value="Santa Rita 1" />
                             <Picker.Item label="Santa Rita 2" value="Santa Rita 2" />
-                            <Picker.Item label="Sinagawsawan" value="Sinagawsawan" />
                             <Picker.Item label="Sinuknipan 1" value="Sinuknipan 1" />
                             <Picker.Item label="Sinuknipan 2" value="Sinuknipan 2" />
                             <Picker.Item label="Sugsugin" value="Sugsugin" />

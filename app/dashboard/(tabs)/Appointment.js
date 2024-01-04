@@ -17,12 +17,15 @@ import { Picker } from "@react-native-picker/picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import "firebase/firestore";
 import { firebase } from "../../../config";
+import { Link, useRouter } from "expo-router";
 
 export default function tab1() {
   const [name, setName] = useState("");
   const [selectedDepartment, setSelectedDepartment] = useState("");
   const [selectedPersonnel, setSelectedPersonnel] = useState("");
   const [showPersonnelDropdown, setShowPersonnelDropdown] = useState(false); 
+
+  const router = useRouter();
 
   //for storing the user info
   const [userUid, setUserUid] = useState(null);
@@ -310,7 +313,11 @@ export default function tab1() {
             <Text style={styles.greenText}>SERVE</Text>
           </Text>
         </View>
-        <TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            router.push("/notif");
+          }}
+        >
           <Ionicons name="notifications-outline" size={24} color="black" />
         </TouchableOpacity>
       </View>

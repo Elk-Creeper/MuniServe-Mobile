@@ -14,6 +14,7 @@ import {
 import { StatusBar } from "expo-status-bar";
 import { Ionicons, FontAwesome } from "@expo/vector-icons"; // Import the Ionicons library for the bell icon
 import { useNavigation } from "@react-navigation/native";
+import { Link, useRouter } from "expo-router";
 
 export default function Tab4() {
   const [showAppointments, setShowAppointments] = useState(false);
@@ -21,6 +22,8 @@ export default function Tab4() {
 
   const [appointmentData, setAppointmentData] = useState([]);
   const [transactionData, setTransactionData] = useState([]);
+
+  const router = useRouter();
 
   useEffect(() => {
     const currentUser = firebase.auth().currentUser;
@@ -107,7 +110,6 @@ export default function Tab4() {
     };
   }, []);
 
-
   return (
 
     <View style={styles.container}>
@@ -125,7 +127,11 @@ export default function Tab4() {
             <Text style={styles.greenText}>SERVE</Text>
           </Text>
         </View>
-        <TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            router.push("/notif");
+          }}
+        >
           <Ionicons name="notifications-outline" size={24} color="black" />
         </TouchableOpacity>
       </View>
@@ -354,7 +360,7 @@ const styles = StyleSheet.create({
     marginBottom: 270,
   },
   itemCreatedAt: {
-    marginLeft: 60,
+    marginLeft: 50,
     marginTop: 3,
     fontSize: 13,
     color: "#597ae8",

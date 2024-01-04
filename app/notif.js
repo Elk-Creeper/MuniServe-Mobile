@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons, FontAwesome } from "@expo/vector-icons"; // Import the Ionicons library for the bell icon
-import { useNavigation } from "@react-navigation/native";
+import { Link, useRouter } from "expo-router";
 
 export default function Tab4() {
     const [showAppointments, setShowAppointments] = useState(false);
@@ -21,6 +21,8 @@ export default function Tab4() {
 
     const [appointmentData, setAppointmentData] = useState([]);
     const [transactionData, setTransactionData] = useState([]);
+
+    const router = useRouter();
 
     useEffect(() => {
         const currentUser = firebase.auth().currentUser;
@@ -108,6 +110,7 @@ export default function Tab4() {
     }, []);
 
     return (
+
         <View style={styles.container}>
             <StatusBar
                 backgroundColor="#93C49E" // Change the background color as needed
@@ -123,7 +126,11 @@ export default function Tab4() {
                         <Text style={styles.greenText}>SERVE</Text>
                     </Text>
                 </View>
-                <TouchableOpacity>
+                <TouchableOpacity
+                    onPress={() => {
+                        router.push("/notif");
+                    }}
+                >
                     <Ionicons name="notifications-outline" size={24} color="black" />
                 </TouchableOpacity>
             </View>
@@ -157,88 +164,88 @@ export default function Tab4() {
                 </TouchableOpacity>
             </View>
 
-            {/* Conditionally Render Content */}
-            {showAppointments && (
-                <View>
-                    {appointmentData.length === 0 ? (
-                        <View style={styles.emptyListContainer}>
-                            <Image
-                                source={require("../assets/imported/box.png")} // Replace with your empty image source
-                                style={styles.emptyBox}
-                            />
-                            <Text style={styles.emptyBoxText}>No appointments found.</Text>
-                        </View>
-                    ) : (
-                        <FlatList
-                            data={appointmentData}
-                            renderItem={({ item }) => (
-                                <View style={styles.container2}>
-                                    <View style={styles.container3}>
-                                        <View style={styles.container4}>
-                                            <Image
-                                                source={require("../assets/imported/Del_Gallego_Camarines_Sur.png")}
-                                                style={styles.boxIcon}
-                                            />
-                                            <Text style={styles.appText}>Appointment</Text>
-                                            <Text style={styles.itemCreatedAt}>
-                                                {" "}
-                                                {item.createdAt}
+            <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
+                {showAppointments && (
+                    <View>
+                        {appointmentData.length === 0 ? (
+                            <View style={styles.emptyListContainer}>
+                                <Image
+                                    source={require("../assets/imported/box.png")} // Replace with your empty image source
+                                    style={styles.emptyBox}
+                                />
+                                <Text style={styles.emptyBoxText}>No appointments found.</Text>
+                            </View>
+                        ) : (
+                            <FlatList
+                                data={appointmentData}
+                                renderItem={({ item }) => (
+                                    <View style={styles.container2}>
+                                        <View style={styles.container3}>
+                                            <View style={styles.container4}>
+                                                <Image
+                                                    source={require("../assets/imported/Del_Gallego_Camarines_Sur.png")}
+                                                    style={styles.boxIcon}
+                                                />
+                                                <Text style={styles.appText}>Appointment</Text>
+                                                <Text style={styles.itemCreatedAt}>
+                                                    {item.createdAt}
+                                                </Text>
+                                            </View>
+                                            <Text style={styles.itemPersonnel}>
+                                                Dear {item.name}, your requested appointment for{" "}
+                                                {item.personnel} from {item.department} on {item.date} at{" "}
+                                                {item.time} is
+                                                <Text style={styles.itemStatus}> {item.status}.</Text>
                                             </Text>
                                         </View>
-                                        <Text style={styles.itemPersonnel}>
-                                            Dear {item.name}, your requested appointment for{" "}
-                                            {item.personnel} from {item.department} on {item.date} at{" "}
-                                            {item.time} is
-                                            <Text style={styles.itemStatus}> {item.status}.</Text>
-                                        </Text>
                                     </View>
-                                </View>
-                            )}
-                        />
-                    )}
-                </View>
-            )}
+                                )}
+                            />
+                        )}
+                    </View>
+                )}
 
-            {showServiceRequests && (
-                <View>
-                    {transactionData.length === 0 ? (
-                        <View style={styles.emptyListContainer}>
-                            <Image
-                                source={require("../assets/imported/box.png")} // Replace with your empty image source
-                                style={styles.emptyBox}
-                            />
-                            <Text style={styles.emptyBoxText}>
-                                No service requests found.
-                            </Text>
-                        </View>
-                    ) : (
-                        <FlatListe
-                            data={transactionData}
-                            renderItem={({ item }) => (
-                                <View style={styles.container2}>
-                                    <View style={styles.container3}>
-                                        <View style={styles.container4}>
-                                            <Image
-                                                source={require("../assets/imported/Del_Gallego_Camarines_Sur.png")}
-                                                style={styles.boxIcon}
-                                            />
-                                            <Text style={styles.appText}>Transaction</Text>
-                                            <Text style={styles.itemCreatedAt}>
-                                                {" "}
-                                                {item.createdAt}
+                {showServiceRequests && (
+                    <View>
+                        {transactionData.length === 0 ? (
+                            <View style={styles.emptyListContainer}>
+                                <Image
+                                    source={require("../assets/imported/box.png")} // Replace with your empty image source
+                                    style={styles.emptyBox}
+                                />
+                                <Text style={styles.emptyBoxText}>
+                                    No service requests found.
+                                </Text>
+                            </View>
+                        ) : (
+                            <FlatList
+                                data={transactionData}
+                                renderItem={({ item }) => (
+                                    <View style={styles.container2}>
+                                        <View style={styles.container3}>
+                                            <View style={styles.container4}>
+                                                <Image
+                                                    source={require("../assets/imported/Del_Gallego_Camarines_Sur.png")}
+                                                    style={styles.boxIcon}
+                                                />
+                                                <Text style={styles.appText}>Transaction</Text>
+                                                <Text style={styles.itemCreatedAt}>
+                                                    {" "}
+                                                    {item.createdAt}
+                                                </Text>
+                                            </View>
+                                            <Text style={styles.itemPersonnel}>
+                                                Dear user, your availed birth registration is
+                                                <Text style={styles.itemStatus}> {item.status}.</Text>
                                             </Text>
                                         </View>
-                                        <Text style={styles.itemPersonnel}>
-                                            Dear user, your availed birth registration is
-                                            <Text style={styles.itemStatus}> {item.status}.</Text>
-                                        </Text>
                                     </View>
-                                </View>
-                            )}
-                        />
-                    )}
-                </View>
-            )}
+                                )}
+                            />
+                        )}
+                    </View>
+                )}
+            </ScrollView>
         </View>
     );
 }
@@ -352,7 +359,7 @@ const styles = StyleSheet.create({
         marginBottom: 270,
     },
     itemCreatedAt: {
-        marginLeft: 70,
+        marginLeft: 50,
         marginTop: 3,
         fontSize: 13,
         color: "#597ae8",

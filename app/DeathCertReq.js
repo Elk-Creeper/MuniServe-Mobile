@@ -1,136 +1,29 @@
-import React, { useState, useEffect, useRef } from "react";
-import {
-    View,
-    TextInput,
-    Text,
-    StyleSheet,
-    Animated,
-    Image,
-    ActivityIndicator,
-    TouchableOpacity,
-    ScrollView,
-    Platform,
-    Alert,
-} from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, TextInput, Text, StyleSheet, Image, TouchableOpacity, ActivityIndicator, ScrollView, SafeAreaView, Alert } from "react-native";
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
-import { Picker } from "@react-native-picker/picker";
 import { StatusBar } from "expo-status-bar";
 import * as ImagePicker from "expo-image-picker";
-import { firebase } from "../config";
-import * as FileSystem from "expo-file-system";
-import * as Animatable from "react-native-animatable";
-import * as MediaLibrary from "expo-media-library";
+import { firebase } from '../config';
+import * as FileSystem from 'expo-file-system';
+import DateTimePicker from "@react-native-community/datetimepicker";
 
-export default function JobApplication() {
+export default function DeathCertReq() {
     const [image, setImage] = useState(null);
     const [uploading, setUploading] = useState(false);
     const timestamp = firebase.firestore.FieldValue.serverTimestamp();
-    const fadeAnimation = useRef(new Animated.Value(1)).current;
+    const [selectedDateText, setSelectedDateText] = useState("");
     const [loadingModalVisible, setLoadingModalVisible] = useState(false);
-    
+
     const [userUid, setUserUid] = useState(null);
     const [userName, setUserName] = useState(null);
     const [userEmail, setUserEmail] = useState(null);
     const [userBarangay, setUserBarangay] = useState(null);
     const [userContact, setUserContact] = useState(null);
 
-    // for downloading the docx
-    const [mediaData, setMediaData] = useState([]);
-
-    useEffect(() => {
-        async function getMediaData() {
-            const mediaRefs = [firebase.storage().ref("RESUME.docx")];
-
-            const mediaInfo = await Promise.all(
-                mediaRefs.map(async (ref) => {
-                    const url = await ref.getDownloadURL();
-                    const metadata = await ref.getMetadata();
-                    return { url, metadata };
-                })
-            );
-            setMediaData(mediaInfo);
-        }
-
-        getMediaData();
-    }, []);
-
-    async function downloadFile(url, filename, isVideo) {
-        try {
-            const { status } = await MediaLibrary.requestPermissionsAsync();
-            if (status !== "granted") {
-                Alert.alert(
-                    "Permission needed",
-                    "This app needs access to your Media library to download files."
-                );
-                return;
-            }
-
-            const fileUri = FileSystem.cacheDirectory + filename;
-            console.log("Starting download..!");
-            const downloadResumable = FileSystem.createDownloadResumable(
-                url,
-                fileUri,
-                {},
-                false
-            );
-            const { uri } = await downloadResumable.downloadAsync(null, {
-                shouldCache: false,
-            });
-            console.log("Download completed: ", uri);
-
-            if (isVideo) {
-                const { uri: thumbnailUri } = await VideoThumbnails.getThumbnailAsync(
-                    uri,
-                    { time: 1000 }
-                );
-                console.log("Thumbnail created:", thumbnailUri);
-            }
-
-            const asset = await MediaLibrary.createAssetAsync(uri);
-            console.log("asset created:", asset);
-
-            Alert.alert("Download successful", `File saved to: ${fileUri}`);
-        } catch (error) {
-            console.error("Error during download:", error);
-            Alert.alert(
-                "Download failed",
-                "There was an error while downloading the file."
-            );
-        }
-    }
-
-    // docx design
-    const CustomButton = ({ title, onPress }) => (
-        <TouchableOpacity
-            style={{
-                backgroundColor: "#307A59",
-                height: 50,
-                width: '100%',
-                borderRadius: 10,
-                justifyContent: "center",
-                alignItems: "center",
-            }}
-            onPress={onPress}
-        >
-            <Text style={{ color: "white" }}>{title}</Text>
-        </TouchableOpacity>
-    );
-
-    useEffect(() => {
-        // If an image is selected, start the fade-out animation
-        if (pictures.length > 0) {
-            Animated.timing(fadeAnimation, {
-                toValue: 0,
-                duration: 500,
-                useNativeDriver: true,
-            }).start();
-        }
-    }, [pictures, fadeAnimation]);
-
     const pickImage = async () => {
         try {
             let result = await ImagePicker.launchImageLibraryAsync({
-                mediaTypes: ImagePicker.MediaTypeOptions.All, //All, Image, Videos
+                mediaTypes: ImagePicker.MediaTypeOptions.All,
                 allowsEditing: false,
                 aspect: [4, 3],
                 quality: 1,
@@ -149,7 +42,6 @@ export default function JobApplication() {
         }
     };
 
-    //to get user identity
     useEffect(() => {
         const getUserInfo = async () => {
             try {
@@ -178,41 +70,60 @@ export default function JobApplication() {
         getUserInfo();
     }, []);
 
-    // upload media files
     const uploadMedia = async () => {
         setLoadingModalVisible(true);
         setUploading(true);
 
         try {
-            // Validate required fields
-            const requiredFields = [name, age, sex, address, phoneNum, educ];
-            if (requiredFields.some(field => !field)) {
-                Alert.alert("Incomplete Form", "Please fill in all required fields.");
-                return;
-            }
-            // Validate name
-            if (!/^[a-zA-Z.\s]+$/.test(name)) {
+            // Check for null or empty values in required fields
+            const requiredFields = [
+                name,
+                place,
+                rname,
+                address,
+                copies,
+                purpose,
+            ];
+
+            if (requiredFields.some((field) => !field || field.trim() === '')) {
                 Alert.alert(
-                    "Invalid Name",
-                    "Name should only contain letters, dots, and spaces."
+                    "Incomplete Form",
+                    "Please fill in all required fields.",
                 );
                 return;
             }
 
-            // Validate phone number
-            if (!/^\d{11}$/.test(phoneNum)) {
-                Alert.alert("Invalid Phone Number", "Phone number must be exactly 11 digits.");
+            // Validate the date
+            if (!selectedDateText) {
+                Alert.alert("Invalid Date", "Please select a valid date.");
                 return;
             }
 
-            // Check if image is provided
+            // Validate the number of copies
+            const parsedCopies = parseInt(copies);
+            if (isNaN(parsedCopies) || parsedCopies <= 0) {
+                Alert.alert("Invalid Number of Copies", "Please enter a valid number of copies.");
+                return;
+            }
+
+            // Validate the name and rname fields
+            if (!/^[a-zA-Z.]+$/.test(name)) {
+                Alert.alert("Invalid Characters", "Name should only contain letters and dots.");
+                return;
+            }
+
+            if (!/^[a-zA-Z.]+$/.test(rname)) {
+                Alert.alert("Invalid Characters", "Requesting party name should only contain letters and dots.");
+                return;
+            }
+
+            // Check if the user has selected an image
             if (!image) {
-                Alert.alert("Missing Image", "Please upload an image.");
+                Alert.alert("Missing Image", "Please select an image for proof of payment.");
                 return;
             }
 
             const { uri } = await FileSystem.getInfoAsync(image);
-
             const blob = await new Promise((resolve, reject) => {
                 const xhr = new XMLHttpRequest();
                 xhr.onload = () => {
@@ -229,40 +140,35 @@ export default function JobApplication() {
             const filename = image.substring(image.lastIndexOf("/") + 1);
             const ref = firebase.storage().ref().child(filename);
 
-            // Upload the image to Firebase Storage
             const snapshot = await ref.put(blob);
-
-            // Get the download URL of the uploaded image
             const downloadURL = await snapshot.ref.getDownloadURL();
 
-            // Store the download URL in Firestore
             const MuniServe = firebase.firestore();
-            const job = MuniServe.collection("job");
+            const deathCert = MuniServe.collection("deathCert");
 
-            await job.add({
+            await deathCert.add({
                 userUid: userUid,
                 userName: userName,
                 userEmail: userEmail,
                 userContact: userContact,
                 userBarangay: userBarangay,
                 name: name,
-                age: age,
-                sex: sex,
+                date: date,
+                place: place,
+                rname: rname,
                 address: address,
-                phoneNum: phoneNum,
-                educ: educ,
-                pictures: downloadURL, // Store the download URL here
-                status: "Pending", // Set the initial status to "Pending"
+                copies: parsedCopies,
+                purpose: purpose,
+                payment: downloadURL,
+                status: "Pending",
                 createdAt: timestamp,
             });
 
-            setUploading(false);
             setImage(null);
             resetForm();
             Alert.alert("Success", "Form filled successfully.");
         } catch (error) {
             console.error(error);
-            setUploading(false);
             Alert.alert("Error", "Form filling failed.");
         } finally {
             setUploading(false);
@@ -270,23 +176,28 @@ export default function JobApplication() {
         }
     };
 
-
     // Data add
     const [name, setName] = useState("");
-    const [age, setAge] = useState("");
-    const [sex, setSex] = useState("");
+    const [date, setDate] = useState(new Date());
+    const [place, setPlace] = useState("");
+    const [rname, setRname] = useState("");
     const [address, setAddress] = useState("");
-    const [phoneNum, setPhoneNum] = useState("");
-    const [educ, setEduc] = useState("");
-    const [pictures, setPictures] = useState("");
+    const [copies, setCopies] = useState("");
+    const [purpose, setPurpose] = useState("");
+    const [payment, setPayment] = useState("");
 
     const resetForm = () => {
         setName("");
-        setAge("");
-        setSex("");
+        setDate(new Date());
+        setPlace("");
+        setRname("");
         setAddress("");
-        setPhoneNum("");
-        setEduc("");
+        setCopies("");
+        setPurpose("");
+        setPayment("");
+
+        // Reset date related states
+        setSelectedDateText("");
     };
 
     const [serve, setServe] = useState([]);
@@ -317,9 +228,32 @@ export default function JobApplication() {
         fetchData();
     }, []);
 
+    const [showDatePicker, setShowDatePicker] = useState(false);
+    const [maxDate, setMaxDate] = useState(new Date());
+
+    const onDateChange = (event, selectedDate) => {
+        const currentDate = selectedDate || new Date();
+
+        // Set maxDate only once when the component mounts
+        if (!maxDate.getTime()) {
+            setMaxDate(new Date());
+        }
+
+        setShowDatePicker(Platform.OS === 'ios');
+        setDate(currentDate);
+        setSelectedDateText(formatDate(currentDate));
+    };
+
+    const formatDate = (date) => {
+        // Format the date as needed (you can customize this based on your requirements)
+        const formattedDate = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+        return formattedDate;
+    };
+
     return (
-        <View style={styles.container}>
+        <SafeAreaView style={styles.container}>
             <StatusBar backgroundColor="#93C49E" />
+
             <View style={styles.header}>
                 <View style={styles.titleContainer}>
                     <Image
@@ -343,22 +277,24 @@ export default function JobApplication() {
                             source={require("../assets/imported/Del_Gallego_Camarines_Sur.png")}
                             style={styles.boxIcon}
                         />
-                        <Text style={styles.itemService_name}>Job Application</Text>
+                        <Text style={styles.itemService_name}>
+                            Death Certificate Request
+                        </Text>
                     </View>
                 </View>
                 <View style={styles.innerContainer}>
                     <Text style={styles.itemService_desc}>
-                        A job application is a form employers use to collection information
-                        about you to see if you are a good fit for the position.
+                        A Death Certificate is an official document setting forth particulars relating to a dead person, including the name of the individual, the date of birth and the date of death.  When requesting for death certificate, the interested party shall provide the following information to facilitate verification and issuance of certification.
                     </Text>
                 </View>
 
+
                 <Text style={styles.noteText}>
-                    Please be ready to supply the following information. Fill the form
-                    below:
-                </Text>
+                    Please be ready to supply the following information. Fill the form below:</Text>
                 <View style={{ marginBottom: 10 }}>
-                    <Text style={styles.label}>Complete name</Text>
+                    <Text style={styles.label}>
+                        Complete name of the deceased person
+                    </Text>
 
                     <View style={styles.placeholder}>
                         <TextInput
@@ -374,15 +310,39 @@ export default function JobApplication() {
                 </View>
 
                 <View style={{ marginBottom: 10 }}>
-                    <Text style={styles.label}>Age</Text>
+                    <Text style={styles.label}>
+                        Date of death
+                    </Text>
+
+                    <TouchableOpacity
+                        onPress={() => setShowDatePicker(true)}
+                        style={styles.placeholder}
+                    >
+                        <Text>{selectedDateText}</Text>
+                    </TouchableOpacity>
+
+                    {showDatePicker && (
+                        <DateTimePicker
+                            value={date}
+                            mode="date"
+                            display="default"
+                            onChange={onDateChange}
+                            maximumDate={maxDate}
+                        />
+                    )}
+                </View>
+
+                <View style={{ marginBottom: 10 }}>
+                    <Text style={styles.label}>
+                        Place of death
+                    </Text>
 
                     <View style={styles.placeholder}>
                         <TextInput
                             placeholder=""
-                            maxLength={2}
-                            value={age}
-                            keyboardType="number-pad"
-                            onChangeText={(age) => setAge(age)}
+                            maxLength={50}
+                            value={place}
+                            onChangeText={(place) => setPlace(place)}
                             style={{
                                 width: "100%",
                             }}
@@ -390,34 +350,37 @@ export default function JobApplication() {
                     </View>
                 </View>
 
-               
                 <View style={{ marginBottom: 10 }}>
-                    <Text style={styles.label}>Sex</Text>
+                    <Text style={styles.label}>
+                        Complete name of the requesting party
+                    </Text>
 
                     <View style={styles.placeholder}>
-                        <Picker
-                                selectedValue={sex}
-                                onValueChange={(itemValue, itemIndex) =>
-                                    setSex(itemValue)
-                                }
-                                style={{ width: "100%" }}
-                            >
-                                <Picker.Item label="Select" value="" />
-                                <Picker.Item label="Female" value="Female" />
-                                <Picker.Item label="Male" value="Male" />
-                        </Picker>
+                        <TextInput
+                            placeholder=""
+                            maxLength={50}
+                            value={rname}
+                            onChangeText={(rname) => setRname(rname)}
+                            style={{
+                                width: "100%",
+                            }}
+                        ></TextInput>
                     </View>
                 </View>
 
                 <View style={{ marginBottom: 10 }}>
-                    <Text style={styles.label}>Address</Text>
+                    <Text style={styles.label}>
+                        Complete address of the requesting party
+                    </Text>
 
                     <View style={styles.placeholder}>
                         <TextInput
                             placeholder=""
                             maxLength={100}
                             value={address}
-                            onChangeText={(address) => setAddress(address)}
+                            onChangeText={(address) =>
+                                setAddress(address)
+                            }
                             style={{
                                 width: "100%",
                             }}
@@ -426,15 +389,16 @@ export default function JobApplication() {
                 </View>
 
                 <View style={{ marginBottom: 10 }}>
-                    <Text style={styles.label}>Phone Number</Text>
+                    <Text style={styles.label}>
+                        Number of copies needed
+                    </Text>
 
                     <View style={styles.placeholder}>
                         <TextInput
                             placeholder=""
-                            maxLength={11}
-                            value={phoneNum}
-                            keyboardType="number-pad"
-                            onChangeText={(phoneNum) => setPhoneNum(phoneNum)}
+                            value={copies}
+                            onChangeText={(copies) => setCopies(copies)}
+                            maxLength={10}
                             style={{
                                 width: "100%",
                             }}
@@ -443,44 +407,35 @@ export default function JobApplication() {
                 </View>
 
                 <View style={{ marginBottom: 10 }}>
-                    <Text style={styles.label}>Educational Attainment</Text>
+                    <Text style={styles.label}>
+                        Purpose of the certification
+                    </Text>
 
-                    <View style={styles.placeholder}>
+                    <View style={styles.placeholder3}>
                         <TextInput
                             placeholder=""
-                            value={educ}
-                            onChangeText={(educ) => setEduc(educ)}
-                            maxLength={100}
+                            multiline={true}
+                            numberOfLines={5}
+                            value={purpose}
+                            onChangeText={(purpose) => setPurpose(purpose)}
+                            maxLength={300}
                             style={{
-                                width: "100%",
+                                width: "100%", textAlignVertical: "top",
                             }}
                         ></TextInput>
                     </View>
                 </View>
 
-                <Text style={styles.noteText}>
-                    Note: Upload first the needed requirements before submitting your
-                    application. Lack of needed information will cause delay or rejection.
+                <Text style={styles.noteText}>Note: Upload first your proof of payment before submitting your application. Lack of needed information will cause delay or rejection.</Text>
+                
+                <Text style={styles.noteText2}>
+                    FEE FOR REGISTRATION: 110 PESOS
                 </Text>
-
-                {mediaData.map((media, index) => {
-                    const { url, metadata } = media;
-                    const { name, contentType } = metadata;
-                    const isVideo = contentType.includes("video");
-                    return (
-                        <View key={index} style={styles.imageContainer}>
-                            <CustomButton
-                                title={`${name}`}
-                                onPress={() => downloadFile(url, name, isVideo)}
-                            />
-                        </View>
-                    );
-                })}
-
+                
                 <View style={styles.selectButton}>
-                    <Text style={styles.buttonText}>2x2 Pictures</Text>
+                    <Text style={styles.buttonText}>Proof of Payment(G-CASH RECEIPT)</Text>
                     <TouchableOpacity onPress={pickImage}>
-                        {pictures.length > 0 ? (
+                        {payment.length > 0 ? (
                             <Animatable.View
                                 style={{
                                     ...styles.plusCircle,
@@ -494,11 +449,12 @@ export default function JobApplication() {
                                 <Ionicons name="ios-add" size={24} color="white" />
                             </View>
                         )}
-                        {pictures.length > 0 && (
+                        {payment.length > 0 && (
                             <View style={styles.checkCircle}>
                                 <Ionicons name="ios-checkmark" size={24} color="white" />
                             </View>
                         )}
+
                     </TouchableOpacity>
                 </View>
 
@@ -506,7 +462,7 @@ export default function JobApplication() {
                     {image && (
                         <Image
                             source={{ uri: image }}
-                            style={{ width: 200, height: 200 }}
+                            style={{ width: 300, height: 300 }}
                         />
                     )}
                     <TouchableOpacity
@@ -524,7 +480,7 @@ export default function JobApplication() {
                     <ActivityIndicator size="large" color="#307A59" />
                 </View>
             )}
-        </View>
+        </SafeAreaView>
     );
 }
 
@@ -567,12 +523,20 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         fontSize: 20,
     },
+    serveText: {
+        fontSize: 18,
+        fontWeight: "bold",
+        color: "black",
+        textAlign: "left",
+        marginTop: 15,
+        marginBottom: 15,
+    },
     boxes1: {
         width: "100%",
         height: 65,
         backgroundColor: "#307A59",
         borderRadius: 15,
-        marginBottom: 15,
+        marginBottom: 30,
         marginTop: 15,
     },
     box: {
@@ -589,6 +553,10 @@ const styles = StyleSheet.create({
         marginLeft: 15,
         width: 40,
         height: 40,
+    },
+    containers: {
+        alignItems: "center",
+        justifyContent: "center",
     },
     inputContainer: {
         flexDirection: "row",
@@ -609,6 +577,25 @@ const styles = StyleSheet.create({
         flex: 1,
         fontSize: 17,
     },
+    loginButton: {
+        backgroundColor: "#307A59",
+        justifyContent: "center",
+        alignItems: "center",
+        borderRadius: 50,
+        paddingVertical: 10,
+        marginTop: 20,
+        width: 165,
+    },
+    loginButtonText: {
+        color: "white",
+        fontSize: 15,
+    },
+    serveContainer: {
+        padding: 15,
+        borderRadius: 15,
+        margin: 5,
+        marginHorizontal: 10,
+    },
     innerContainer: {
         alignContent: "center",
         flexDirection: "column",
@@ -626,9 +613,15 @@ const styles = StyleSheet.create({
         fontSize: 15,
         textAlign: "justify",
         lineHeight: 30,
-        marginBottom: 20,
+    },
+    itemService_proc: {
+        fontWeight: "300",
+        fontSize: 15,
+        textAlign: "justify",
+        lineHeight: 30,
     },
     imageContainer: {
+        marginTop: 20,
         alignItems: "center",
     },
     imageName: {
@@ -641,16 +634,42 @@ const styles = StyleSheet.create({
         height: 200,
         resizeMode: "cover",
     },
+    closeButton: {
+        position: "absolute",
+        top: 30,
+        right: 10,
+        backgroundColor: "#307A59",
+        borderRadius: 100,
+        padding: 5,
+        width: 30,
+        height: 30,
+        justifyContent: "center",
+        alignItems: "center",
+        textAlign: "center",
+    },
+    closeButtonText: {
+        fontSize: 18,
+        color: "white",
+        textAlign: "center",
+    },
     regText: {
         fontSize: 25,
         textAlign: "center",
     },
     noteText: {
-        fontSize: 15,
+        fontSize: 17,
         textAlign: "justify",
         marginTop: 5,
-        marginBottom: 10,
-        fontWeight: "400",
+        marginBottom: 5,
+        fontWeight: "500",
+    },
+    noteText2: {
+        fontSize: 17,
+        textAlign: "justify",
+        marginTop: 5,
+        marginBottom: 5,
+        fontWeight: "500",
+        color: "#945",
     },
     boxContainer: {
         flexDirection: "row",
@@ -675,9 +694,10 @@ const styles = StyleSheet.create({
         alignItems: "center",
         borderRadius: 50,
         paddingVertical: 10,
-        marginTop: 50,
+        marginTop: 10,
         width: 165,
         marginLeft: 15,
+        marginBottom: 40,
     },
     selectButton: {
         borderRadius: 10,
@@ -689,7 +709,9 @@ const styles = StyleSheet.create({
         backgroundColor: "transparent",
         borderColor: "#000",
         borderWidth: 1,
+        marginTop: 10,
         flexDirection: "row",
+        marginVertical: 10,
         padding: 10,
     },
     buttonText: {
@@ -698,6 +720,25 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: "light",
         textAlign: "left",
+    },
+    plusCircle: {
+        width: 30,
+        height: 30,
+        borderRadius: 15,
+        backgroundColor: "#307A59",
+        justifyContent: "center",
+        alignItems: "center",
+        marginRight: 10, // Adjust margin as needed
+    },
+    checkCircle: {
+        width: 30,
+        height: 30,
+        borderRadius: 15,
+        backgroundColor: "#3498db", // Check sign color
+        justifyContent: "center",
+        alignItems: "center",
+        marginRight: 10, // Adjust margin as needed
+        marginBottom: 30,
     },
     submitText: {
         color: "#fff",
@@ -715,9 +756,8 @@ const styles = StyleSheet.create({
         borderColor: "black",
         borderRadius: 8,
         borderWidth: 1,
-        alignItems: "left",
+        alignItems: "justify",
         justifyContent: "center",
-        textAlign: "justify",
         paddingLeft: 10,
     },
     placeholder2: {
@@ -743,32 +783,12 @@ const styles = StyleSheet.create({
         marginVertical: 8,
     },
     datePickerStyle: {
-        width: "100%",
-        borderColor: "black",
+        width: '100%',
+        borderColor: 'black',
         borderRadius: 8,
         borderWidth: 1,
-        alignItems: "center",
-        justifyContent: "center",
-    },
-    plusCircle: {
-        width: 30,
-        height: 30,
-        borderRadius: 15,
-        backgroundColor: "#307A59",
-        justifyContent: "center",
-        alignItems: "center",
-        marginRight: 10, // Adjust margin as needed
-    },
-
-    checkCircle: {
-        width: 30,
-        height: 30,
-        borderRadius: 15,
-        backgroundColor: "#3498db", // Check sign color
-        justifyContent: "center",
-        alignItems: "center",
-        marginRight: 10, // Adjust margin as needed
-        marginBottom: 30,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     loadingContainer: {
         ...StyleSheet.absoluteFillObject,
