@@ -18,8 +18,11 @@ import * as ImagePicker from "expo-image-picker";
 import { firebase } from "../config";
 import * as FileSystem from "expo-file-system";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { Link, useRouter } from "expo-router";
 
 export default function BirthReg() {
+  const router = useRouter();
+
   const [image, setImage] = useState(null);
   const [uploading, setUploading] = useState(false);
   const timestamp = firebase.firestore.FieldValue.serverTimestamp();
@@ -131,7 +134,7 @@ export default function BirthReg() {
 
       // Store the download URL in Firestore
       const MuniServe = firebase.firestore();
-      const birthreg = MuniServe.collection("birth_reg");
+      const birthreg = MuniServe.collection("birth");
 
       await birthreg.add({
         userUid: userUid,
@@ -335,7 +338,11 @@ export default function BirthReg() {
             <Text style={styles.greenText}>SERVE</Text>
           </Text>
         </View>
-        <TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            router.push("/notif");
+          }}
+        >
           <Ionicons name="notifications-outline" size={24} color="black" />
         </TouchableOpacity>
       </View>
@@ -853,13 +860,13 @@ export default function BirthReg() {
 
         <View style={{ marginBottom: 10 }}>
           <Text style={styles.label}>
-            PLACE
+            PLACE (municipality, province, country)
           </Text>
 
           <View style={styles.placeholder}>
             <TextInput
               placeholder=""
-              maxLength={20}
+              maxLength={50}
               value={mpPlace}
               onChangeText={(mpPlace) =>
                 setMpPlace(mpPlace)

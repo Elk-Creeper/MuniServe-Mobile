@@ -19,23 +19,33 @@ export default function tab1() {
 
   const [name, setName] = useState("");
   const [contact, setContact] = useState("");
+  const [profileImage, setProfileImage] = useState("");
 
   useEffect(() => {
-    firebase
-      .firestore()
-      .collection("users")
-      .doc(firebase.auth().currentUser.uid)
-      .get()
-      .then((snapshot) => {
-        if (snapshot.exists) {
-          setName(snapshot.data());
-          setContact(snapshot.data());
-        } else {
-          console.log("User does not exist");
-        }
-      });
-  }, []);
+    const currentUser = firebase.auth().currentUser;
+    if (currentUser) {
+      const userId = currentUser.uid;
 
+      const unsubscribe = firebase
+        .firestore()
+        .collection("users")
+        .doc(userId)
+        .onSnapshot((snapshot) => {
+          if (snapshot.exists) {
+            const userData = snapshot.data();
+            console.log("User Data:", userData);
+            setName(userData.firstName || "");
+            setContact(userData.contact || "");
+            setProfileImage(userData.profileImage || "");
+          } else {
+            console.log("User does not exist");
+          }
+        });
+
+      return () => unsubscribe(); // Unsubscribe when the component unmounts
+    }
+  }, []);
+  
   return (
     <View style={styles.container}>
       <StatusBar
@@ -65,12 +75,12 @@ export default function tab1() {
         <View style={styles.greenContainer}>
           <View style={styles.profileContainer}>
             <Image
-              source={require("../../../assets/imported/raiza.jpg")} // Replace with the user's profile image
+              source={profileImage ? { uri: profileImage } : require("../../../assets/imported/DP.jpg")}
               style={styles.profileImage}
             />
             <View style={styles.userInfo}>
-              <Text style={styles.userName}>Hi, {name.firstName}</Text>
-              <Text style={styles.userPhone}>{contact.contact}</Text>
+              <Text style={styles.userName}>Hi, {name}</Text>
+              <Text style={styles.userPhone}>{contact}</Text>
             </View>
           </View>
         </View>
@@ -157,7 +167,7 @@ export default function tab1() {
             <TouchableOpacity
               style={styles.circularIcon}
               onPress={() => {
-                router.push("/projects");
+                router.push("../../Tourist");
               }}
             >
               <Image

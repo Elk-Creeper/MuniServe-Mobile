@@ -1,126 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { firebase } from "../../../config";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  FlatList,
-  TextInput,
-  ScrollView,
-  Button,
-} from "react-native";
+import { View, TextInput, Text, StyleSheet, Image, TouchableOpacity, ActivityIndicator, ScrollView, SafeAreaView, Alert } from "react-native";
+import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
-import { Ionicons, FontAwesome } from "@expo/vector-icons"; // Import the Ionicons library for the bell icon
-import { useNavigation } from "@react-navigation/native";
 import { Link, useRouter } from "expo-router";
 
-export default function Tab4() {
-  const [showAppointments, setShowAppointments] = useState(false);
-  const [showServiceRequests, setShowServiceRequests] = useState(false);
-
-  const [appointmentData, setAppointmentData] = useState([]);
-  const [transactionData, setTransactionData] = useState([]);
-
+export default function Transaction() {
   const router = useRouter();
 
-  useEffect(() => {
-    const currentUser = firebase.auth().currentUser;
-    const currentUserUid = currentUser ? currentUser.uid : null;
-
-    if (!currentUserUid) {
-      // Handle the case when the user is not authenticated
-      return;
-    }
-
-    const appointmentPage = firebase.firestore().collection("appointments");
-    const unsubscribeTransaction = appointmentPage
-      .where("userUid", "==", currentUserUid)
-      .onSnapshot((querySnapshot) => {
-        const appointments = [];
-        const currentTime = new Date();
-
-        querySnapshot.forEach((doc) => {
-          const {
-            department,
-            personnel,
-            reason,
-            status,
-            time,
-            date,
-            name,
-            createdAt,
-          } = doc.data();
-
-          if (
-            date &&
-            date.toDate &&
-            time &&
-            time.toDate &&
-            createdAt &&
-            createdAt.toDate
-          ) {
-            const appointmentDate = date.toDate();
-            const formattedDate = appointmentDate.toLocaleDateString();
-            const formattedTime = time.toDate().toLocaleTimeString();
-
-            const timeDiffInMilliseconds = currentTime - createdAt.toDate();
-            const timeDiffInMinutes = Math.floor(
-              timeDiffInMilliseconds / (1000 * 60)
-            );
-
-            let formattedCreatedAt;
-            if (timeDiffInMinutes < 1) {
-              formattedCreatedAt = "Just now";
-            } else if (timeDiffInMinutes < 60) {
-              formattedCreatedAt = `${timeDiffInMinutes}m ago`;
-            } else if (timeDiffInMinutes < 1440) {
-              const hours = Math.floor(timeDiffInMinutes / 60);
-              formattedCreatedAt = `${hours} ${hours === 1 ? "hour" : "hours"
-                } ago`;
-            } else {
-              formattedCreatedAt = formattedDate;
-            }
-
-            appointments.push({
-              id: doc.id,
-              department,
-              personnel,
-              reason,
-              status,
-              date: formattedDate,
-              time: formattedTime,
-              name,
-              createdAt: formattedCreatedAt,
-            });
-          } else {
-            console.warn(
-              "Skipping document with missing or invalid date/time/createdAt:",
-              doc.id
-            );
-          }
-        });
-
-        setAppointmentData(appointments);
-      });
-
-    return () => {
-      unsubscribeTransaction();
-    };
-  }, []);
-
   return (
+    <SafeAreaView style={styles.container}>
+      <StatusBar backgroundColor="#93C49E" />
 
-    <View style={styles.container}>
-      <StatusBar
-        backgroundColor="#93C49E" // Change the background color as needed
-      />
       <View style={styles.header}>
         <View style={styles.titleContainer}>
           <Image
-            source={require("../../../assets/imported/Del_Gallego_Camarines_Sur.png")}
-            style={styles.imageStyle}
+            source={require("../../../assets/imported/Del_Gallego_Camarines_Sur.png")} style={styles.imageStyle}
           />
           <Text style={styles.titleText}>
             <Text style={styles.blackText}>MUNI</Text>
@@ -135,119 +29,97 @@ export default function Tab4() {
           <Ionicons name="notifications-outline" size={24} color="black" />
         </TouchableOpacity>
       </View>
-      
-      {/* Navigation Buttons */}
-      <View style={styles.navigationButtons}>
-        <TouchableOpacity
-          style={[
-            styles.navigationButton,
-            showAppointments && styles.activeButton,
-          ]}
-          onPress={() => {
-            setShowAppointments(true);
-            setShowServiceRequests(false);
-          }}
-        >
-          <Text style={styles.buttonText}>Appointments</Text>
-        </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[
-            styles.navigationButton,
-            showServiceRequests && styles.activeButton,
-          ]}
-          onPress={() => {
-            setShowServiceRequests(true);
-            setShowAppointments(false);
-          }}
-        >
-          <Text style={styles.buttonText}>Service Requests</Text>
-        </TouchableOpacity>
-      </View>
-      
       <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
-      {showAppointments && (
-        <View>
-          {appointmentData.length === 0 ? (
-            <View style={styles.emptyListContainer}>
-              <Image
-                source={require("../../../assets/imported/box.png")} // Replace with your empty image source
-                style={styles.emptyBox}
-              />
-              <Text style={styles.emptyBoxText}>No appointments found.</Text>
-            </View>
-          ) : (
-            <FlatList
-              data={appointmentData}
-              renderItem={({ item }) => (
-                <View style={styles.container2}>
-                  <View style={styles.container3}>
-                    <View style={styles.container4}>
-                      <Image
-                        source={require("../../../assets/imported/Del_Gallego_Camarines_Sur.png")}
-                        style={styles.boxIcon}
-                      />
-                      <Text style={styles.appText}>Appointment</Text>
-                      <Text style={styles.itemCreatedAt}>
-                        {item.createdAt}
-                      </Text>
-                    </View>
-                    <Text style={styles.itemPersonnel}>
-                      Dear {item.name}, your requested appointment for{" "}
-                      {item.personnel} from {item.department} on {item.date} at{" "}
-                      {item.time} is
-                      <Text style={styles.itemStatus}> {item.status}.</Text>
-                    </Text>
-                  </View>
-                </View>
-              )}
-            />
-          )}
-        </View>
-      )}
 
-      {showServiceRequests && (
-        <View>
-          {transactionData.length === 0 ? (
-            <View style={styles.emptyListContainer}>
-              <Image
-                source={require("../../../assets/imported/box.png")} // Replace with your empty image source
-                style={styles.emptyBox}
-              />
-              <Text style={styles.emptyBoxText}>
-                No service requests found.
-              </Text>
-            </View>
-          ) : (
-            <FlatList
-              data={transactionData}
-              renderItem={({ item }) => (
-                <View style={styles.container2}>
-                  <View style={styles.container3}>
-                    <View style={styles.container4}>
-                      <Image
-                        source={require("../../../assets/imported/Del_Gallego_Camarines_Sur.png")}
-                        style={styles.boxIcon}
-                      />
-                      <Text style={styles.appText}>Transaction</Text>
-                      <Text style={styles.itemCreatedAt}>
-                        {" "}
-                        {item.createdAt}
-                      </Text>
-                    </View>
-                    <Text style={styles.itemPersonnel}>
-                      Dear user, your availed birth registration is
-                      <Text style={styles.itemStatus}> {item.status}.</Text>
-                    </Text>
-                  </View>
-                </View>
-              )}
-            />
-          )}
+        <Text style={styles.noteText}>My Transaction</Text>
+
+        <View style={styles.choices}>
+          <TouchableOpacity
+            style={[
+              styles.selection
+            ]}
+            onPress={() => {
+              router.push("../../TrackLiveBirth");
+            }}                    >
+            <Image source={require("../../../assets/imported/form.png")} style={styles.form} />
+            <Text style={styles.selectionText}>Live Birth Registration</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.selection
+            ]}
+            onPress={() => {
+              router.push("../../TrackBP");
+            }}                    >
+            <Image source={require("../../../assets/imported/form.png")} style={styles.form} />
+            <Text style={styles.selectionText}>Business Permit</Text>
+          </TouchableOpacity>
         </View>
-      )}
+
+        <View style={styles.choices}>
+          <TouchableOpacity
+            style={[
+              styles.selection
+            ]}
+            onPress={() => {
+              router.push("../../TrackDeathCert");
+            }}                    >
+            <Image source={require("../../../assets/imported/form.png")} style={styles.form} />
+            <Text style={styles.selectionText}>Death Certificate</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.selection
+            ]}
+            onPress={() => {
+              router.push("../../TrackDeathReg");
+            }}                    >
+            <Image source={require("../../../assets/imported/form.png")} style={styles.form} />
+            <Text style={styles.selectionText}>Death Registration</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.choices}>
+          <TouchableOpacity
+            style={[
+              styles.selection
+            ]}
+            onPress={() => {
+              router.push("../../TrackMarriageCert");
+            }}                    >
+            <Image source={require("../../../assets/imported/form.png")} style={styles.form} />
+            <Text style={styles.selectionText}>Marriage Certificate</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.selection
+            ]}
+            onPress={() => {
+              router.push("../../TrackMarriageReg");
+            }}                    >
+            <Image source={require("../../../assets/imported/form.png")} style={styles.form} />
+            <Text style={styles.selectionText}>Marriage Registration</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.choice}>
+          <TouchableOpacity
+            style={[
+              styles.selection
+            ]}
+            onPress={() => {
+              router.push("../../TrackJobApp");
+            }}                    >
+            <Image source={require("../../../assets/imported/form.png")} style={styles.form} />
+            <Text style={styles.selectionText}>Job Application</Text>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -290,80 +162,83 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 20,
   },
-  navigationButtons: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    marginVertical: 10,
-  },
-
-  navigationButton: {
+  boxes1: {
+    width: "100%",
+    height: 65,
     backgroundColor: "#307A59",
-    padding: 10,
-    borderRadius: 10,
-    width: "49%",
-    alignItems: "center",
-  },
-
-  activeButton: {
-    backgroundColor: "#93C49E", // Change to your active button color
-    color: "black",
-  },
-
-  buttonText: {
-    color: "white",
-    fontWeight: "500",
-    textAlign: "center",
-  },
-
-  content: {
-    flex: 1,
-  },
-  container2: {
-    padding: 15,
     borderRadius: 15,
-    margin: 5,
-    marginHorizontal: 10,
-    borderWidth: 1,
-    backgroundColor: "#F6F3F3",
+    marginBottom: 30,
+    marginTop: 15,
   },
-  itemStatus: {
-    color: "green",
-    fontWeight: "500",
-    textTransform: "uppercase",
-  },
-  itemPersonnel: {
-    textAlign: "justify",
-    lineHeight: 20,
-  },
-  appText: {
-    fontSize: 18,
-    marginLeft: 8,
-    marginBottom: 10,
+  boxAcc: {
+    flexDirection: "row",
   },
   boxIcon: {
-    width: 25,
-    height: 25,
+    marginTop: 12,
+    marginLeft: 15,
+    width: 40,
+    height: 40,
   },
-  container4: {
-    flexDirection: "row",
+  innerContainer: {
+    alignContent: "center",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
   },
-  emptyBox: {
-    width: 130,
-    height: 130,
-    marginLeft: 95,
-    marginTop: 150,
-  },
-  emptyBoxText: {
-    textAlign: "center",
+  itemService_name: {
+    marginLeft: 20,
+    color: "white",
     fontSize: 18,
-    fontWeight: "600",
-    marginBottom: 270,
+    marginTop: 19,
   },
-  itemCreatedAt: {
-    marginLeft: 50,
-    marginTop: 3,
-    fontSize: 13,
-    color: "#597ae8",
+  itemService_desc: {
+    fontWeight: "300",
+    fontSize: 15,
+    textAlign: "justify",
+    lineHeight: 30,
+  },
+  regText: {
+    fontSize: 25,
+    textAlign: "center",
+  },
+  noteText: {
+    fontSize: 25,
+    marginBottom: 20,
     fontWeight: "600",
+    textAlign: "center",
+  },
+  choices: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    marginTop: 30,
+  },
+  choice: {
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 30,
+  },
+  selection: {
+    width: 100,
+    height: 80,
+    borderColor: "#307A59",
+    borderWidth: 2,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 15,
+    padding: 10,
+    margin: 5,
+  },
+  selectionText: {
+    textAlign: "center",
+    fontSize: 11,
+  },
+  form: {
+    justifyContent: "center",
+    alignItems: "center",
+    resizeMode: "contain",
+    flex: 1,
+    width: 30,
+    height: 30,
   },
 });

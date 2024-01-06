@@ -2,7 +2,6 @@ import { View, Text, StyleSheet, Image, TouchableOpacity, Alert, ScrollView } fr
 import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons"; // Import the Ionicons library for the bell icon
 import { Link, useRouter } from "expo-router";
-import { useNavigation } from "@react-navigation/native";
 import { firebase } from "../../../config";
 import React, { useState, useEffect } from "react";
 
@@ -11,21 +10,31 @@ export default function tab4() {
 
   const [name, setName] = useState("");
   const [contact, setContact] = useState("");
+  const [profileImage, setProfileImage] = useState("");
 
   useEffect(() => {
-    firebase
-      .firestore()
-      .collection("users")
-      .doc(firebase.auth().currentUser.uid)
-      .get()
-      .then((snapshot) => {
-        if (snapshot.exists) {
-          setName(snapshot.data());
-          setContact(snapshot.data());
-        } else {
-          console.log("User does not exist");
-        }
-      });
+    const currentUser = firebase.auth().currentUser;
+    if (currentUser) {
+      const userId = currentUser.uid;
+
+      const unsubscribe = firebase
+        .firestore()
+        .collection("users")
+        .doc(userId)
+        .onSnapshot((snapshot) => {
+          if (snapshot.exists) {
+            const userData = snapshot.data();
+            console.log("User Data:", userData);
+            setName(userData.firstName || "");
+            setContact(userData.contact || "");
+            setProfileImage(userData.profileImage || "");
+          } else {
+            console.log("User does not exist");
+          }
+        });
+
+      return () => unsubscribe(); // Unsubscribe when the component unmounts
+    }
   }, []);
 
   const handleLogout = () => {
@@ -81,18 +90,21 @@ export default function tab4() {
       </View>
 
       <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
-        <View style={styles.greenContainer}>
-          <View style={styles.profileContainer}>
+        <TouchableOpacity style={[styles.greenContainer]} onPress={() => {
+          router.push("../../EditProfile");
+        }}   >
+          <View style={styles.profileContainer}
+          >
             <Image
-              source={require("../../../assets/imported/raiza.jpg")} // Replace with the user's profile image
+              source={profileImage ? { uri: profileImage } : require("../../../assets/imported/DP.jpg")}
               style={styles.profileImage}
             />
             <View style={styles.userInfo}>
-              <Text style={styles.userName}>Hi, {name.firstName}</Text>
-              <Text style={styles.userPhone}>{contact.contact}</Text>
+              <Text style={styles.userName}>Hi, {name}</Text>
+              <Text style={styles.userPhone}>{contact}</Text>
             </View>
           </View>
-        </View>
+        </TouchableOpacity>
 
         <View style={styles.boxes1}>
           <TouchableOpacity
@@ -109,7 +121,7 @@ export default function tab4() {
             </View>
           </TouchableOpacity>
         </View>
-        
+
         <View style={styles.boxes2}>
           <TouchableOpacity
             onPress={() => {
@@ -159,10 +171,10 @@ export default function tab4() {
         </View>
 
         <View style={styles.boxes5}>
-          <TouchableOpacity 
-          onPress={() => {
-            router.push("/rateApp");
-          }}>         
+          <TouchableOpacity
+            onPress={() => {
+              router.push("/rateApp");
+            }}>
             <View style={styles.boxAcc}>
               <Image
                 source={require("../../../assets/icons/rate.png")}
@@ -236,7 +248,6 @@ const styles = StyleSheet.create({
     flexDirection: "row", // Row direction for circular icons
     alignItems: "center", // Center vertically
     marginBottom: 20,
-    marginTop: 10,
   },
   profileContainer: {
     alignItems: "flex-start",

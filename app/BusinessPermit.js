@@ -22,9 +22,11 @@ import { firebase } from "../config";
 import * as FileSystem from "expo-file-system";
 import * as MediaLibrary from "expo-media-library";
 import * as VideoThumbnails from "expo-video-thumbnails";
-import { Video } from "expo-av";
+import { Link, useRouter } from "expo-router";
 
 export default function Tab4() {
+    const router = useRouter();
+
     const [barangayClearance1, setBarangayClearance1] = useState([]);
     const [appForm1, setAppForm1] = useState([]);
     const [dti, setDti] = useState([]);
@@ -795,7 +797,11 @@ export default function Tab4() {
                         <Text style={styles.greenText}>SERVE</Text>
                     </Text>
                 </View>
-                <TouchableOpacity>
+                <TouchableOpacity
+                    onPress={() => {
+                        router.push("/notif");
+                    }}
+                >
                     <Ionicons name="notifications-outline" size={24} color="black" />
                 </TouchableOpacity>
             </View>

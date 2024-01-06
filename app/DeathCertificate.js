@@ -22,7 +22,11 @@ export default function DeathCert() {
                         <Text style={styles.greenText}>SERVE</Text>
                     </Text>
                 </View>
-                <TouchableOpacity>
+                <TouchableOpacity
+                    onPress={() => {
+                        router.push("/notif");
+                    }}
+                >
                     <Ionicons name="notifications-outline" size={24} color="black" />
                 </TouchableOpacity>
             </View>
@@ -56,7 +60,7 @@ export default function DeathCert() {
                             router.push("/DeathCertReq");
                         }}                    >
                         <Image source={require("../assets/imported/form.png")} style={styles.form} />
-                        <Text style={styles.selectionText}>Death Certificate Request Form</Text>
+                        <Text style={styles.selectionText}>Request Form</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity
@@ -67,7 +71,7 @@ export default function DeathCert() {
                             router.push("/DeathReg");
                         }}                    >
                         <Image source={require("../assets/imported/form.png")} style={styles.form} />
-                        <Text style={styles.selectionText}>Death Certificate Registration Form</Text>
+                        <Text style={styles.selectionText}>Registration Form</Text>
                     </TouchableOpacity>
                 </View>
 

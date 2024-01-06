@@ -11,11 +11,12 @@ import React, { useState, useEffect } from "react";
 import { firebase } from "../config";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
-
+import { Link, useRouter } from "expo-router";
 
 const Council = () => {
     const [council, setCouncil] = useState([]);
     const MuniServe = firebase.firestore().collection("council");
+    const router = useRouter();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -79,7 +80,11 @@ const Council = () => {
                         <Text style={styles.greenText}>SERVE</Text>
                     </Text>
                 </View>
-                <TouchableOpacity>
+                <TouchableOpacity
+                    onPress={() => {
+                        router.push("/notif");
+                    }}
+                >
                     <Ionicons name="notifications-outline" size={24} color="black" />
                 </TouchableOpacity>
             </View>

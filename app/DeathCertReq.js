@@ -6,8 +6,11 @@ import * as ImagePicker from "expo-image-picker";
 import { firebase } from '../config';
 import * as FileSystem from 'expo-file-system';
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { Link, useRouter } from "expo-router";
 
 export default function DeathCertReq() {
+    const router = useRouter();
+
     const [image, setImage] = useState(null);
     const [uploading, setUploading] = useState(false);
     const timestamp = firebase.firestore.FieldValue.serverTimestamp();
@@ -107,15 +110,16 @@ export default function DeathCertReq() {
             }
 
             // Validate the name and rname fields
-            if (!/^[a-zA-Z.]+$/.test(name)) {
-                Alert.alert("Invalid Characters", "Name should only contain letters and dots.");
+            if (!/^[a-zA-Z. ]+$/.test(name)) {
+                Alert.alert("Invalid Characters", "Name should only contain letters, dots, and spaces.");
                 return;
             }
 
-            if (!/^[a-zA-Z.]+$/.test(rname)) {
-                Alert.alert("Invalid Characters", "Requesting party name should only contain letters and dots.");
+            if (!/^[a-zA-Z. ]+$/.test(rname)) {
+                Alert.alert("Invalid Characters", "Requesting party name should only contain letters, dots, and spaces.");
                 return;
             }
+
 
             // Check if the user has selected an image
             if (!image) {
@@ -265,7 +269,11 @@ export default function DeathCertReq() {
                         <Text style={styles.greenText}>SERVE</Text>
                     </Text>
                 </View>
-                <TouchableOpacity>
+                <TouchableOpacity
+                    onPress={() => {
+                        router.push("/notif");
+                    }}
+                >
                     <Ionicons name="notifications-outline" size={24} color="black" />
                 </TouchableOpacity>
             </View>

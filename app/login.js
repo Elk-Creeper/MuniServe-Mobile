@@ -6,7 +6,6 @@ import {
     TextInput,
     StyleSheet,
     StatusBar,
-    Image,
 } from "react-native";
 import { firebase } from "../config";
 import { useRouter } from "expo-router";
@@ -74,20 +73,24 @@ const Login = () => {
         }
     };
 
+    const forgotPassword = async () => {
+        try {
+            await firebase.auth().sendPasswordResetEmail(email);
+            alert("Password reset email sent. Check your email inbox.");
+        } catch (error) {
+            console.error("forgotPassword error", error);
+            alert(error.message);
+        }
+    };
+
     return (
         <View style={styles.container1}>
             <StatusBar backgroundColor="#93C49E" />
             <View style={styles.header}>
-                <View style={styles.titleContainer}>
-                    <Image
-                        source={require("../assets/imported/Del_Gallego_Camarines_Sur.png")}
-                        style={styles.imageStyle}
-                    />
                     <Text style={styles.titleText}>
                         <Text style={styles.blackText}>MUNI</Text>
                         <Text style={styles.greenText}>SERVE</Text>
                     </Text>
-                </View>
             </View>
 
             <View style={styles.container2}>
@@ -118,6 +121,11 @@ const Login = () => {
                     </Text>
                 </TouchableOpacity>
 
+                {/* "Forgot Password" functionality */}
+                <TouchableOpacity onPress={forgotPassword}>
+                    <Text style={styles.forgotPassword}>Forgot Password?</Text>
+                </TouchableOpacity>
+
                 <View style={styles.texts}>
                     <Text
                         style={{
@@ -126,13 +134,13 @@ const Login = () => {
                             textAlign: "center",
                             marginTop: 20,
                         }}
-                    >Don't have an account?
+                    >Create New Account?
                     </Text>
                     <TouchableOpacity onPress={() => {
                         router.push("/register");
                     }}>
                         <View style={styles.box}>
-                            <Text style={styles.itemService_name}>  Register Now</Text>
+                            <Text style={styles.itemService_name}> Register Now</Text>
                         </View>
                     </TouchableOpacity>
                 </View>
@@ -162,6 +170,7 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         alignItems: "center",
         marginBottom: 20,
+        justifyContent: "center",
     },
     titleContainer: {
         flexDirection: "row",
@@ -175,18 +184,22 @@ const styles = StyleSheet.create({
     titleText: {
         fontSize: 24,
         fontWeight: "bold",
-        flexDirection: "row",
         letterSpacing: 3,
+        justifyContent: "center",
+        alignItems: "center",
+        alignContent: 'center',
+        textAlign: 'center',
+        marginTop: 10,
     },
     blackText: {
         color: "black",
         fontWeight: "bold",
-        fontSize: 20,
+        fontSize: 25,
     },
     greenText: {
         color: "green",
         fontWeight: "bold",
-        fontSize: 20,
+        fontSize: 25,
     },
     textInput: {
         paddingTop: 10,
@@ -201,7 +214,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 15,
     },
     button: {
-        marginTop: 210,
+        marginTop: 180,
         height: 60,
         width: "100%",
         backgroundColor: "#307A59",
@@ -223,5 +236,13 @@ const styles = StyleSheet.create({
         marginTop: 20,
         fontWeight: '500',
         fontSize: 16,
+    },
+    forgotPassword: {
+        fontWeight: "500",
+        fontSize: 16,
+        textAlign: "center",
+        marginTop: 10,
+        color: "#0174BE",
+        textDecorationLine: "underline",
     },
 });

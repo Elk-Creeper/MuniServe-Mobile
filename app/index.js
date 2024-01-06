@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from "react-native";
-import { StatusBar } from "expo-status-bar";
 import { Link, useRouter } from "expo-router";
 import { twJoin } from "tailwind-merge";
 import React, { useState, useEffect } from 'react';
@@ -106,10 +105,10 @@ export default function onboarding() {
       </View>
 
       <TouchableOpacity onPress={() => {
-        router.push("/register");
+        router.push("/login");
       }}>
         <View style={styles.box}>
-            <Text style={styles.regText}>Register Now</Text>
+            <Text style={styles.regText}>Login Now</Text>
         </View>
       </TouchableOpacity>
 
@@ -122,13 +121,13 @@ export default function onboarding() {
             marginTop: 20,
           }}
         >
-          Already have an account?
+          Don't have an account?
         </Text>
         <TouchableOpacity onPress={() => {
-          router.push("/login");
+          router.push("/register");
         }}>
           <View style={styles.box2}>
-            <Text style={styles.logText}>  Login Now</Text>
+            <Text style={styles.logText}>  Register Now</Text>
           </View>
         </TouchableOpacity>
       </View>
@@ -155,9 +154,10 @@ const styles = StyleSheet.create({
     marginTop: 15
   },
   logText: {
-    color: "#0174BE",
-    marginTop: 22,
-    fontWeight: '500',
+      color: "#0174BE",
+      marginTop: 20,
+      fontWeight: '500',
+      fontSize: 16,
   },
 });
 

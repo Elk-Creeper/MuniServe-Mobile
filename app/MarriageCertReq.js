@@ -8,9 +8,11 @@ import { firebase } from '../config';
 import * as FileSystem from 'expo-file-system';
 import DateTimePicker from "@react-native-community/datetimepicker";
 import * as Animatable from "react-native-animatable";
-
+import { Link, useRouter } from "expo-router";
 
 export default function MarriageCertReq() {
+    const router = useRouter();
+
     const [image, setImage] = useState(null);
     const [uploading, setUploading] = useState(false);
     const timestamp = firebase.firestore.FieldValue.serverTimestamp();
@@ -277,7 +279,11 @@ export default function MarriageCertReq() {
                         <Text style={styles.greenText}>SERVE</Text>
                     </Text>
                 </View>
-                <TouchableOpacity>
+                <TouchableOpacity
+                    onPress={() => {
+                        router.push("/notif");
+                    }}
+                >
                     <Ionicons name="notifications-outline" size={24} color="black" />
                 </TouchableOpacity>
             </View>
@@ -304,7 +310,7 @@ export default function MarriageCertReq() {
                     Please be ready to supply the following information. Fill the form below:</Text>
                 <View style={{ marginBottom: 10 }}>
                     <Text style={styles.label}>
-                        Complete name of the husband
+                        COMPLETE NAME OF THE HUSBAND
                     </Text>
 
                     <View style={styles.placeholder}>
@@ -322,7 +328,7 @@ export default function MarriageCertReq() {
 
                 <View style={{ marginBottom: 10 }}>
                     <Text style={styles.label}>
-                        Complete name of the wife
+                        COMPLETE NAME OF THE WIFE
                     </Text>
 
                     <View style={styles.placeholder}>
@@ -340,7 +346,7 @@ export default function MarriageCertReq() {
 
                 <View style={{ marginBottom: 10 }}>
                     <Text style={styles.label}>
-                        Date of death
+                        DATE OF MARRIAGE
                     </Text>
 
                     <TouchableOpacity
@@ -363,7 +369,7 @@ export default function MarriageCertReq() {
 
                 <View style={{ marginBottom: 10 }}>
                     <Text style={styles.label}>
-                        Place of marriage
+                        PLACE OF MARRIAGE
                     </Text>
 
                     <View style={styles.placeholder}>
@@ -381,7 +387,7 @@ export default function MarriageCertReq() {
 
                 <View style={{ marginBottom: 10 }}>
                     <Text style={styles.label}>
-                        Complete name of the requesting party
+                        COMPLETE NAME OF THE REQUESTING PARTY
                     </Text>
 
                     <View style={styles.placeholder}>
@@ -399,7 +405,7 @@ export default function MarriageCertReq() {
 
                 <View style={{ marginBottom: 10 }}>
                     <Text style={styles.label}>
-                        Complete address of the requesting party
+                        COMPLETE ADDRESS OF THE REQUESTING PARTY
                     </Text>
 
                     <View style={styles.placeholder}>
@@ -419,7 +425,7 @@ export default function MarriageCertReq() {
 
                 <View style={{ marginBottom: 10 }}>
                     <Text style={styles.label}>
-                        Number of copies needed
+                        NUMBER OF COPIES NEEDED
                     </Text>
 
                     <View style={styles.placeholder}>
@@ -437,7 +443,7 @@ export default function MarriageCertReq() {
 
                 <View style={{ marginBottom: 10 }}>
                     <Text style={styles.label}>
-                        Purpose of the certification
+                        PURPOSE OF THE CERTIFICATION
                     </Text>
 
                     <View style={styles.placeholder3}>

@@ -22,7 +22,7 @@ const Transaction = () => {
             return;
         }
 
-        const appointmentPage = firebase.firestore().collection("appointments");
+        const appointmentPage = firebase.firestore().collection("job");
         const unsubscribeTransaction = appointmentPage
             .where("userUid", "==", currentUserUid)
             .onSnapshot((querySnapshot) => {
@@ -30,64 +30,29 @@ const Transaction = () => {
                 const currentTime = new Date();
 
                 querySnapshot.forEach((doc) => {
-                    const {
-                        department,
-                        personnel,
-                        reason,
-                        status,
-                        time,
-                        date,
-                        name,
-                        createdAt,
-                    } = doc.data();
+                    const { userName, status, createdAt } = doc.data();
 
-                    if (
-                        date &&
-                        date.toDate &&
-                        time &&
-                        time.toDate &&
-                        createdAt &&
-                        createdAt.toDate
-                    ) {
-                        const appointmentDate = date.toDate();
-                        const formattedDate = appointmentDate.toLocaleDateString();
-                        const formattedTime = time.toDate().toLocaleTimeString();
+                    const timeDiffInMilliseconds = currentTime - createdAt.toDate();
+                    const timeDiffInMinutes = Math.floor(timeDiffInMilliseconds / (1000 * 60));
 
-                        const timeDiffInMilliseconds = currentTime - createdAt.toDate();
-                        const timeDiffInMinutes = Math.floor(
-                            timeDiffInMilliseconds / (1000 * 60)
-                        );
-
-                        let formattedCreatedAt;
-                        if (timeDiffInMinutes < 1) {
-                            formattedCreatedAt = "Just now";
-                        } else if (timeDiffInMinutes < 60) {
-                            formattedCreatedAt = `${timeDiffInMinutes}m ago`;
-                        } else if (timeDiffInMinutes < 1440) {
-                            const hours = Math.floor(timeDiffInMinutes / 60);
-                            formattedCreatedAt = `${hours} ${hours === 1 ? "hour" : "hours"
-                                } ago`;
-                        } else {
-                            formattedCreatedAt = formattedDate;
-                        }
-
-                        appointments.push({
-                            id: doc.id,
-                            department,
-                            personnel,
-                            reason,
-                            status,
-                            date: formattedDate,
-                            time: formattedTime,
-                            name,
-                            createdAt: formattedCreatedAt,
-                        });
+                    let formattedCreatedAt;
+                    if (timeDiffInMinutes < 1) {
+                        formattedCreatedAt = "Just now";
+                    } else if (timeDiffInMinutes < 60) {
+                        formattedCreatedAt = `${timeDiffInMinutes}m ago`;
+                    } else if (timeDiffInMinutes < 1440) {
+                        const hours = Math.floor(timeDiffInMinutes / 60);
+                        formattedCreatedAt = `${hours} ${hours === 1 ? "hour" : "hours"} ago`;
                     } else {
-                        console.warn(
-                            "Skipping document with missing or invalid date/time/createdAt:",
-                            doc.id
-                        );
+                        formattedCreatedAt = createdAt.toDate().toLocaleDateString();
                     }
+
+                    appointments.push({
+                        id: doc.id,
+                        userName,
+                        status,
+                        createdAt: formattedCreatedAt,
+                    });
                 });
 
                 setAppointmentData(appointments);
@@ -97,6 +62,23 @@ const Transaction = () => {
             unsubscribeTransaction();
         };
     }, []);
+
+    const getStatusMessage = (item) => {
+        const { userName, status } = item;
+
+        switch (status) {
+            case 'Pending':
+                return `Dear ${userName}, your request for Job Application is PENDING.`;
+            case 'Approved':
+                return `Dear ${userName}, your request for Job Application is already APPROVED and now ready to be processed.`;
+            case 'On Process':
+                return `Dear ${userName}, your request for Job Application is now ON PROCESS. Please wait for at least 10 days for it to be completed.`;
+            case 'Completed':
+                return `Dear ${userName}, your request for Job Application has been COMPLETED and ready to be claimed at the Office of Municipal Civil Registrar. Note that you can claim it during office hours and days.`;
+            default:
+                return ''; // Handle other statuses if needed
+        }
+    };
 
     return (
         <View style={styles.container}>
@@ -115,7 +97,7 @@ const Transaction = () => {
                     </Text>
                 </View>
             </View>
-            <Text style={styles.regText}>My Appointments</Text>
+            <Text style={styles.regText}>Birth Certificate Transaction</Text>
 
             <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
                 <View style={styles.container5}>
@@ -132,25 +114,23 @@ const Transaction = () => {
                             data={appointmentData}
                             renderItem={({ item }) => (
                                 <View style={styles.container2}>
-                                        <View style={styles.container4}>
-                                            <Image
-                                                source={require("../assets/imported/Del_Gallego_Camarines_Sur.png")}
-                                                style={styles.boxIcon}
-                                            />
-                                            <Text style={styles.appText}>Appointment</Text>
-                                            <Text style={styles.itemCreatedAt}>
-                                                {item.createdAt}
-                                            </Text>
-                                        </View>
-                                        <Text style={styles.itemPersonnel}>
-                                            Dear {item.name}, your requested appointment for{" "}
-                                            {item.personnel} from {item.department} on {item.date} at{" "}
-                                            {item.time} is
-                                            <Text style={styles.itemStatus}> {item.status}.</Text>
+                                    <View style={styles.container4}>
+                                        <Image
+                                            source={require("../assets/imported/Del_Gallego_Camarines_Sur.png")}
+                                            style={styles.boxIcon}
+                                        />
+                                        <Text style={styles.appText}>Transaction</Text>
+                                        <Text style={styles.itemCreatedAt}>
+                                            {item.createdAt}
                                         </Text>
+                                    </View>
+                                    <Text style={styles.itemPersonnel}>
+                                        {getStatusMessage(item)}
+                                    </Text>
                                 </View>
                             )}
                         />
+
                     )}
                 </View>
             </ScrollView>
@@ -253,7 +233,7 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     regText: {
-        fontSize: 23,
+        fontSize: 20,
         textAlign: "center",
         fontWeight: "500",
         marginBottom: 20,
@@ -278,7 +258,7 @@ const styles = StyleSheet.create({
         marginBottom: 270,
     },
     itemCreatedAt: {
-        marginLeft: 50,
+        marginLeft: 70,
         marginTop: 3,
         fontSize: 13,
         color: "#597ae8",

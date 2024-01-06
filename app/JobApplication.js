@@ -19,9 +19,11 @@ import * as ImagePicker from "expo-image-picker";
 import { firebase } from "../config";
 import * as FileSystem from "expo-file-system";
 import * as Animatable from "react-native-animatable";
-import * as MediaLibrary from "expo-media-library";
+import { Link, useRouter } from "expo-router";
 
 export default function JobApplication() {
+    const router = useRouter();
+
     const [image, setImage] = useState(null);
     const [uploading, setUploading] = useState(false);
     const timestamp = firebase.firestore.FieldValue.serverTimestamp();
@@ -331,7 +333,11 @@ export default function JobApplication() {
                         <Text style={styles.greenText}>SERVE</Text>
                     </Text>
                 </View>
-                <TouchableOpacity>
+                <TouchableOpacity
+                    onPress={() => {
+                        router.push("/notif");
+                    }}
+                >
                     <Ionicons name="notifications-outline" size={24} color="black" />
                 </TouchableOpacity>
             </View>

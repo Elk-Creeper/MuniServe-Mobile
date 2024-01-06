@@ -55,9 +55,7 @@ const History = () => {
                 backgroundColor="#93C49E" // Change the background color as needed
             />
 
-            <View style={styles.header}>
-                <Text style={styles.historyText}>The Town of Del Gallego</Text>
-            </View>
+            <Text style={styles.historyText}>The Town of Del Gallego</Text>
 
             <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
                 <FlatList
@@ -103,7 +101,7 @@ const History = () => {
                 <Text style={styles.mayorsName}>Bayani B. Veluz 2000 – 2001</Text>
                 <Text style={styles.mayorsName}>Carolina C. Uy 2001 – 2003</Text>
                 <Text style={styles.mayorsName}>Lydia B. Abarientos 2010 – 2019</Text>
-                <Text style={styles.mayorsName}>Melanie Abarientos-Garcia 2019 – Present</Text>
+                <Text style={styles.mayorsName1}>Melanie Abarientos-Garcia 2019 – Present</Text>
             </ScrollView>
         </View>
     );
@@ -116,28 +114,17 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: "left",
         backgroundColor: "white",
-        padding: 35,
-    },
-    header: {
-        marginTop: 10,
-        backgroundColor: "#307A59",
-        borderRadius: 10,
     },
     historyText: {
-        fontSize: 17,
+        fontSize: 18,
         textAlign: "center",
-        marginTop: 15,
+        marginTop: 40,
         fontWeight: "500",
         marginBottom: 15,
-        color: "white",
-        fontWeight: "400",
+        fontWeight: "600",
     },
-    text: {
-        fontSize: 21,
-        marginTop: 30,
-        fontWeight: "500",
-        marginBottom: 25,
-        textAlign: "center",
+    paraText: {
+        paddingHorizontal: 35,
     },
     itemPara: {
         textAlign: "justify",
@@ -172,15 +159,20 @@ const styles = StyleSheet.create({
         textAlign: "center",
         marginBottom: 10,
     },
+    mayorsName1: {
+        fontSize: 16,
+        fontWeight: "400",
+        textAlign: "center",
+        marginBottom: 50,
+    },
     image: {
-        width: 270, // Adjust the width as needed
-        height: 170, // Adjust the height as needed
-        resizeMode: "cover", // Adjust the resizeMode as needed
+        width: 300, // Adjust the width as needed
+        height: 200, // Adjust the height as needed
+        resizeMode: "center", // Adjust the resizeMode as needed
         borderRadius: 10, // Optional: add border radius for rounded corners
         marginTop: 10, // Optional: add margin for spacing
     },
     imageStyle: {
-        marginLeft: 10,
-        marginTop: 20,
+        alignItems: "center",
     },
 });

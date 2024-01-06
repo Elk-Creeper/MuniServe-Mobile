@@ -94,16 +94,10 @@ const Registration = () => {
         <View style={styles.container1}>
             <StatusBar backgroundColor="#93C49E" />
             <View style={styles.header}>
-                <View style={styles.titleContainer}>
-                    <Image
-                        source={require("../assets/imported/Del_Gallego_Camarines_Sur.png")}
-                        style={styles.imageStyle}
-                    />
-                    <Text style={styles.titleText}>
-                        <Text style={styles.blackText}>MUNI</Text>
-                        <Text style={styles.greenText}>SERVE</Text>
-                    </Text>
-                </View>
+                <Text style={styles.titleText}>
+                    <Text style={styles.blackText}>MUNI</Text>
+                    <Text style={styles.greenText}>SERVE</Text>
+                </Text>
             </View>
 
             <View style={styles.container2}>
@@ -245,6 +239,7 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
+        justifyContent: "center",
     },
     titleContainer: {
         flexDirection: "row",
@@ -258,8 +253,12 @@ const styles = StyleSheet.create({
     titleText: {
         fontSize: 24,
         fontWeight: "bold",
-        flexDirection: "row",
         letterSpacing: 3,
+        justifyContent: "center",
+        alignItems: "center",
+        alignContent: 'center',
+        textAlign: 'center',
+        marginTop: 10,
     },
     blackText: {
         color: "black",
@@ -272,7 +271,7 @@ const styles = StyleSheet.create({
         fontSize: 20,
     },
     button: {
-        marginTop: 55,
+        marginTop: 40,
         height: 50,
         width: "100%",
         backgroundColor: "#307A59",
@@ -284,6 +283,7 @@ const styles = StyleSheet.create({
         fontSize: 30,
         textAlign: "left",
         fontWeight: "700",
+        marginTop: 15,
     },
     text: {
         marginTop: 10,

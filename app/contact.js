@@ -90,10 +90,8 @@ const Contact = () => {
             <StatusBar
                 backgroundColor="#93C49E" // Change the background color as needed
             />
-
-            <View style={styles.header}>
-                <Text style={styles.aboutText}>Contact Us</Text>
-            </View>
+            
+            <Text style={styles.aboutText}>Contact Us</Text>
 
             <Text style={styles.text}>How can we help?</Text>
 
@@ -170,25 +168,17 @@ const styles = StyleSheet.create({
         backgroundColor: "white",
         padding: 35,
     },
-    header: {
-        marginTop: 10,
-        backgroundColor: "#307A59",
-        borderRadius: 10,
-    },
     aboutText: {
-        fontSize: 17,
+        fontSize: 25,
         textAlign: "center",
-        marginTop: 15,
-        fontWeight: "500",
-        marginBottom: 15,
-        color: "white",
-        fontWeight: "400",
+        marginBottom: 50,
+        fontWeight: "700",
     },
     text: {
         fontSize: 21,
         marginTop: 30,
-        fontWeight: "500",
-        marginBottom: 25,
+        fontWeight: "600",
+        marginBottom: 15,
     },
     itemPara: {
         textAlign: "justify",
@@ -213,10 +203,11 @@ const styles = StyleSheet.create({
         width: "100%",
         alignItems: "center",
         justifyContent: "center",
-        marginTop: 200,
+        marginTop: 180,
     },
     buttonText: {
         color: "white",
         fontSize: 18,
+        fontWeight: "500"
     },
 });

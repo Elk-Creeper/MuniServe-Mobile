@@ -110,16 +110,6 @@ export default function tab4() {
 
       <Text style={styles.newsText}>News and Announcements</Text>
 
-      <View style={styles.assembler}>
-        <View style={styles.Main}>
-          <TextInput
-            placeholder="Search"
-            style={styles.Input}
-            onChangeText={handleSearch}
-          />
-        </View>
-      </View>
-
       <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
         <FlatList
           style={{ height: "100%" }}
@@ -225,6 +215,7 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     textAlign: "center",
     marginTop: 5,
+    marginBottom: 20,
   },
   newsImage: {
     marginLeft: 10,
