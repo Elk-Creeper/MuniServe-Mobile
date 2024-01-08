@@ -9,11 +9,9 @@ import {
     Animated,
     ScrollView,
     FlatList,
-    Pressable,
     Alert,
     TextInput,
     ActivityIndicator,
-    Button
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
@@ -27,18 +25,34 @@ import { Link, useRouter } from "expo-router";
 export default function Tab4() {
     const router = useRouter();
 
+    const [cedula1, setCedula1] = useState([]);
     const [barangayClearance1, setBarangayClearance1] = useState([]);
-    const [appForm1, setAppForm1] = useState([]);
-    const [dti, setDti] = useState([]);
-    const [sec, setSec] = useState([]);
-    const [lessor, setLessor] = useState([]);
-    const [tax, setTax] = useState([]);
-    const [publicLiability, setPublicLiability] = useState([]);
-    const [appForm2, setAppForm2] = useState([]);
+    const [dti1, setDti1] = useState([]);
+    const [sec1, setSec1] = useState([]);
+    const [fire1, setFire1] = useState([]);
+    const [sanitary1, setSanitary1] = useState([]);
+    const [police1, setPolice1] = useState([]);
+    const [picture1, setPicture1] = useState([]);
+    const [mayorsPermit1, setMayorsPermit1] = useState([]);
+    const [mpdc1, setMpdc1] = useState([]);
+    const [meo1, setMeo1] = useState([]);
+    const [contact1, setContact1] = useState([]);
+    const [businessNum1, setBusinessNum1] = useState([]);
+
+    const [cedula2, setCedula2] = useState([]);
     const [barangayClearance2, setBarangayClearance2] = useState([]);
-    const [xerox, setXerox] = useState([]);
-    const [audited, setAudited] = useState([]);
-    const [publicLiability2, setPublicLiability2] = useState([]);
+    const [dti2, setDti2] = useState([]);
+    const [sec2, setSec2] = useState([]);
+    const [fire2, setFire2] = useState([]);
+    const [sanitary2, setSanitary2] = useState([]);
+    const [police2, setPolice2] = useState([]);
+    const [picture2, setPicture2] = useState([]);
+    const [mayorsPermit2, setMayorsPermit2] = useState([]);
+    const [mpdc2, setMpdc2] = useState([]);
+    const [meo2, setMeo2] = useState([]);
+    const [contact2, setContact2] = useState([]);
+    const [businessNum2, setBusinessNum2] = useState([]);
+  
     const [uploading, setUploading] = useState(false);
     const [loadingModalVisible, setLoadingModalVisible] = useState(false); 
 
@@ -140,22 +154,32 @@ export default function Tab4() {
         </TouchableOpacity>
     );
 
-
     useEffect(() => {
         // If an image is selected, start the fade-out animation
         if (
-            appForm1.length > 0 &&
+            cedula1.length > 0 &&
             barangayClearance1.length > 0 &&
-            dti.length > 0 &&
-            sec.length > 0 &&
-            lessor.length > 0 &&
-            tax.length > 0 &&
-            publicLiability.length > 0 &&
-            appForm2.length > 0 &&
+            dti1.length > 0 &&
+            sec1.length > 0 &&
+            fire1.length > 0 &&
+            sanitary1.length > 0 &&
+            police1.length > 0 &&
+            picture1.length > 0 &&
+            mayorsPermit1.length > 0 &&
+            mpdc1.length > 0 &&
+            meo1.length > 0 &&
+
+            cedula2.length > 0 &&
             barangayClearance2.length > 0 &&
-            xerox.length > 0 &&
-            audited > 0 &&
-            publicLiability2.length > 0
+            dti2.length > 0 &&
+            sec2.length > 0 &&
+            fire2.length > 0 &&
+            sanitary2.length > 0 &&
+            police2.length > 0 &&
+            picture2.length > 0 &&
+            mayorsPermit2.length > 0 &&
+            mpdc2.length > 0 &&
+            meo2.length > 0 
         ) {
             Animated.timing(fadeAnimation, {
                 toValue: 0,
@@ -163,7 +187,9 @@ export default function Tab4() {
                 useNativeDriver: true,
             }).start();
         }
-    }, [appForm1, barangayClearance1, dti, sec, lessor, tax, publicLiability, appForm2, barangayClearance2, xerox, audited, publicLiability2, fadeAnimation]);
+    }, [cedula1, barangayClearance1, dti1, sec1, fire1, sanitary1, police1, picture1, mayorsPermit1, mpdc1, meo1, 
+        cedula2, barangayClearance2, dti2, sec2, fire2, sanitary2, police2, picture2, mayorsPermit2, mpdc2, meo2
+    ]);
 
     const pickImage = async (category) => {
         try {
@@ -177,52 +203,90 @@ export default function Tab4() {
 
             if (!result.canceled) {
                 // Add selected images to the respective arrays based on category
-                if (category === "app form 1") {
-                    setAppForm1([
-                        ...appForm1,
+                if (category === "cedula1") {
+                    setCedula1([
+                        ...cedula1,
                         ...result.assets.map((asset) => asset.uri),
                     ]);
-                } else if (category === "barangay clearance 1") {
+                } else if (category === "barangayClearance1") {
                     setBarangayClearance1([
                         ...barangayClearance1,
                         ...result.assets.map((asset) => asset.uri),
                     ]);
-                } else if (category === "dti") {
-                    setDti([...dti, ...result.assets.map((asset) => asset.uri)]);
-                } else if (category === "sec") {
-                    setSec([...sec, ...result.assets.map((asset) => asset.uri)]);
-                } else if (category === "lessor") {
-                    setLessor([...lessor, ...result.assets.map((asset) => asset.uri)]);
-                } else if (category === "tax") {
-                    setTax([...tax, ...result.assets.map((asset) => asset.uri)]);
-                } else if (category === "public liability") {
-                    setPublicLiability([
-                        ...publicLiability,
+                } else if (category === "dti1") {
+                    setDti1([...dti1, ...result.assets.map((asset) => asset.uri)]);
+                } else if (category === "sec1") {
+                    setSec1([...sec1, ...result.assets.map((asset) => asset.uri)]);
+                } else if (category === "fire1") {
+                    setFire1([...fire1, ...result.assets.map((asset) => asset.uri)]);
+                } else if (category === "sanitary1") {
+                    setSanitary1([...sanitary1, ...result.assets.map((asset) => asset.uri)]);
+                } else if (category === "police1") {
+                    setPolice1([
+                        ...police1,
                         ...result.assets.map((asset) => asset.uri),
                     ]);
-                } else if (category === "app form 2") {
-                    setAppForm2([
-                        ...appForm2,
+                } else if (category === "picture1") {
+                    setPicture1([
+                        ...picture1,
                         ...result.assets.map((asset) => asset.uri),
                     ]);
-                } else if (category === "barangay clearance 2") {
+                } else if (category === "mayorsPermit1") {
+                    setMayorsPermit1([
+                        ...mayorsPermit1,
+                        ...result.assets.map((asset) => asset.uri),
+                    ]);
+                } else if (category === "mpdc1") {
+                    setMpdc1([
+                        ...mpdc1,
+                        ...result.assets.map((asset) => asset.uri),
+                    ]);
+                } else if (category === "meo1") {
+                    setMeo1([
+                        ...meo1,
+                        ...result.assets.map((asset) => asset.uri),
+                    ]);
+                } else if (category === "cedula2") {
+                    setCedula2([
+                        ...cedula2,
+                        ...result.assets.map((asset) => asset.uri),
+                    ]);
+                } else if (category === "barangayClearance2") {
                     setBarangayClearance2([
                         ...barangayClearance2,
                         ...result.assets.map((asset) => asset.uri),
                     ]);
-                } else if (category === "xerox") {
-                    setXerox([
-                        ...xerox,
+                } else if (category === "dti2") {
+                    setDti2([...dti2, ...result.assets.map((asset) => asset.uri)]);
+                } else if (category === "sec2") {
+                    setSec2([...sec2, ...result.assets.map((asset) => asset.uri)]);
+                } else if (category === "fire2") {
+                    setFire2([...fire2, ...result.assets.map((asset) => asset.uri)]);
+                } else if (category === "sanitary2") {
+                    setSanitary2([...sanitary2, ...result.assets.map((asset) => asset.uri)]);
+                } else if (category === "police2") {
+                    setPolice2([
+                        ...police2,
                         ...result.assets.map((asset) => asset.uri),
                     ]);
-                } else if (category === "audited") {
-                    setAudited([
-                        ...audited,
+                } else if (category === "picture2") {
+                    setPicture2([
+                        ...picture2,
                         ...result.assets.map((asset) => asset.uri),
                     ]);
-                } else if (category === "public liability 2") {
-                    setPublicLiability2([
-                        ...publicLiability2,
+                } else if (category === "mayorsPermit2") {
+                    setMayorsPermit2([
+                        ...mayorsPermit2,
+                        ...result.assets.map((asset) => asset.uri),
+                    ]);
+                } else if (category === "mpdc2") {
+                    setMpdc2([
+                        ...mpdc2,
+                        ...result.assets.map((asset) => asset.uri),
+                    ]);
+                } else if (category === "meo2") {
+                    setMeo2([
+                        ...meo2,
                         ...result.assets.map((asset) => asset.uri),
                     ]);
                 }
@@ -266,55 +330,95 @@ export default function Tab4() {
     }, []);
 
     const removeImage = (category, index) => {
-        if (category === "app form 1") {
-            const newImages = [...appForm1];
+        if (category === "cedula1") {
+            const newImages = [...cedula1];
             newImages.splice(index, 1);
-            setAppForm1(newImages);
-        } else if (category === "barangay clearance 1") {
+            setCedula1(newImages);
+        } else if (category === "barangayClearance1") {
             const newImages = [...barangayClearance1];
             newImages.splice(index, 1);
             setBarangayClearance1(newImages);
-        } else if (category === "dti") {
-            const newImages = [...dti];
+        } else if (category === "dti1") {
+            const newImages = [...dti1];
             newImages.splice(index, 1);
-            setDti(newImages);
-        } else if (category === "sec") {
-            const newImages = [...sec];
+            setDti1(newImages);
+        } else if (category === "sec1") {
+            const newImages = [...sec1];
             newImages.splice(index, 1);
-            setSec(newImages);
-        } else if (category === "lessor") {
-            const newImages = [...lessor];
+            setSec1(newImages);
+        } else if (category === "fire1") {
+            const newImages = [...fire1];
             newImages.splice(index, 1);
-            setLessor(newImages);
-        } else if (category === "tax") {
-            const newImages = [...tax];
+            setFire1(newImages);
+        } else if (category === "sanitary1") {
+            const newImages = [...sanitary1];
             newImages.splice(index, 1);
-            setTax(newImages);
-        } else if (category === "public liability") {
-            const newImages = [...publicLiability];
+            setSanitary1(newImages);
+        } else if (category === "police1") {
+            const newImages = [...police1];
             newImages.splice(index, 1);
-            setPublicLiability(newImages);
-        } else if (category === "app form 2") {
-            const newImages = [...appForm2];
+            setPolice1(newImages);
+        } else if (category === "picture1") {
+            const newImages = [...picture1];
             newImages.splice(index, 1);
-            setAppForm2(newImages);
-        } else if (category === "barangay clearance 2") {
+            setPicture1(newImages);
+        } else if (category === "mayorsPermit1") {
+            const newImages = [...mayorsPermit1];
+            newImages.splice(index, 1);
+            setMayorsPermit1(newImages);
+        } else if (category === "mpdc1") {
+            const newImages = [...mpdc1];
+            newImages.splice(index, 1);
+            setMpdc1(newImages);
+        } else if (category === "meo1") {
+            const newImages = [...meo1];
+            newImages.splice(index, 1);
+            setMeo1(newImages);
+        } else if (category === "cedula2") {
+            const newImages = [...cedula2];
+            newImages.splice(index, 1);
+            setCedula2(newImages);
+        } else if (category === "barangayClearance2") {
             const newImages = [...barangayClearance2];
             newImages.splice(index, 1);
             setBarangayClearance2(newImages);
-        } else if (category === "xerox") {
-            const newImages = [...xerox];
+        } else if (category === "dti2") {
+            const newImages = [...dti2];
             newImages.splice(index, 1);
-            setXerox(newImages);
-        } else if (category === "audited") {
-            const newImages = [...audited];
+            setDti2(newImages);
+        } else if (category === "sec2") {
+            const newImages = [...sec2];
             newImages.splice(index, 1);
-            setAudited(newImages);
-        } else if (category === "public liability 2") {
-            const newImages = [...publicLiability2];
+            setSec2(newImages);
+        } else if (category === "fire2") {
+            const newImages = [...fire2];
             newImages.splice(index, 1);
-            setPublicLiability2(newImages);
-        }
+            setFire2(newImages);
+        } else if (category === "sanitary2") {
+            const newImages = [...sanitary2];
+            newImages.splice(index, 1);
+            setSanitary2(newImages);
+        } else if (category === "police2") {
+            const newImages = [...police2];
+            newImages.splice(index, 1);
+            setPolice2(newImages);
+        } else if (category === "picture2") {
+            const newImages = [...picture2];
+            newImages.splice(index, 1);
+            setPicture2(newImages);
+        } else if (category === "mayorsPermit2") {
+            const newImages = [...mayorsPermit2];
+            newImages.splice(index, 1);
+            setMayorsPermit2(newImages);
+        } else if (category === "mpdc2") {
+            const newImages = [...mpdc2];
+            newImages.splice(index, 1);
+            setMpdc2(newImages);
+        } else if (category === "meo2") {
+            const newImages = [...meo2];
+            newImages.splice(index, 1);
+            setMeo2(newImages);
+        } 
     };
 
     const uploadMedia = async () => {
@@ -322,28 +426,49 @@ export default function Tab4() {
         setUploading(true);
 
         try {
+
+            // Validate phone number
+            if (!/^\d{11}$/.test(contact1) || !/^\d{11}$/.test(contact2)) {
+                Alert.alert("Invalid Phone Number", "Phone number must be exactly 11 digits.");
+                return;
+            }
+
             const imageURLs = {
                 userUid: userUid,
                 userName: userName,
                 userEmail: userEmail,
                 userContact: userContact,
                 userBarangay: userBarangay,
-                appForm1: [],
+                cedula1: [],
                 barangayClearance1: [],
-                dti: [],
-                sec: [],
-                lessor: [],
-                tax: [],
-                publicLiability: [],
-                appForm2: [],
+                dti1: [],
+                sec1: [],
+                fire1: [],
+                sanitary1: [],
+                police1: [],
+                picture1: [],
+                mayorsPermit1: [],
+                mpdc1: [],
+                meo1: [],
+                contact1: contact1,
+                businessNum1: businessNum1,
+                cedula2: [],
                 barangayClearance2: [],
-                xerox: [],
-                audited: [],
-                publicLiability2: [],
+                dti2: [],
+                sec2: [],
+                fire2: [],
+                sanitary2: [],
+                police2: [],
+                picture2: [],
+                mayorsPermit2: [],
+                mpdc2: [],
+                meo2: [],
+                contact2: contact2,
+                businessNum2: businessNum2,
             };
 
             // Loop through the selected images and upload each one
-            for (const uri of appForm1) {
+            for (const uri of cedula1) {
                 const { uri: fileUri } = await FileSystem.getInfoAsync(uri);
                 const blob = await new Promise((resolve, reject) => {
                     const xhr = new XMLHttpRequest();
@@ -368,7 +493,7 @@ export default function Tab4() {
                 const downloadURL = await snapshot.ref.getDownloadURL();
 
                 // Add the download URL to the appropriate array based on the category
-                imageURLs.appForm1.push(downloadURL);
+                imageURLs.cedula1.push(downloadURL);
             }
 
             for (const uri of barangayClearance1) {
@@ -399,7 +524,7 @@ export default function Tab4() {
                 imageURLs.barangayClearance1.push(downloadURL);
             }
 
-            for (const uri of dti) {
+            for (const uri of dti1) {
                 const { uri: fileUri } = await FileSystem.getInfoAsync(uri);
                 const blob = await new Promise((resolve, reject) => {
                     const xhr = new XMLHttpRequest();
@@ -424,10 +549,10 @@ export default function Tab4() {
                 const downloadURL = await snapshot.ref.getDownloadURL();
 
                 // Add the download URL to the appropriate array based on the category
-                imageURLs.dti.push(downloadURL);
+                imageURLs.dti1.push(downloadURL);
             }
 
-            for (const uri of sec) {
+            for (const uri of sec1) {
                 const { uri: fileUri } = await FileSystem.getInfoAsync(uri);
                 const blob = await new Promise((resolve, reject) => {
                     const xhr = new XMLHttpRequest();
@@ -452,10 +577,10 @@ export default function Tab4() {
                 const downloadURL = await snapshot.ref.getDownloadURL();
 
                 // Add the download URL to the appropriate array based on the category
-                imageURLs.sec.push(downloadURL);
+                imageURLs.sec1.push(downloadURL);
             }
 
-            for (const uri of lessor) {
+            for (const uri of fire1) {
                 const { uri: fileUri } = await FileSystem.getInfoAsync(uri);
                 const blob = await new Promise((resolve, reject) => {
                     const xhr = new XMLHttpRequest();
@@ -480,10 +605,10 @@ export default function Tab4() {
                 const downloadURL = await snapshot.ref.getDownloadURL();
 
                 // Add the download URL to the appropriate array based on the category
-                imageURLs.lessor.push(downloadURL);
+                imageURLs.fire1.push(downloadURL);
             }
 
-            for (const uri of tax) {
+            for (const uri of sanitary1) {
                 const { uri: fileUri } = await FileSystem.getInfoAsync(uri);
                 const blob = await new Promise((resolve, reject) => {
                     const xhr = new XMLHttpRequest();
@@ -508,10 +633,10 @@ export default function Tab4() {
                 const downloadURL = await snapshot.ref.getDownloadURL();
 
                 // Add the download URL to the appropriate array based on the category
-                imageURLs.tax.push(downloadURL);
+                imageURLs.sanitary1.push(downloadURL);
             }
 
-            for (const uri of publicLiability) {
+            for (const uri of police1) {
                 const { uri: fileUri } = await FileSystem.getInfoAsync(uri);
                 const blob = await new Promise((resolve, reject) => {
                     const xhr = new XMLHttpRequest();
@@ -536,10 +661,10 @@ export default function Tab4() {
                 const downloadURL = await snapshot.ref.getDownloadURL();
 
                 // Add the download URL to the appropriate array based on the category
-                imageURLs.publicLiability.push(downloadURL);
+                imageURLs.police1.push(downloadURL);
             }
 
-            for (const uri of appForm2) {
+            for (const uri of picture1) {
                 const { uri: fileUri } = await FileSystem.getInfoAsync(uri);
                 const blob = await new Promise((resolve, reject) => {
                     const xhr = new XMLHttpRequest();
@@ -564,7 +689,119 @@ export default function Tab4() {
                 const downloadURL = await snapshot.ref.getDownloadURL();
 
                 // Add the download URL to the appropriate array based on the category
-                imageURLs.appForm2.push(downloadURL);
+                imageURLs.picture1.push(downloadURL);
+            }
+
+            for (const uri of mayorsPermit1) {
+                const { uri: fileUri } = await FileSystem.getInfoAsync(uri);
+                const blob = await new Promise((resolve, reject) => {
+                    const xhr = new XMLHttpRequest();
+                    xhr.onload = () => {
+                        resolve(xhr.response);
+                    };
+                    xhr.onerror = (e) => {
+                        reject(new TypeError("Network request failed"));
+                    };
+                    xhr.responseType = "blob";
+                    xhr.open("GET", fileUri, true);
+                    xhr.send(null);
+                });
+
+                const filename = uri.substring(uri.lastIndexOf("/") + 1);
+                const ref = firebase.storage().ref().child(filename);
+
+                // Upload the image to Firebase Storage
+                const snapshot = await ref.put(blob);
+
+                // Get the download URL of the uploaded image
+                const downloadURL = await snapshot.ref.getDownloadURL();
+
+                // Add the download URL to the appropriate array based on the category
+                imageURLs.mayorsPermit1.push(downloadURL);
+            }
+
+            for (const uri of mpdc1) {
+                const { uri: fileUri } = await FileSystem.getInfoAsync(uri);
+                const blob = await new Promise((resolve, reject) => {
+                    const xhr = new XMLHttpRequest();
+                    xhr.onload = () => {
+                        resolve(xhr.response);
+                    };
+                    xhr.onerror = (e) => {
+                        reject(new TypeError("Network request failed"));
+                    };
+                    xhr.responseType = "blob";
+                    xhr.open("GET", fileUri, true);
+                    xhr.send(null);
+                });
+
+                const filename = uri.substring(uri.lastIndexOf("/") + 1);
+                const ref = firebase.storage().ref().child(filename);
+
+                // Upload the image to Firebase Storage
+                const snapshot = await ref.put(blob);
+
+                // Get the download URL of the uploaded image
+                const downloadURL = await snapshot.ref.getDownloadURL();
+
+                // Add the download URL to the appropriate array based on the category
+                imageURLs.mpdc1.push(downloadURL);
+            }
+
+            for (const uri of meo1) {
+                const { uri: fileUri } = await FileSystem.getInfoAsync(uri);
+                const blob = await new Promise((resolve, reject) => {
+                    const xhr = new XMLHttpRequest();
+                    xhr.onload = () => {
+                        resolve(xhr.response);
+                    };
+                    xhr.onerror = (e) => {
+                        reject(new TypeError("Network request failed"));
+                    };
+                    xhr.responseType = "blob";
+                    xhr.open("GET", fileUri, true);
+                    xhr.send(null);
+                });
+
+                const filename = uri.substring(uri.lastIndexOf("/") + 1);
+                const ref = firebase.storage().ref().child(filename);
+
+                // Upload the image to Firebase Storage
+                const snapshot = await ref.put(blob);
+
+                // Get the download URL of the uploaded image
+                const downloadURL = await snapshot.ref.getDownloadURL();
+
+                // Add the download URL to the appropriate array based on the category
+                imageURLs.meo1.push(downloadURL);
+            }
+
+            for (const uri of cedula2) {
+                const { uri: fileUri } = await FileSystem.getInfoAsync(uri);
+                const blob = await new Promise((resolve, reject) => {
+                    const xhr = new XMLHttpRequest();
+                    xhr.onload = () => {
+                        resolve(xhr.response);
+                    };
+                    xhr.onerror = (e) => {
+                        reject(new TypeError("Network request failed"));
+                    };
+                    xhr.responseType = "blob";
+                    xhr.open("GET", fileUri, true);
+                    xhr.send(null);
+                });
+
+                const filename = uri.substring(uri.lastIndexOf("/") + 1);
+                const ref = firebase.storage().ref().child(filename);
+
+                // Upload the image to Firebase Storage
+                const snapshot = await ref.put(blob);
+
+                // Get the download URL of the uploaded image
+                const downloadURL = await snapshot.ref.getDownloadURL();
+
+                // Add the download URL to the appropriate array based on the category
+                imageURLs.cedula2.push(downloadURL);
             }
 
             for (const uri of barangayClearance2) {
@@ -595,7 +832,7 @@ export default function Tab4() {
                 imageURLs.barangayClearance2.push(downloadURL);
             }
 
-            for (const uri of xerox) {
+            for (const uri of dti2) {
                 const { uri: fileUri } = await FileSystem.getInfoAsync(uri);
                 const blob = await new Promise((resolve, reject) => {
                     const xhr = new XMLHttpRequest();
@@ -620,10 +857,10 @@ export default function Tab4() {
                 const downloadURL = await snapshot.ref.getDownloadURL();
 
                 // Add the download URL to the appropriate array based on the category
-                imageURLs.xerox.push(downloadURL);
+                imageURLs.dti2.push(downloadURL);
             }
 
-            for (const uri of audited) {
+            for (const uri of sec2) {
                 const { uri: fileUri } = await FileSystem.getInfoAsync(uri);
                 const blob = await new Promise((resolve, reject) => {
                     const xhr = new XMLHttpRequest();
@@ -648,10 +885,10 @@ export default function Tab4() {
                 const downloadURL = await snapshot.ref.getDownloadURL();
 
                 // Add the download URL to the appropriate array based on the category
-                imageURLs.audited.push(downloadURL);
+                imageURLs.sec2.push(downloadURL);
             }
 
-            for (const uri of publicLiability2) {
+            for (const uri of fire2) {
                 const { uri: fileUri } = await FileSystem.getInfoAsync(uri);
                 const blob = await new Promise((resolve, reject) => {
                     const xhr = new XMLHttpRequest();
@@ -676,7 +913,175 @@ export default function Tab4() {
                 const downloadURL = await snapshot.ref.getDownloadURL();
 
                 // Add the download URL to the appropriate array based on the category
-                imageURLs.publicLiability2.push(downloadURL);
+                imageURLs.fire2.push(downloadURL);
+            }
+
+            for (const uri of sanitary2) {
+                const { uri: fileUri } = await FileSystem.getInfoAsync(uri);
+                const blob = await new Promise((resolve, reject) => {
+                    const xhr = new XMLHttpRequest();
+                    xhr.onload = () => {
+                        resolve(xhr.response);
+                    };
+                    xhr.onerror = (e) => {
+                        reject(new TypeError("Network request failed"));
+                    };
+                    xhr.responseType = "blob";
+                    xhr.open("GET", fileUri, true);
+                    xhr.send(null);
+                });
+
+                const filename = uri.substring(uri.lastIndexOf("/") + 1);
+                const ref = firebase.storage().ref().child(filename);
+
+                // Upload the image to Firebase Storage
+                const snapshot = await ref.put(blob);
+
+                // Get the download URL of the uploaded image
+                const downloadURL = await snapshot.ref.getDownloadURL();
+
+                // Add the download URL to the appropriate array based on the category
+                imageURLs.sanitary2.push(downloadURL);
+            }
+
+            for (const uri of police2) {
+                const { uri: fileUri } = await FileSystem.getInfoAsync(uri);
+                const blob = await new Promise((resolve, reject) => {
+                    const xhr = new XMLHttpRequest();
+                    xhr.onload = () => {
+                        resolve(xhr.response);
+                    };
+                    xhr.onerror = (e) => {
+                        reject(new TypeError("Network request failed"));
+                    };
+                    xhr.responseType = "blob";
+                    xhr.open("GET", fileUri, true);
+                    xhr.send(null);
+                });
+
+                const filename = uri.substring(uri.lastIndexOf("/") + 1);
+                const ref = firebase.storage().ref().child(filename);
+
+                // Upload the image to Firebase Storage
+                const snapshot = await ref.put(blob);
+
+                // Get the download URL of the uploaded image
+                const downloadURL = await snapshot.ref.getDownloadURL();
+
+                // Add the download URL to the appropriate array based on the category
+                imageURLs.police2.push(downloadURL);
+            }
+
+            for (const uri of picture2) {
+                const { uri: fileUri } = await FileSystem.getInfoAsync(uri);
+                const blob = await new Promise((resolve, reject) => {
+                    const xhr = new XMLHttpRequest();
+                    xhr.onload = () => {
+                        resolve(xhr.response);
+                    };
+                    xhr.onerror = (e) => {
+                        reject(new TypeError("Network request failed"));
+                    };
+                    xhr.responseType = "blob";
+                    xhr.open("GET", fileUri, true);
+                    xhr.send(null);
+                });
+
+                const filename = uri.substring(uri.lastIndexOf("/") + 1);
+                const ref = firebase.storage().ref().child(filename);
+
+                // Upload the image to Firebase Storage
+                const snapshot = await ref.put(blob);
+
+                // Get the download URL of the uploaded image
+                const downloadURL = await snapshot.ref.getDownloadURL();
+
+                // Add the download URL to the appropriate array based on the category
+                imageURLs.picture2.push(downloadURL);
+            }
+
+            for (const uri of mayorsPermit2) {
+                const { uri: fileUri } = await FileSystem.getInfoAsync(uri);
+                const blob = await new Promise((resolve, reject) => {
+                    const xhr = new XMLHttpRequest();
+                    xhr.onload = () => {
+                        resolve(xhr.response);
+                    };
+                    xhr.onerror = (e) => {
+                        reject(new TypeError("Network request failed"));
+                    };
+                    xhr.responseType = "blob";
+                    xhr.open("GET", fileUri, true);
+                    xhr.send(null);
+                });
+
+                const filename = uri.substring(uri.lastIndexOf("/") + 1);
+                const ref = firebase.storage().ref().child(filename);
+
+                // Upload the image to Firebase Storage
+                const snapshot = await ref.put(blob);
+
+                // Get the download URL of the uploaded image
+                const downloadURL = await snapshot.ref.getDownloadURL();
+
+                // Add the download URL to the appropriate array based on the category
+                imageURLs.mayorsPermit2.push(downloadURL);
+            }
+
+            for (const uri of mpdc2) {
+                const { uri: fileUri } = await FileSystem.getInfoAsync(uri);
+                const blob = await new Promise((resolve, reject) => {
+                    const xhr = new XMLHttpRequest();
+                    xhr.onload = () => {
+                        resolve(xhr.response);
+                    };
+                    xhr.onerror = (e) => {
+                        reject(new TypeError("Network request failed"));
+                    };
+                    xhr.responseType = "blob";
+                    xhr.open("GET", fileUri, true);
+                    xhr.send(null);
+                });
+
+                const filename = uri.substring(uri.lastIndexOf("/") + 1);
+                const ref = firebase.storage().ref().child(filename);
+
+                // Upload the image to Firebase Storage
+                const snapshot = await ref.put(blob);
+
+                // Get the download URL of the uploaded image
+                const downloadURL = await snapshot.ref.getDownloadURL();
+
+                // Add the download URL to the appropriate array based on the category
+                imageURLs.mpdc2.push(downloadURL);
+            }
+
+            for (const uri of meo2) {
+                const { uri: fileUri } = await FileSystem.getInfoAsync(uri);
+                const blob = await new Promise((resolve, reject) => {
+                    const xhr = new XMLHttpRequest();
+                    xhr.onload = () => {
+                        resolve(xhr.response);
+                    };
+                    xhr.onerror = (e) => {
+                        reject(new TypeError("Network request failed"));
+                    };
+                    xhr.responseType = "blob";
+                    xhr.open("GET", fileUri, true);
+                    xhr.send(null);
+                });
+
+                const filename = uri.substring(uri.lastIndexOf("/") + 1);
+                const ref = firebase.storage().ref().child(filename);
+
+                // Upload the image to Firebase Storage
+                const snapshot = await ref.put(blob);
+
+                // Get the download URL of the uploaded image
+                const downloadURL = await snapshot.ref.getDownloadURL();
+
+                // Add the download URL to the appropriate array based on the category
+                imageURLs.meo2.push(downloadURL);
             }
 
             // Store the data in Firestore
@@ -701,26 +1106,44 @@ export default function Tab4() {
             );
 
             // Clear the state and reset form values
-            setSelectedApplicationType(null);
-            setAppForm1([]);
-            setBarangayClearance1([]);
-            setDti([]);
-            setSec([]);
-            setLessor([]);
-            setTax([]);
-            setPublicLiability([]);
-            setAppForm2([]);
-            setBarangayClearance2([]);
-            setXerox([]);
-            setAudited([]);
-            setPublicLiability2([]);
             resetForm();
+
         } catch (error) {
             // Show an error alert
         } finally {
             setUploading(false);
             setLoadingModalVisible(false); // Hide loading modal
         }
+    };
+
+    const resetForm = () => {
+        setSelectedApplicationType(null);
+        setCedula1([]);
+        setBarangayClearance1([]);
+        setDti1([]);
+        setSec1([]);
+        setFire1([]);
+        setSanitary1([]);
+        setPolice1([]);
+        setPicture1([]);
+        setMayorsPermit1([]);
+        setMpdc1([]);
+        setMeo1([]);
+        setContact1("");
+        setBusinessNum1("");
+        setCedula2([]);
+        setBarangayClearance2([]);
+        setDti2([]);
+        setSec2([]);
+        setFire2([]);
+        setSanitary2([]);
+        setPolice2([]);
+        setPicture2([]);
+        setMayorsPermit2([]);
+        setMpdc2([]);
+        setMeo2([]);
+        setContact2("");
+        setBusinessNum2("");
     };
 
     const handleApplicationTypeSelection = (type) => {
@@ -733,40 +1156,6 @@ export default function Tab4() {
             useNativeDriver: true, // Set to false for color animation
         }).start();
     };
-
-    const [serve, setServe] = useState([]);
-    const MuniServe = firebase.firestore().collection("services");
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const querySnapshot = await MuniServe.get(); // Use get() to fetch the data
-                const serve = [];
-
-                querySnapshot.forEach((doc) => {
-                    const { service_name, service_desc, service_proc } = doc.data();
-                    serve.push({
-                        id: doc.id,
-                        service_name,
-                        service_desc,
-                        service_proc,
-                    });
-                });
-
-                setServe(serve);
-            } catch (error) {
-                console.error("Error fetching data: ", error);
-                Alert.alert(
-                    "Error",
-                    "There was an error uploading images. Please try again.",
-                    [{ text: "OK", onPress: () => console.log("OK Pressed") }],
-                    { cancelable: false }
-                );
-            }
-        };
-
-        fetchData();
-    }, []);
 
     return (
         <View style={styles.container}>
@@ -817,25 +1206,53 @@ export default function Tab4() {
                     </View>
                 </View>
                 <View style={styles.innerContainer}>
-                    <Text style={styles.itemService_desc}>
-                        A legal document that offers proof of compliance with certain city
-                        or state laws regulating structural appearances and safety as well
-                        as the sale of products. Business permits regulate safety, structure
-                        and appearance of the business community. They act as proof that
-                        your business follows certain laws and ordinances. Requirements vary
-                        by jurisdiction, and failure to comply often results in fines or
-                        even having your business shut down. Research the permits you need
-                        before you start any work, setup or property purchase. That way, you
-                        can make sure compliance is in order and avoid the additional
-                        expenses and delays of fixing things later. This annual BOSS gathers
-                        under one roof all the government agencies to set up desks for
-                        permits or clearances needed to renew and apply for a business
-                        permit.
-                    </Text>
+                    <Text style={styles.titleSteps}>CLIENT STEPS</Text>
+                    <Text style={styles.textSteps}>1. Proceed to the Office of the Mayor</Text>
+                    <View style={styles.stepsCon}>
+                        <Text style={styles.titleSteps}>AGENCY ACTION</Text>
+                        <Text style={styles.textSteps}>1. Check Application Forms and minimum requirements</Text>
+                        <Text style={styles.titleSteps}>FEES TO BE PAID</Text>
+                        <Text style={styles.textSteps}>None</Text>
+                        <Text style={styles.titleSteps}>PROCESSING TIME</Text>
+                        <Text style={styles.textSteps}>10 minutes</Text>
+                        <Text style={styles.titleSteps}>PERSON RESPONSIBLE</Text>
+                        <Text style={styles.textName}>Sofia B. Soledad</Text>
+                        <Text style={{ fontWeight: "600" }}>Administrative Aide I</Text>
+                        <Text style={{ fontWeight: "600" }}>Mayor's Office</Text>
+                    </View>
+                    <Text style={styles.titleSteps}>CLIENT STEPS</Text>
+                    <Text style={styles.textSteps}>2. Proceed to the Municipal Treasurers Office for the assessment and payment of fees</Text>
+                    <View style={styles.stepsCon}>
+                        <Text style={styles.titleSteps}>AGENCY ACTION</Text>
+                        <Text style={styles.textSteps}>2. Receive payment</Text>
+                        <Text style={styles.textSteps}>2. (1) Issue Official Receipt</Text>
+                        <Text style={styles.titleSteps}>FEES TO BE PAID</Text>
+                        <Text style={styles.textSteps}>None</Text>
+                        <Text style={styles.titleSteps}>PROCESSING TIME</Text>
+                        <Text style={styles.textSteps}>10 minutes</Text>
+                        <Text style={styles.titleSteps}>PERSON RESPONSIBLE</Text>
+                        <Text style={styles.textName}>Revenue Collection Clerk</Text>
+                        <Text style={{ fontWeight: "600" }}>Municipal Treasurer's Office</Text>
+                    </View>
+                    <Text style={styles.titleSteps}>CLIENT STEPS</Text>
+                    <Text style={styles.textSteps}>3. Proceed to the Office of the Mayor and submit the required documents</Text>
+                    <View style={styles.stepsCon}>
+                        <Text style={styles.titleSteps}>AGENCY ACTION</Text>
+                        <Text style={styles.textSteps}>3. Prepare the requested document  and print the Mayor's permit for approval of the Municipal Mayor</Text>
+                        <Text style={styles.titleSteps}>FEES TO BE PAID</Text>
+                        <Text style={styles.textSteps}>None</Text>
+                        <Text style={styles.titleSteps}>PROCESSING TIME</Text>
+                        <Text style={styles.textSteps}>30 minutes{"\n"}{"\n"}{"\n"}5 minutes</Text>
+                        <Text style={styles.titleSteps}>PERSON RESPONSIBLE</Text>
+                        <Text style={styles.textName}>Sofia B. Soledad</Text>
+                        <Text style={{ fontWeight: "600" }}>Administrative Aide I</Text>
+                        <Text style={{ fontWeight: "600" }}>Mayor's Office{"\n"}{"\n"}{"\n"}Hon. Melanie Abarientos-Garcia</Text>
+                    </View>
+
                 </View>
 
                 <Text style={styles.noteText}>
-                    Direction: Select the application type then download and fill up the application form below.
+                    Direction: Select the application type, then proceed to upload the requirements.                
                 </Text>
 
                 <View style={styles.choices}>
@@ -874,21 +1291,6 @@ export default function Tab4() {
 
                 {selectedApplicationType === "new" && (
                     <>
-                        {mediaData.map((media, index) => {
-                            const { url, metadata } = media;
-                            const { name, contentType } = metadata;
-                            const isVideo = contentType.includes("video");
-                            const isImage = contentType.includes("image");
-                            return (
-                                <View key={index} style={styles.imageContainer}>
-                                    <CustomButton
-                                        title={`${name}`}
-                                        onPress={() => downloadFile(url, name, isVideo)}
-                                    />
-                                </View>
-                            );
-                        })}
-
                         <Text style={styles.noteText}>
                             Note: Upload the requirements needed before submitting your
                             application. Lack of needed information will cause delay or
@@ -897,17 +1299,17 @@ export default function Tab4() {
 
                         <View style={styles.selectButton}>
                             <Text style={styles.buttonText}>
-                                Application form (2 copies, Notarized)
+                                Cedula
                             </Text>
-                            <TouchableOpacity onPress={() => pickImage("app form 1")}>
-                                {appForm1.length > 0 ? (
+                            <TouchableOpacity onPress={() => pickImage("cedula1")}>
+                                {cedula1.length > 0 ? (
                                     <Animated.View></Animated.View>
                                 ) : (
                                     <View style={styles.plusCircle}>
                                         <Ionicons name="ios-add" size={24} color="white" />
                                     </View>
                                 )}
-                                {appForm1.length > 0 && (
+                                {cedula1.length > 0 && (
                                     <View style={styles.checkCircle}>
                                         <Ionicons name="ios-checkmark" size={24} color="white" />
                                     </View>
@@ -918,7 +1320,7 @@ export default function Tab4() {
                         <View style={styles.imageContainer}>
                             <FlatList
                                 horizontal
-                                data={appForm1}
+                                data={cedula1}
                                 keyExtractor={(item, index) => index.toString()}
                                 renderItem={({ item, index }) => (
                                     <View style={styles.uploadedImageContainer}>
@@ -928,7 +1330,7 @@ export default function Tab4() {
                                         />
                                         <TouchableOpacity
                                             style={styles.removeImageButton}
-                                            onPress={() => removeImage("app form 1", index)}
+                                            onPress={() => removeImage("cedula1", index)}
                                         >
                                             <Ionicons name="ios-close" size={20} color="#fff" />
                                         </TouchableOpacity>
@@ -939,10 +1341,10 @@ export default function Tab4() {
 
                         <View style={styles.selectButton}>
                             <Text style={styles.buttonText}>
-                                Original Barangay Business Clearance
+                                Barangay Business Clearance
                             </Text>
                             <TouchableOpacity
-                                onPress={() => pickImage("barangay clearance 1")}
+                                onPress={() => pickImage("barangayClearance1")}
                             >
                                 {barangayClearance1.length > 0 ? (
                                     <Animated.View></Animated.View>
@@ -972,7 +1374,7 @@ export default function Tab4() {
                                         />
                                         <TouchableOpacity
                                             style={styles.removeImageButton}
-                                            onPress={() => removeImage("barangay clearance 1", index)}
+                                            onPress={() => removeImage("barangayClearance1", index)}
                                         >
                                             <Ionicons name="ios-close" size={20} color="#fff" />
                                         </TouchableOpacity>
@@ -985,15 +1387,15 @@ export default function Tab4() {
                             <Text style={styles.buttonText}>
                                 DTI Registration (Single Proprietor)
                             </Text>
-                            <TouchableOpacity onPress={() => pickImage("dti")}>
-                                {dti.length > 0 ? (
+                            <TouchableOpacity onPress={() => pickImage("dti1")}>
+                                {dti1.length > 0 ? (
                                     <Animated.View></Animated.View>
                                 ) : (
                                     <View style={styles.plusCircle}>
                                         <Ionicons name="ios-add" size={24} color="white" />
                                     </View>
                                 )}
-                                {dti.length > 0 && (
+                                {dti1.length > 0 && (
                                     <View style={styles.checkCircle}>
                                         <Ionicons name="ios-checkmark" size={24} color="white" />
                                     </View>
@@ -1004,7 +1406,7 @@ export default function Tab4() {
                         <View style={styles.imageContainer}>
                             <FlatList
                                 horizontal
-                                data={dti}
+                                data={dti1}
                                 keyExtractor={(item, index) => index.toString()}
                                 renderItem={({ item, index }) => (
                                     <View style={styles.uploadedImageContainer}>
@@ -1014,7 +1416,7 @@ export default function Tab4() {
                                         />
                                         <TouchableOpacity
                                             style={styles.removeImageButton}
-                                            onPress={() => removeImage("dti", index)}
+                                            onPress={() => removeImage("dti1", index)}
                                         >
                                             <Ionicons name="ios-close" size={20} color="#fff" />
                                         </TouchableOpacity>
@@ -1025,17 +1427,17 @@ export default function Tab4() {
 
                         <View style={styles.selectButton}>
                             <Text style={styles.buttonText}>
-                                SEC Registration (Corporation)
+                                SEC Registration (Corporation & Partnership)
                             </Text>
-                            <TouchableOpacity onPress={() => pickImage("sec")}>
-                                {sec.length > 0 ? (
+                            <TouchableOpacity onPress={() => pickImage("sec1")}>
+                                {sec1.length > 0 ? (
                                     <Animated.View></Animated.View>
                                 ) : (
                                     <View style={styles.plusCircle}>
                                         <Ionicons name="ios-add" size={24} color="white" />
                                     </View>
                                 )}
-                                {sec.length > 0 && (
+                                {sec1.length > 0 && (
                                     <View style={styles.checkCircle}>
                                         <Ionicons name="ios-checkmark" size={24} color="white" />
                                     </View>
@@ -1046,7 +1448,7 @@ export default function Tab4() {
                         <View style={styles.imageContainer}>
                             <FlatList
                                 horizontal
-                                data={sec}
+                                data={sec1}
                                 keyExtractor={(item, index) => index.toString()}
                                 renderItem={({ item, index }) => (
                                     <View style={styles.uploadedImageContainer}>
@@ -1056,7 +1458,7 @@ export default function Tab4() {
                                         />
                                         <TouchableOpacity
                                             style={styles.removeImageButton}
-                                            onPress={() => removeImage("sec", index)}
+                                            onPress={() => removeImage("sec1", index)}
                                         >
                                             <Ionicons name="ios-close" size={20} color="#fff" />
                                         </TouchableOpacity>
@@ -1067,17 +1469,17 @@ export default function Tab4() {
 
                         <View style={styles.selectButton}>
                             <Text style={styles.buttonText}>
-                                Lessor’s Permit (If Renting){" "}
+                                Fire Safety Clearance
                             </Text>
-                            <TouchableOpacity onPress={() => pickImage("lessor")}>
-                                {lessor.length > 0 ? (
+                            <TouchableOpacity onPress={() => pickImage("fire1")}>
+                                {fire1.length > 0 ? (
                                     <Animated.View></Animated.View>
                                 ) : (
                                     <View style={styles.plusCircle}>
                                         <Ionicons name="ios-add" size={24} color="white" />
                                     </View>
                                 )}
-                                {lessor.length > 0 && (
+                                {fire1.length > 0 && (
                                     <View style={styles.checkCircle}>
                                         <Ionicons name="ios-checkmark" size={24} color="white" />
                                     </View>
@@ -1088,7 +1490,7 @@ export default function Tab4() {
                         <View style={styles.imageContainer}>
                             <FlatList
                                 horizontal
-                                data={lessor}
+                                data={fire1}
                                 keyExtractor={(item, index) => index.toString()}
                                 renderItem={({ item, index }) => (
                                     <View style={styles.uploadedImageContainer}>
@@ -1098,7 +1500,7 @@ export default function Tab4() {
                                         />
                                         <TouchableOpacity
                                             style={styles.removeImageButton}
-                                            onPress={() => removeImage("lessor", index)}
+                                            onPress={() => removeImage("fire1", index)}
                                         >
                                             <Ionicons name="ios-close" size={20} color="#fff" />
                                         </TouchableOpacity>
@@ -1109,17 +1511,17 @@ export default function Tab4() {
 
                         <View style={styles.selectButton}>
                             <Text style={styles.buttonText}>
-                                Tax Declaration of Property (If Owned)
+                                Sanitary/Health Certificate
                             </Text>
-                            <TouchableOpacity onPress={() => pickImage("tax")}>
-                                {tax.length > 0 ? (
+                            <TouchableOpacity onPress={() => pickImage("sanitary1")}>
+                                {sanitary1.length > 0 ? (
                                     <Animated.View></Animated.View>
                                 ) : (
                                     <View style={styles.plusCircle}>
                                         <Ionicons name="ios-add" size={24} color="white" />
                                     </View>
                                 )}
-                                {tax.length > 0 && (
+                                {sanitary1.length > 0 && (
                                     <View style={styles.checkCircle}>
                                         <Ionicons name="ios-checkmark" size={24} color="white" />
                                     </View>
@@ -1130,7 +1532,7 @@ export default function Tab4() {
                         <View style={styles.imageContainer}>
                             <FlatList
                                 horizontal
-                                data={tax}
+                                data={sanitary1}
                                 keyExtractor={(item, index) => index.toString()}
                                 renderItem={({ item, index }) => (
                                     <View style={styles.uploadedImageContainer}>
@@ -1140,7 +1542,7 @@ export default function Tab4() {
                                         />
                                         <TouchableOpacity
                                             style={styles.removeImageButton}
-                                            onPress={() => removeImage("tax", index)}
+                                            onPress={() => removeImage("sanitary1", index)}
                                         >
                                             <Ionicons name="ios-close" size={20} color="#fff" />
                                         </TouchableOpacity>
@@ -1151,18 +1553,17 @@ export default function Tab4() {
 
                         <View style={styles.selectButton}>
                             <Text style={styles.buttonText}>
-                                Public Liability Insurance SPA for Authorized Representatives
-                                with I.D.
+                                Police Clearance
                             </Text>
-                            <TouchableOpacity onPress={() => pickImage("public liability")}>
-                                {publicLiability.length > 0 ? (
+                            <TouchableOpacity onPress={() => pickImage("police1")}>
+                                {police1.length > 0 ? (
                                     <Animated.View></Animated.View>
                                 ) : (
                                     <View style={styles.plusCircle}>
                                         <Ionicons name="ios-add" size={24} color="white" />
                                     </View>
                                 )}
-                                {publicLiability.length > 0 && (
+                                {police1.length > 0 && (
                                     <View style={styles.checkCircle}>
                                         <Ionicons name="ios-checkmark" size={24} color="white" />
                                     </View>
@@ -1173,7 +1574,7 @@ export default function Tab4() {
                         <View style={styles.imageContainer}>
                             <FlatList
                                 horizontal
-                                data={publicLiability}
+                                data={police1}
                                 keyExtractor={(item, index) => index.toString()}
                                 renderItem={({ item, index }) => (
                                     <View style={styles.uploadedImageContainer}>
@@ -1183,13 +1584,215 @@ export default function Tab4() {
                                         />
                                         <TouchableOpacity
                                             style={styles.removeImageButton}
-                                            onPress={() => removeImage("public liability", index)}
+                                            onPress={() => removeImage("police1", index)}
                                         >
                                             <Ionicons name="ios-close" size={20} color="#fff" />
                                         </TouchableOpacity>
                                     </View>
                                 )}
                             />
+                        </View>
+                        
+                        <View style={styles.selectButton}>
+                            <Text style={styles.buttonText}>
+                                Picture 2x2 (1 piece)
+                            </Text>
+                            <TouchableOpacity onPress={() => pickImage("picture1")}>
+                                {picture1.length > 0 ? (
+                                    <Animated.View></Animated.View>
+                                ) : (
+                                    <View style={styles.plusCircle}>
+                                        <Ionicons name="ios-add" size={24} color="white" />
+                                    </View>
+                                )}
+                                {picture1.length > 0 && (
+                                    <View style={styles.checkCircle}>
+                                        <Ionicons name="ios-checkmark" size={24} color="white" />
+                                    </View>
+                                )}
+                            </TouchableOpacity>
+                        </View>
+
+                        <View style={styles.imageContainer}>
+                            <FlatList
+                                horizontal
+                                data={picture1}
+                                keyExtractor={(item, index) => index.toString()}
+                                renderItem={({ item, index }) => (
+                                    <View style={styles.uploadedImageContainer}>
+                                        <Image
+                                            source={{ uri: item }}
+                                            style={styles.uploadedImage}
+                                        />
+                                        <TouchableOpacity
+                                            style={styles.removeImageButton}
+                                            onPress={() => removeImage("picture1", index)}
+                                        >
+                                            <Ionicons name="ios-close" size={20} color="#fff" />
+                                        </TouchableOpacity>
+                                    </View>
+                                )}
+                            />
+                        </View>
+
+                        <View style={styles.selectButton}>
+                            <Text style={styles.buttonText}>
+                                Official Receipt for Mayor's Permit
+                            </Text>
+                            <TouchableOpacity onPress={() => pickImage("mayorsPermit1")}>
+                                {mayorsPermit1.length > 0 ? (
+                                    <Animated.View></Animated.View>
+                                ) : (
+                                    <View style={styles.plusCircle}>
+                                        <Ionicons name="ios-add" size={24} color="white" />
+                                    </View>
+                                )}
+                                {mayorsPermit1.length > 0 && (
+                                    <View style={styles.checkCircle}>
+                                        <Ionicons name="ios-checkmark" size={24} color="white" />
+                                    </View>
+                                )}
+                            </TouchableOpacity>
+                        </View>
+
+                        <View style={styles.imageContainer}>
+                            <FlatList
+                                horizontal
+                                data={mayorsPermit1}
+                                keyExtractor={(item, index) => index.toString()}
+                                renderItem={({ item, index }) => (
+                                    <View style={styles.uploadedImageContainer}>
+                                        <Image
+                                            source={{ uri: item }}
+                                            style={styles.uploadedImage}
+                                        />
+                                        <TouchableOpacity
+                                            style={styles.removeImageButton}
+                                            onPress={() => removeImage("mayorsPermit1", index)}
+                                        >
+                                            <Ionicons name="ios-close" size={20} color="#fff" />
+                                        </TouchableOpacity>
+                                    </View>
+                                )}
+                            />
+                        </View>
+
+                        <View style={styles.selectButton}>
+                            <Text style={styles.buttonText}>
+                                MPDC Certification
+                            </Text>
+                            <TouchableOpacity onPress={() => pickImage("mpdc1")}>
+                                {mpdc1.length > 0 ? (
+                                    <Animated.View></Animated.View>
+                                ) : (
+                                    <View style={styles.plusCircle}>
+                                        <Ionicons name="ios-add" size={24} color="white" />
+                                    </View>
+                                )}
+                                {mpdc1.length > 0 && (
+                                    <View style={styles.checkCircle}>
+                                        <Ionicons name="ios-checkmark" size={24} color="white" />
+                                    </View>
+                                )}
+                            </TouchableOpacity>
+                        </View>
+
+                        <View style={styles.imageContainer}>
+                            <FlatList
+                                horizontal
+                                data={mpdc1}
+                                keyExtractor={(item, index) => index.toString()}
+                                renderItem={({ item, index }) => (
+                                    <View style={styles.uploadedImageContainer}>
+                                        <Image
+                                            source={{ uri: item }}
+                                            style={styles.uploadedImage}
+                                        />
+                                        <TouchableOpacity
+                                            style={styles.removeImageButton}
+                                            onPress={() => removeImage("mpdc1", index)}
+                                        >
+                                            <Ionicons name="ios-close" size={20} color="#fff" />
+                                        </TouchableOpacity>
+                                    </View>
+                                )}
+                            />
+                        </View>
+
+                        <View style={styles.selectButton}>
+                            <Text style={styles.buttonText}>
+                                MEO Certification
+                            </Text>
+                            <TouchableOpacity onPress={() => pickImage("meo1")}>
+                                {meo1.length > 0 ? (
+                                    <Animated.View></Animated.View>
+                                ) : (
+                                    <View style={styles.plusCircle}>
+                                        <Ionicons name="ios-add" size={24} color="white" />
+                                    </View>
+                                )}
+                                {meo1.length > 0 && (
+                                    <View style={styles.checkCircle}>
+                                        <Ionicons name="ios-checkmark" size={24} color="white" />
+                                    </View>
+                                )}
+                            </TouchableOpacity>
+                        </View>
+
+                        <View style={styles.imageContainer}>
+                            <FlatList
+                                horizontal
+                                data={meo1}
+                                keyExtractor={(item, index) => index.toString()}
+                                renderItem={({ item, index }) => (
+                                    <View style={styles.uploadedImageContainer}>
+                                        <Image
+                                            source={{ uri: item }}
+                                            style={styles.uploadedImage}
+                                        />
+                                        <TouchableOpacity
+                                            style={styles.removeImageButton}
+                                            onPress={() => removeImage("meo1", index)}
+                                        >
+                                            <Ionicons name="ios-close" size={20} color="#fff" />
+                                        </TouchableOpacity>
+                                    </View>
+                                )}
+                            />
+                        </View>
+
+                        <View style={{ marginBottom: 10 }}>
+                            <Text style={styles.label}>Contact Number</Text>
+
+                            <View style={styles.placeholder}>
+                                <TextInput
+                                    placeholder=""
+                                    maxLength={11}
+                                    value={contact1}
+                                    keyboardType="phone-pad"
+                                    onChangeText={(contact1) => setContact1(contact1)}
+                                    style={{
+                                        width: "100%",
+                                    }}
+                                ></TextInput>
+                            </View>
+                        </View>
+
+                        <View style={{ marginBottom: 10 }}>
+                            <Text style={styles.label}>Business Registration Number</Text>
+
+                            <View style={styles.placeholder}>
+                                <TextInput
+                                    placeholder=""
+                                    maxLength={20}
+                                    value={businessNum1}
+                                    keyboardType="phone-pad"
+                                    onChangeText={(businessNum1) => setBusinessNum1(businessNum1)}
+                                    style={{
+                                        width: "100%",
+                                    }}
+                                ></TextInput>
+                            </View>
                         </View>
                     </>
                 )}
@@ -1218,16 +1821,18 @@ export default function Tab4() {
                         </Text>
 
                         <View style={styles.selectButton}>
-                            <Text style={styles.buttonText}>Application form (2 copies)</Text>
-                            <TouchableOpacity onPress={() => pickImage("app form 2")}>
-                                {appForm2.length > 0 ? (
+                            <Text style={styles.buttonText}>
+                                Cedula
+                            </Text>
+                            <TouchableOpacity onPress={() => pickImage("cedula2")}>
+                                {cedula2.length > 0 ? (
                                     <Animated.View></Animated.View>
                                 ) : (
                                     <View style={styles.plusCircle}>
                                         <Ionicons name="ios-add" size={24} color="white" />
                                     </View>
                                 )}
-                                {appForm2.length > 0 && (
+                                {cedula2.length > 0 && (
                                     <View style={styles.checkCircle}>
                                         <Ionicons name="ios-checkmark" size={24} color="white" />
                                     </View>
@@ -1238,7 +1843,7 @@ export default function Tab4() {
                         <View style={styles.imageContainer}>
                             <FlatList
                                 horizontal
-                                data={appForm2}
+                                data={cedula2}
                                 keyExtractor={(item, index) => index.toString()}
                                 renderItem={({ item, index }) => (
                                     <View style={styles.uploadedImageContainer}>
@@ -1248,7 +1853,7 @@ export default function Tab4() {
                                         />
                                         <TouchableOpacity
                                             style={styles.removeImageButton}
-                                            onPress={() => removeImage("app form 2", index)}
+                                            onPress={() => removeImage("cedula2", index)}
                                         >
                                             <Ionicons name="ios-close" size={20} color="#fff" />
                                         </TouchableOpacity>
@@ -1259,10 +1864,10 @@ export default function Tab4() {
 
                         <View style={styles.selectButton}>
                             <Text style={styles.buttonText}>
-                                Original Barangay Business Clearance
+                                Barangay Business Clearance
                             </Text>
                             <TouchableOpacity
-                                onPress={() => pickImage("barangay clearance 2")}
+                                onPress={() => pickImage("barangayClearance2")}
                             >
                                 {barangayClearance2.length > 0 ? (
                                     <Animated.View></Animated.View>
@@ -1292,7 +1897,7 @@ export default function Tab4() {
                                         />
                                         <TouchableOpacity
                                             style={styles.removeImageButton}
-                                            onPress={() => removeImage("barangay clearance 2", index)}
+                                            onPress={() => removeImage("barangayClearance2", index)}
                                         >
                                             <Ionicons name="ios-close" size={20} color="#fff" />
                                         </TouchableOpacity>
@@ -1303,17 +1908,17 @@ export default function Tab4() {
 
                         <View style={styles.selectButton}>
                             <Text style={styles.buttonText}>
-                                Xerox Copy of previous Business Permit and Receipt
+                                DTI Registration (Single Proprietor)
                             </Text>
-                            <TouchableOpacity onPress={() => pickImage("xerox")}>
-                                {xerox.length > 0 ? (
+                            <TouchableOpacity onPress={() => pickImage("dti2")}>
+                                {dti2.length > 0 ? (
                                     <Animated.View></Animated.View>
                                 ) : (
                                     <View style={styles.plusCircle}>
                                         <Ionicons name="ios-add" size={24} color="white" />
                                     </View>
                                 )}
-                                {xerox.length > 0 && (
+                                {dti2.length > 0 && (
                                     <View style={styles.checkCircle}>
                                         <Ionicons name="ios-checkmark" size={24} color="white" />
                                     </View>
@@ -1324,7 +1929,7 @@ export default function Tab4() {
                         <View style={styles.imageContainer}>
                             <FlatList
                                 horizontal
-                                data={xerox}
+                                data={dti2}
                                 keyExtractor={(item, index) => index.toString()}
                                 renderItem={({ item, index }) => (
                                     <View style={styles.uploadedImageContainer}>
@@ -1334,7 +1939,7 @@ export default function Tab4() {
                                         />
                                         <TouchableOpacity
                                             style={styles.removeImageButton}
-                                            onPress={() => removeImage("xerox", index)}
+                                            onPress={() => removeImage("dti2", index)}
                                         >
                                             <Ionicons name="ios-close" size={20} color="#fff" />
                                         </TouchableOpacity>
@@ -1345,18 +1950,17 @@ export default function Tab4() {
 
                         <View style={styles.selectButton}>
                             <Text style={styles.buttonText}>
-                                Audited Financial Statement and/or Monthly or Quarterly VAT
-                                Returns
+                                SEC Registration (Corporation & Partnership)
                             </Text>
-                            <TouchableOpacity onPress={() => pickImage("audited")}>
-                                {audited.length > 0 ? (
+                            <TouchableOpacity onPress={() => pickImage("sec2")}>
+                                {sec2.length > 0 ? (
                                     <Animated.View></Animated.View>
                                 ) : (
                                     <View style={styles.plusCircle}>
                                         <Ionicons name="ios-add" size={24} color="white" />
                                     </View>
                                 )}
-                                {audited.length > 0 && (
+                                {sec2.length > 0 && (
                                     <View style={styles.checkCircle}>
                                         <Ionicons name="ios-checkmark" size={24} color="white" />
                                     </View>
@@ -1367,7 +1971,7 @@ export default function Tab4() {
                         <View style={styles.imageContainer}>
                             <FlatList
                                 horizontal
-                                data={audited}
+                                data={sec2}
                                 keyExtractor={(item, index) => index.toString()}
                                 renderItem={({ item, index }) => (
                                     <View style={styles.uploadedImageContainer}>
@@ -1377,7 +1981,7 @@ export default function Tab4() {
                                         />
                                         <TouchableOpacity
                                             style={styles.removeImageButton}
-                                            onPress={() => removeImage("audited", index)}
+                                            onPress={() => removeImage("sec2", index)}
                                         >
                                             <Ionicons name="ios-close" size={20} color="#fff" />
                                         </TouchableOpacity>
@@ -1388,18 +1992,17 @@ export default function Tab4() {
 
                         <View style={styles.selectButton}>
                             <Text style={styles.buttonText}>
-                                Public Liability Insurance SPA for Authorized Representatives
-                                with I.D.
+                                Fire Safety Clearance
                             </Text>
-                            <TouchableOpacity onPress={() => pickImage("public liability 2")}>
-                                {publicLiability2.length > 0 ? (
+                            <TouchableOpacity onPress={() => pickImage("fire2")}>
+                                {fire2.length > 0 ? (
                                     <Animated.View></Animated.View>
                                 ) : (
                                     <View style={styles.plusCircle}>
                                         <Ionicons name="ios-add" size={24} color="white" />
                                     </View>
                                 )}
-                                {publicLiability2.length > 0 && (
+                                {fire2.length > 0 && (
                                     <View style={styles.checkCircle}>
                                         <Ionicons name="ios-checkmark" size={24} color="white" />
                                     </View>
@@ -1410,7 +2013,7 @@ export default function Tab4() {
                         <View style={styles.imageContainer}>
                             <FlatList
                                 horizontal
-                                data={publicLiability2}
+                                data={fire2}
                                 keyExtractor={(item, index) => index.toString()}
                                 renderItem={({ item, index }) => (
                                     <View style={styles.uploadedImageContainer}>
@@ -1420,13 +2023,299 @@ export default function Tab4() {
                                         />
                                         <TouchableOpacity
                                             style={styles.removeImageButton}
-                                            onPress={() => removeImage("public liability 2", index)}
+                                            onPress={() => removeImage("fire2", index)}
                                         >
                                             <Ionicons name="ios-close" size={20} color="#fff" />
                                         </TouchableOpacity>
                                     </View>
                                 )}
                             />
+                        </View>
+
+                        <View style={styles.selectButton}>
+                            <Text style={styles.buttonText}>
+                                Sanitary/Health Certificate
+                            </Text>
+                            <TouchableOpacity onPress={() => pickImage("sanitary2")}>
+                                {sanitary2.length > 0 ? (
+                                    <Animated.View></Animated.View>
+                                ) : (
+                                    <View style={styles.plusCircle}>
+                                        <Ionicons name="ios-add" size={24} color="white" />
+                                    </View>
+                                )}
+                                {sanitary2.length > 0 && (
+                                    <View style={styles.checkCircle}>
+                                        <Ionicons name="ios-checkmark" size={24} color="white" />
+                                    </View>
+                                )}
+                            </TouchableOpacity>
+                        </View>
+
+                        <View style={styles.imageContainer}>
+                            <FlatList
+                                horizontal
+                                data={sanitary2}
+                                keyExtractor={(item, index) => index.toString()}
+                                renderItem={({ item, index }) => (
+                                    <View style={styles.uploadedImageContainer}>
+                                        <Image
+                                            source={{ uri: item }}
+                                            style={styles.uploadedImage}
+                                        />
+                                        <TouchableOpacity
+                                            style={styles.removeImageButton}
+                                            onPress={() => removeImage("sanitary2", index)}
+                                        >
+                                            <Ionicons name="ios-close" size={20} color="#fff" />
+                                        </TouchableOpacity>
+                                    </View>
+                                )}
+                            />
+                        </View>
+
+                        <View style={styles.selectButton}>
+                            <Text style={styles.buttonText}>
+                                Police Clearance
+                            </Text>
+                            <TouchableOpacity onPress={() => pickImage("police2")}>
+                                {police2.length > 0 ? (
+                                    <Animated.View></Animated.View>
+                                ) : (
+                                    <View style={styles.plusCircle}>
+                                        <Ionicons name="ios-add" size={24} color="white" />
+                                    </View>
+                                )}
+                                {police2.length > 0 && (
+                                    <View style={styles.checkCircle}>
+                                        <Ionicons name="ios-checkmark" size={24} color="white" />
+                                    </View>
+                                )}
+                            </TouchableOpacity>
+                        </View>
+
+                        <View style={styles.imageContainer}>
+                            <FlatList
+                                horizontal
+                                data={police2}
+                                keyExtractor={(item, index) => index.toString()}
+                                renderItem={({ item, index }) => (
+                                    <View style={styles.uploadedImageContainer}>
+                                        <Image
+                                            source={{ uri: item }}
+                                            style={styles.uploadedImage}
+                                        />
+                                        <TouchableOpacity
+                                            style={styles.removeImageButton}
+                                            onPress={() => removeImage("police2", index)}
+                                        >
+                                            <Ionicons name="ios-close" size={20} color="#fff" />
+                                        </TouchableOpacity>
+                                    </View>
+                                )}
+                            />
+                        </View>
+
+                        <View style={styles.selectButton}>
+                            <Text style={styles.buttonText}>
+                                Picture 2x2 (1 piece)
+                            </Text>
+                            <TouchableOpacity onPress={() => pickImage("picture2")}>
+                                {picture2.length > 0 ? (
+                                    <Animated.View></Animated.View>
+                                ) : (
+                                    <View style={styles.plusCircle}>
+                                        <Ionicons name="ios-add" size={24} color="white" />
+                                    </View>
+                                )}
+                                {picture2.length > 0 && (
+                                    <View style={styles.checkCircle}>
+                                        <Ionicons name="ios-checkmark" size={24} color="white" />
+                                    </View>
+                                )}
+                            </TouchableOpacity>
+                        </View>
+
+                        <View style={styles.imageContainer}>
+                            <FlatList
+                                horizontal
+                                data={picture2}
+                                keyExtractor={(item, index) => index.toString()}
+                                renderItem={({ item, index }) => (
+                                    <View style={styles.uploadedImageContainer}>
+                                        <Image
+                                            source={{ uri: item }}
+                                            style={styles.uploadedImage}
+                                        />
+                                        <TouchableOpacity
+                                            style={styles.removeImageButton}
+                                            onPress={() => removeImage("picture2", index)}
+                                        >
+                                            <Ionicons name="ios-close" size={20} color="#fff" />
+                                        </TouchableOpacity>
+                                    </View>
+                                )}
+                            />
+                        </View>
+
+                        <View style={styles.selectButton}>
+                            <Text style={styles.buttonText}>
+                                Official Receipt for Mayor's Permit
+                            </Text>
+                            <TouchableOpacity onPress={() => pickImage("mayorsPermit2")}>
+                                {mayorsPermit2.length > 0 ? (
+                                    <Animated.View></Animated.View>
+                                ) : (
+                                    <View style={styles.plusCircle}>
+                                        <Ionicons name="ios-add" size={24} color="white" />
+                                    </View>
+                                )}
+                                {mayorsPermit2.length > 0 && (
+                                    <View style={styles.checkCircle}>
+                                        <Ionicons name="ios-checkmark" size={24} color="white" />
+                                    </View>
+                                )}
+                            </TouchableOpacity>
+                        </View>
+
+                        <View style={styles.imageContainer}>
+                            <FlatList
+                                horizontal
+                                data={mayorsPermit2}
+                                keyExtractor={(item, index) => index.toString()}
+                                renderItem={({ item, index }) => (
+                                    <View style={styles.uploadedImageContainer}>
+                                        <Image
+                                            source={{ uri: item }}
+                                            style={styles.uploadedImage}
+                                        />
+                                        <TouchableOpacity
+                                            style={styles.removeImageButton}
+                                            onPress={() => removeImage("mayorsPermit2", index)}
+                                        >
+                                            <Ionicons name="ios-close" size={20} color="#fff" />
+                                        </TouchableOpacity>
+                                    </View>
+                                )}
+                            />
+                        </View>
+
+                        <View style={styles.selectButton}>
+                            <Text style={styles.buttonText}>
+                                MPDC Certification
+                            </Text>
+                            <TouchableOpacity onPress={() => pickImage("mpdc2")}>
+                                {mpdc2.length > 0 ? (
+                                    <Animated.View></Animated.View>
+                                ) : (
+                                    <View style={styles.plusCircle}>
+                                        <Ionicons name="ios-add" size={24} color="white" />
+                                    </View>
+                                )}
+                                {mpdc2.length > 0 && (
+                                    <View style={styles.checkCircle}>
+                                        <Ionicons name="ios-checkmark" size={24} color="white" />
+                                    </View>
+                                )}
+                            </TouchableOpacity>
+                        </View>
+
+                        <View style={styles.imageContainer}>
+                            <FlatList
+                                horizontal
+                                data={mpdc2}
+                                keyExtractor={(item, index) => index.toString()}
+                                renderItem={({ item, index }) => (
+                                    <View style={styles.uploadedImageContainer}>
+                                        <Image
+                                            source={{ uri: item }}
+                                            style={styles.uploadedImage}
+                                        />
+                                        <TouchableOpacity
+                                            style={styles.removeImageButton}
+                                            onPress={() => removeImage("mpdc2", index)}
+                                        >
+                                            <Ionicons name="ios-close" size={20} color="#fff" />
+                                        </TouchableOpacity>
+                                    </View>
+                                )}
+                            />
+                        </View>
+
+                        <View style={styles.selectButton}>
+                            <Text style={styles.buttonText}>
+                                MEO Certification
+                            </Text>
+                            <TouchableOpacity onPress={() => pickImage("meo2")}>
+                                {meo2.length > 0 ? (
+                                    <Animated.View></Animated.View>
+                                ) : (
+                                    <View style={styles.plusCircle}>
+                                        <Ionicons name="ios-add" size={24} color="white" />
+                                    </View>
+                                )}
+                                {meo2.length > 0 && (
+                                    <View style={styles.checkCircle}>
+                                        <Ionicons name="ios-checkmark" size={24} color="white" />
+                                    </View>
+                                )}
+                            </TouchableOpacity>
+                        </View>
+
+                        <View style={styles.imageContainer}>
+                            <FlatList
+                                horizontal
+                                data={meo2}
+                                keyExtractor={(item, index) => index.toString()}
+                                renderItem={({ item, index }) => (
+                                    <View style={styles.uploadedImageContainer}>
+                                        <Image
+                                            source={{ uri: item }}
+                                            style={styles.uploadedImage}
+                                        />
+                                        <TouchableOpacity
+                                            style={styles.removeImageButton}
+                                            onPress={() => removeImage("meo2", index)}
+                                        >
+                                            <Ionicons name="ios-close" size={20} color="#fff" />
+                                        </TouchableOpacity>
+                                    </View>
+                                )}
+                            />
+                        </View>
+
+                        <View style={{ marginBottom: 10 }}>
+                            <Text style={styles.label}>Contact Number</Text>
+
+                            <View style={styles.placeholder}>
+                                <TextInput
+                                    placeholder=""
+                                    maxLength={11}
+                                    value={contact2}
+                                    keyboardType="phone-pad"
+                                    onChangeText={(contact2) => setContact2(contact2)}
+                                    style={{
+                                        width: "100%",
+                                    }}
+                                ></TextInput>
+                            </View>
+                        </View>
+
+                        <View style={{ marginBottom: 10 }}>
+                            <Text style={styles.label}>Business Registration Number</Text>
+
+                            <View style={styles.placeholder}>
+                                <TextInput
+                                    placeholder=""
+                                    maxLength={20}
+                                    value={businessNum2}
+                                    keyboardType="phone-pad"
+                                    onChangeText={(businessNum2) => setBusinessNum2(businessNum2)}
+                                    style={{
+                                        width: "100%",
+                                    }}
+                                ></TextInput>
+                            </View>
                         </View>
                     </>
                 )}
@@ -1439,7 +2328,7 @@ export default function Tab4() {
                             if (!selectedApplicationType) {
                                 // Show an alert if no category is selected
                                 Alert.alert(
-                                    "Error",
+                                    "Error Message",
                                     "Please choose an application type before submitting.",
                                     [{ text: "OK", onPress: () => console.log("OK Pressed") }],
                                     { cancelable: false }
@@ -1447,17 +2336,38 @@ export default function Tab4() {
                             } else if (selectedApplicationType === "new") {
                                 // Check if any information is typed
                                 if (
-                                    appForm1.length === 0 ||
+                                    cedula1.length === 0 ||
                                     barangayClearance1.length === 0 ||
-                                    dti.length === 0 ||
-                                    sec.length === 0 ||
-                                    lessor.length === 0 ||
-                                    tax.length === 0 ||
-                                    publicLiability.length === 0
+                                    dti1.length === 0 ||
+                                    sec1.length === 0 ||
+                                    fire1.length === 0 ||
+                                    sanitary1.length === 0 ||
+                                    police1.length === 0 ||
+                                    picture1.length === 0 ||
+                                    mayorsPermit1.length === 0 ||
+                                    mpdc1.length === 0 ||
+                                    meo1.length === 0 ||
+                                    !contact1 ||
+                                    !businessNum1
                                 ) {
                                     // Show an alert if any of the required fields is empty
+                                    console.log("Empty Fields:", {
+                                        cedula1,
+                                        barangayClearance1,
+                                        dti1,
+                                        sec1,
+                                        fire1,
+                                        sanitary1,
+                                        police1,
+                                        picture1,
+                                        mayorsPermit1,
+                                        mpdc1,
+                                        meo1,
+                                        contact1,
+                                        businessNum1
+                                    });
                                     Alert.alert(
-                                        "Error",
+                                        "Incomplete Document",
                                         "Please upload all required documents before submitting.",
                                         [{ text: "OK", onPress: () => console.log("OK Pressed") }],
                                         { cancelable: false }
@@ -1468,13 +2378,36 @@ export default function Tab4() {
                             } else if (selectedApplicationType === "renew") {
                                 // Check if any information is typed
                                 if (
-                                    appForm2.length === 0 ||
+                                    cedula2.length === 0 ||
                                     barangayClearance2.length === 0 ||
-                                    xerox.length === 0 ||
-                                    audited.length === 0 ||
-                                    publicLiability2.length === 0
+                                    dti2.length === 0 ||
+                                    sec2.length === 0 ||
+                                    fire2.length === 0 ||
+                                    sanitary2.length === 0 ||
+                                    police2.length === 0 ||
+                                    picture2.length === 0 ||
+                                    mayorsPermit2.length === 0 ||
+                                    mpdc2.length === 0 ||
+                                    meo2.length === 0 ||
+                                    !contact2 ||
+                                    !businessNum2
                                 ) {
                                     // Show an alert if any of the required fields is empty
+                                    console.log("Empty Fields:", {
+                                        cedula2,
+                                        barangayClearance2,
+                                        dti2,
+                                        sec2,
+                                        fire2,
+                                        sanitary2,
+                                        police2,
+                                        picture2,
+                                        mayorsPermit2,
+                                        mpdc2,
+                                        meo2,
+                                        contact2,
+                                        businessNum2
+                                    });
                                     Alert.alert(
                                         "Error",
                                         "Please upload all required documents before submitting.",
@@ -1490,6 +2423,7 @@ export default function Tab4() {
                         <Text style={styles.submitText}>Submit</Text>
                     </TouchableOpacity>
                 </View>
+
             </ScrollView>
         </View>
     );
@@ -1557,12 +2491,6 @@ const styles = StyleSheet.create({
         width: 40,
         height: 40,
     },
-    innerContainer: {
-        alignContent: "center",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-    },
     itemService_name: {
         marginLeft: 20,
         color: "white",
@@ -1582,11 +2510,11 @@ const styles = StyleSheet.create({
         lineHeight: 30,
     },
     noteText: {
-        fontSize: 15,
+        fontSize: 16,
         textAlign: "justify",
         marginTop: 5,
         marginBottom: 10,
-        fontWeight: "400",
+        fontWeight: "500",
     },
     submit: {
         justifyContent: "center",
@@ -1687,7 +2615,8 @@ const styles = StyleSheet.create({
         alignItems: "center",
         borderRadius: 15,
         padding: 10,
-        margin: 5,
+        marginBottom: 15,
+        margin: 10,
     },
     form: {
         justifyContent: "center",
@@ -1725,5 +2654,17 @@ const styles = StyleSheet.create({
     },
     buttonDocx: {
         backgroundColor: "#307A59",
+    },
+    titleSteps: {
+        fontWeight: "700",
+        fontSize: 16
+    },
+    textSteps: {
+        fontSize: 15,
+        marginBottom: 10
+    },
+    stepsCon: {
+        marginLeft: 50,
+        marginBottom: 20,
     },
 });

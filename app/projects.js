@@ -26,7 +26,11 @@ export default function projects() {
                         <Text style={styles.greenText}>SERVE</Text>
                     </Text>
                 </View>
-                <TouchableOpacity>
+                <TouchableOpacity
+                    onPress={() => {
+                        router.push("/notif");
+                    }}
+                >
                     <Ionicons name="notifications-outline" size={24} color="black" />
                 </TouchableOpacity>
             </View>
@@ -34,7 +38,7 @@ export default function projects() {
             <View style={styles.nodataContainer}>
                 <View style={styles.nodata}>
                     <Image source={require("../assets/imported/box.png")} />
-                    <Text style={styles.data}>No data available at the moment.</Text>
+                    <Text style={styles.data}>This feature is not available at the moment.</Text>
                 </View>
             </View>
 

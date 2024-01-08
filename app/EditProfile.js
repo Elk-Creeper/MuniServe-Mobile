@@ -2,12 +2,10 @@ import { View, Text, StyleSheet, Image, TouchableOpacity, Alert, ScrollView } fr
 import { StatusBar } from "expo-status-bar";
 import { firebase } from "../config";
 import React, { useState, useEffect } from "react";
-import * as ImagePicker from "expo-image-picker";
-import { Link, useRouter } from "expo-router";
-
+import * as ImagePicker from 'expo-image-picker';
 
 export default function EditProfile() {
-  const router = useRouter();
+  const storage = firebase.storage();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -63,19 +61,32 @@ export default function EditProfile() {
   }, []);
 
   const handleImagePicker = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 1,
-    });
-
-    if (!result.cancelled) {
-      await firebase.firestore().collection("users").doc(firebase.auth().currentUser.uid).update({
-        profileImage: result.uri,
+    try {
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 1,
       });
 
-      setProfileImage({ uri: result.uri });
+      if (!result.cancelled) {
+        const storageRef = storage.ref();
+        const imageRef = storageRef.child(`profileImages/${firebase.auth().currentUser.uid}`);
+        const response = await fetch(result.uri);
+        const blob = await response.blob();
+
+        await imageRef.put(blob);
+        const downloadURL = await imageRef.getDownloadURL();
+
+        await firebase.firestore().collection("users").doc(firebase.auth().currentUser.uid).update({
+          profileImage: downloadURL,
+        });
+
+        setProfileImage({ uri: downloadURL });
+      }
+    } catch (error) {
+      console.error("Error during image upload:", error);
+      // Handle the error here (e.g., show a user-friendly error message)
     }
   };
 

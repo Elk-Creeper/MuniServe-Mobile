@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
-        marginBottom: 20,
+        marginBottom: 10,
     },
     titleContainer: {
         flexDirection: "row",
@@ -205,7 +205,6 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: "800",
         textAlign: "center",
-        marginTop: 5,
         marginBottom: 20,
     },
     newsImage: {

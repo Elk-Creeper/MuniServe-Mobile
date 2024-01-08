@@ -87,7 +87,9 @@ export default function MarriageReg() {
         try {
             // Validation checks
             if (
-                !h_name ||
+                !h_fname ||
+                !h_mname ||
+                !h_lname ||
                 !h_dateBirth ||
                 !h_age ||
                 !h_placeBirth ||
@@ -105,7 +107,9 @@ export default function MarriageReg() {
                 !hp_residence ||
                 !h_placeMarriage ||
                 !h_dateMarriage ||
-                !w_name ||
+                !w_fname ||
+                !w_mname ||
+                !w_lname ||
                 !w_dateBirth ||
                 !w_age ||
                 !w_placeBirth ||
@@ -129,8 +133,8 @@ export default function MarriageReg() {
             }
 
             // Validate name
-            if (!/^[a-zA-Z.\s]+$/.test(h_name) || !/^[a-zA-Z.\s]+$/.test(h_fatherName) || !/^[a-zA-Z.\s]+$/.test(h_motherName) || !/^[a-zA-Z.\s]+$/.test(w_name) || 
-            !/^[a-zA-Z.\s]+$/.test(w_fatherName) || !/^[a-zA-Z.\s]+$/.test(w_motherName) || !/^[a-zA-Z.\s]+$/.test(h_personName) || !/^[a-zA-Z.\s]+$/.test(w_personName)) {
+            if (!/^[a-zA-Z.\s]+$/.test(h_fname) || !/^[a-zA-Z.\s]+$/.test(h_mname) || !/^[a-zA-Z.\s]+$/.test(h_lname) || !/^[a-zA-Z.\s]+$/.test(h_fatherName) || !/^[a-zA-Z.\s]+$/.test(h_motherName) || !/^[a-zA-Z.\s]+$/.test(w_fname) || 
+                !/^[a-zA-Z.\s]+$/.test(w_mname) || !/^[a-zA-Z.\s]+$/.test(w_lname) || !/^[a-zA-Z.\s]+$/.test(w_fatherName) || !/^[a-zA-Z.\s]+$/.test(w_motherName) || !/^[a-zA-Z.\s]+$/.test(h_personName) || !/^[a-zA-Z.\s]+$/.test(w_personName)) {
                 Alert.alert(
                     "Invalid Name",
                     "Name should only contain letters, dots, and spaces."
@@ -172,7 +176,51 @@ export default function MarriageReg() {
             const MarriageReg = MuniServe.collection("marriage_reg");
 
             await MarriageReg.add({
-                // ... (existing fields)
+                userUid: userUid,
+                userName: userName,
+                userEmail: userEmail,
+                userContact: userContact,
+                userBarangay: userBarangay,
+                h_fname : h_fname,
+                h_mname : h_mname,
+                h_lname : h_lname,
+                h_dateBirth : h_dateBirth,
+                h_age : h_age,
+                h_placeBirth : h_placeBirth,
+                h_sex : h_sex,
+                h_citizenship : h_citizenship,
+                h_residence : h_residence,
+                h_religion : h_religion,
+                h_civilstat : h_civilstat,
+                h_fatherName : h_fatherName,
+                hf_citizenship : hf_citizenship,
+                h_motherName : h_motherName,
+                hm_citizenship : hm_citizenship,
+                h_personName : h_personName,
+                h_relationship : h_relationship,
+                hp_residence : hp_residence,
+                h_placeMarriage : h_placeBirth,
+                h_dateMarriage : h_dateMarriage,
+                w_fname : w_fname,
+                w_mname : w_mname,
+                w_lname : w_lname,
+                w_dateBirth : w_dateBirth,
+                w_age : w_age,
+                w_placeBirth : w_placeBirth,
+                w_sex : w_sex,
+                w_citizenship : w_citizenship,
+                w_residence : w_residence,
+                w_religion : w_religion,
+                w_civilstat : w_civilstat,
+                w_fatherName : w_fatherName,
+                wf_citizenship : wf_citizenship,
+                w_motherName : w_motherName,
+                wm_citizenship : wm_citizenship,
+                w_personName : w_personName,
+                w_relationship : w_relationship,
+                wp_residence : wp_residence,
+                w_placeMarriage : w_placeMarriage,
+                w_dateMarriage : w_dateMarriage,
                 payment: downloadURL, // Store the download URL here
                 status: "Pending", // Set the initial status to "Pending"
                 createdAt: timestamp,
@@ -193,7 +241,9 @@ export default function MarriageReg() {
     };
 
     // Data add
-    const [h_name, setH_name] = useState("");
+    const [h_fname, setH_fname] = useState("");
+    const [h_mname, setH_mname] = useState("");
+    const [h_lname, setH_lname] = useState("");
     const [h_age, setH_age] =  useState("");
     const [h_placeBirth, setH_placeBirth] =  useState("");
     const [h_sex, setH_sex] = useState("");
@@ -210,7 +260,9 @@ export default function MarriageReg() {
     const [hp_residence, setHp_residence] = useState("");
     const [h_placeMarriage, setH_placeMarriage] = useState("");
 
-    const [w_name, setW_name] = useState("");
+    const [w_fname, setW_fname] = useState("");
+    const [w_mname, setW_mname] = useState("");
+    const [w_lname, setW_lname] = useState("");
     const [w_age, setW_age] = useState("");
     const [w_placeBirth, setW_placeBirth] = useState("");
     const [w_sex, setW_sex] = useState("");
@@ -235,7 +287,9 @@ export default function MarriageReg() {
     const [payment, setPayment] = useState("");
 
     const resetForm = () => {
-        setH_name("");
+        setH_fname("");
+        setH_mname("");
+        setH_lname("");
         setH_dateBirth(new Date());
         setH_age("");
         setH_placeBirth("");
@@ -254,7 +308,9 @@ export default function MarriageReg() {
         setH_placeMarriage("");
         setH_dateMarriage(new Date());
 
-        setW_name("");
+        setW_fname("");
+        setW_mname("");
+        setW_lname("");
         setW_dateBirth(new Date());
         setW_age("");
         setW_placeBirth("");
@@ -421,14 +477,46 @@ export default function MarriageReg() {
                 <Text style={styles.noteText1}>Husband</Text>
 
                 <View style={{ marginBottom: 10 }}>
-                    <Text style={styles.label}>NAME (first, middle, last)</Text>
+                    <Text style={styles.label}>FIRST NAME</Text>
 
                     <View style={styles.placeholder}>
                         <TextInput
                             placeholder=""
                             maxLength={50}
-                            value={h_name}
-                            onChangeText={(h_name) => setH_name(h_name)}
+                            value={h_fname}
+                            onChangeText={(h_fname) => setH_fname(h_fname)}
+                            style={{
+                                width: "100%",
+                            }}
+                        ></TextInput>
+                    </View>
+                </View>
+
+                <View style={{ marginBottom: 10 }}>
+                    <Text style={styles.label}>MIDDLE NAME</Text>
+
+                    <View style={styles.placeholder}>
+                        <TextInput
+                            placeholder=""
+                            maxLength={50}
+                            value={h_mname}
+                            onChangeText={(h_mname) => setH_name(h_mname)}
+                            style={{
+                                width: "100%",
+                            }}
+                        ></TextInput>
+                    </View>
+                </View>
+
+                <View style={{ marginBottom: 10 }}>
+                    <Text style={styles.label}>LAST NAME</Text>
+
+                    <View style={styles.placeholder}>
+                        <TextInput
+                            placeholder=""
+                            maxLength={50}
+                            value={h_lname}
+                            onChangeText={(h_lname) => setH_name(h_lname)}
                             style={{
                                 width: "100%",
                             }}
@@ -728,14 +816,46 @@ export default function MarriageReg() {
                 <Text style={styles.noteText1}>Wife</Text>
 
                 <View style={{ marginBottom: 10 }}>
-                    <Text style={styles.label}>NAME (first, middle, last)</Text>
+                    <Text style={styles.label}>FIRST NAME</Text>
 
                     <View style={styles.placeholder}>
                         <TextInput
                             placeholder=""
                             maxLength={50}
-                            value={w_name}
-                            onChangeText={(w_name) => setW_name(w_name)}
+                            value={w_fname}
+                            onChangeText={(w_fname) => setW_name(w_fname)}
+                            style={{
+                                width: "100%",
+                            }}
+                        ></TextInput>
+                    </View>
+                </View>
+
+                <View style={{ marginBottom: 10 }}>
+                    <Text style={styles.label}>MIDDLE NAME</Text>
+
+                    <View style={styles.placeholder}>
+                        <TextInput
+                            placeholder=""
+                            maxLength={50}
+                            value={w_mname}
+                            onChangeText={(w_mname) => setW_name(w_mname)}
+                            style={{
+                                width: "100%",
+                            }}
+                        ></TextInput>
+                    </View>
+                </View>
+
+                <View style={{ marginBottom: 10 }}>
+                    <Text style={styles.label}>LAST NAME</Text>
+
+                    <View style={styles.placeholder}>
+                        <TextInput
+                            placeholder=""
+                            maxLength={50}
+                            value={w_lname}
+                            onChangeText={(w_lname) => setW_name(w_lname)}
                             style={{
                                 width: "100%",
                             }}

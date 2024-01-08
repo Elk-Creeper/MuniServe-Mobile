@@ -395,7 +395,6 @@ export default function JobApplication() {
                         ></TextInput>
                     </View>
                 </View>
-
                
                 <View style={{ marginBottom: 10 }}>
                     <Text style={styles.label}>Sex</Text>
