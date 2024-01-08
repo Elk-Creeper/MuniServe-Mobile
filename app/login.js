@@ -9,12 +9,19 @@ import {
 } from "react-native";
 import { firebase } from "../config";
 import { useRouter } from "expo-router";
+import { MaterialIcons } from '@expo/vector-icons';
 
 const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [initialAuthCheckComplete, setInitialAuthCheckComplete] = useState(false);
     const router = useRouter();
+
+    const [showPassword, setShowPassword] = useState(false);
+
+    const togglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
+    };
 
     useEffect(() => {
         const unsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
@@ -103,15 +110,25 @@ const Login = () => {
                         autoCapitalize="none"
                         autoCorrect={false}
                     />
+                    <View style={styles.con}>
                     <TextInput
                         style={styles.textInput}
                         placeholder="Password"
                         onChangeText={(password) => setPassword(password)}
                         autoCapitalize="none"
                         autoCorrect={false}
-                        secureTextEntry={true}
+                        secureTextEntry={!showPassword}
                     />
+                        <TouchableOpacity style={styles.eyeIcon} onPress={togglePasswordVisibility}>
+                            <MaterialIcons
+                                name={showPassword ? 'visibility' : 'visibility-off'}
+                                size={22}
+                                color="black"
+                            />
+                        </TouchableOpacity>
+                    </View>
                 </View>
+
                 <TouchableOpacity
                     onPress={() => loginUser(email, password)}
                     style={styles.button}
@@ -244,5 +261,14 @@ const styles = StyleSheet.create({
         marginTop: 10,
         color: "#0174BE",
         textDecorationLine: "underline",
+    },
+    con: {
+        flexDirection: 'row',
+    },
+    eyeIcon: {
+        padding: 10,
+        marginLeft: 235,
+        marginTop: 5,
+        position: 'absolute'
     },
 });

@@ -120,7 +120,6 @@ export default function DeathCertReq() {
                 return;
             }
 
-
             // Check if the user has selected an image
             if (!image) {
                 Alert.alert("Missing Image", "Please select an image for proof of payment.");

@@ -12,6 +12,7 @@ import React, { useState } from "react";
 import { firebase } from "../config";
 import { Link, useRouter } from "expo-router";
 import { Picker } from "@react-native-picker/picker";
+import { MaterialIcons } from '@expo/vector-icons';
 
 const Registration = () => {
     const [email, setEmail] = useState("");
@@ -21,6 +22,11 @@ const Registration = () => {
     const [barangay, setBarangay] = useState("");
     const [contact, setContact] = useState("");
     const router = useRouter();
+
+    const [showPassword, setShowPassword] = useState(false);
+    const togglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
+    };
 
     const isInputValid = (input) => /^[a-zA-Z\s]+$/.test(input);
 
@@ -177,14 +183,23 @@ const Registration = () => {
                         autoCorrect={false}
                         keyboardType="email-address"
                     />
-                    <TextInput
-                        style={styles.textInput}
-                        placeholder="Password"
-                        onChangeText={(password) => setPassword(password)}
-                        autoCapitalize="none"
-                        autoCorrect={false}
-                        secureTextEntry={true}
-                    />
+                    <View style={styles.con}>
+                        <TextInput
+                            style={styles.textInput}
+                            placeholder="Password"
+                            onChangeText={(password) => setPassword(password)}
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                            secureTextEntry={!showPassword}
+                        />
+                        <TouchableOpacity style={styles.eyeIcon} onPress={togglePasswordVisibility}>
+                            <MaterialIcons
+                                name={showPassword ? 'visibility' : 'visibility-off'}
+                                size={22}
+                                color="black"
+                            />
+                        </TouchableOpacity>
+                    </View>
                 </View>
                 <TouchableOpacity
                     onPress={() => registerUser(email, password, firstName, lastName, barangay, contact)}
@@ -323,5 +338,14 @@ const styles = StyleSheet.create({
         textAlign: "justify",
         paddingLeft: 10,
         marginBottom: 10,
+    },
+    con: {
+        flexDirection: 'row',
+    },
+    eyeIcon: {
+        padding: 10,
+        marginLeft: 240,
+        marginTop: 5,
+        position: 'absolute'
     },
 });

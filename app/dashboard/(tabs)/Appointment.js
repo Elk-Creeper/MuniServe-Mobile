@@ -325,24 +325,6 @@ export default function tab1() {
       <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
         <Text style={styles.serveText}>BOOK AN APPOINTMENT</Text>
 
-        <View style={styles.inputContainer}>
-          <Ionicons
-            name="people"
-            size={20}
-            color="#aaa"
-            style={styles.icons}
-          />
-          <TextInput
-            placeholder="Input Name"
-            maxLength={50}
-            value={name}
-            onChangeText={(name) => setName(name)}
-            style={{
-              width: "100%",
-            }}
-          ></TextInput>
-        </View>
-
         {/* Department Dropdown */}
         <View style={styles.dropdownContainer}>
           <Picker

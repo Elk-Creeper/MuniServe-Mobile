@@ -10,12 +10,29 @@ import {
 } from 'react-native';
 import React, { useState } from 'react';
 import { firebase } from '../config';
+import { MaterialIcons } from '@expo/vector-icons';
 
 export default function ChangePassword() {
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmNewPassword, setConfirmNewPassword] = useState('');
     const [loading, setLoading] = useState(false);
+
+    const [showPassword1, setShowPassword1] = useState(false);
+    const [showPassword2, setShowPassword2] = useState(false);
+    const [showPassword3, setShowPassword3] = useState(false);
+
+    const togglePasswordVisibility1 = () => {
+        setShowPassword1(!showPassword1);
+    };
+
+    const togglePasswordVisibility2 = () => {
+        setShowPassword2(!showPassword2);
+    };
+
+    const togglePasswordVisibility3 = () => {
+        setShowPassword3(!showPassword3);
+    };
 
     const validatePassword = () => {
         if (newPassword.length < 6) {
@@ -78,26 +95,56 @@ export default function ChangePassword() {
         <View style={styles.container}>
             <Text style={styles.text}>Change Password</Text>
 
-            <TextInput
-                style={styles.textInput}
-                placeholder="Current Password"
-                secureTextEntry
-                value={currentPassword}
-                onChangeText={(text) => setCurrentPassword(text)}
-            />
-            <TextInput
-                style={styles.textInput}
-                placeholder="New Password"
-                secureTextEntry
-                value={newPassword}
-             />
-            <TextInput
-                style={styles.textInput}
-                placeholder="Confirm New Password"
-                secureTextEntry
-                value={confirmNewPassword}
-                onChangeText={(text) => setConfirmNewPassword(text)}
-            />
+            <View style={styles.con}>
+                <TextInput
+                    style={styles.textInput}
+                    placeholder="Current Password"
+                    secureTextEntry={!showPassword1}
+                    value={currentPassword}
+                    onChangeText={(text) => setCurrentPassword(text)}
+                />
+                <TouchableOpacity style={styles.eyeIcon} onPress={togglePasswordVisibility1}>
+                    <MaterialIcons
+                        name={showPassword1 ? 'visibility' : 'visibility-off'}
+                        size={22}
+                        color="black"
+                    />
+                </TouchableOpacity>
+            </View>
+
+            <View style={styles.con}>
+                <TextInput
+                    style={styles.textInput}
+                    placeholder="New Password"
+                    secureTextEntry={!showPassword2}
+                    value={newPassword}
+                    onChangeText={(text) => setNewPassword(text)}
+                />
+                <TouchableOpacity style={styles.eyeIcon} onPress={togglePasswordVisibility2}>
+                    <MaterialIcons
+                        name={showPassword2 ? 'visibility' : 'visibility-off'}
+                        size={22}
+                        color="black"
+                    />
+                </TouchableOpacity>
+            </View>
+
+            <View style={styles.con}>
+                <TextInput
+                    style={styles.textInput}
+                    placeholder="Confirm New Password"
+                    secureTextEntry={!showPassword3}
+                    value={confirmNewPassword}
+                    onChangeText={(text) => setConfirmNewPassword(text)}
+                />
+                <TouchableOpacity style={styles.eyeIcon} onPress={togglePasswordVisibility3}>
+                    <MaterialIcons
+                        name={showPassword3 ? 'visibility' : 'visibility-off'}
+                        size={22}
+                        color="black"
+                    />
+                </TouchableOpacity>
+            </View>
 
             <TouchableOpacity style={styles.button} onPress={handleChangePassword} disabled={loading}>
                 <Text style={styles.buttonText}>Save Changes</Text>
@@ -161,5 +208,13 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: 'rgba(0, 0, 0, 0.1)',
+    },
+    con: {
+        flexDirection: 'row',
+    },
+    eyeIcon: {
+        padding: 12,
+        marginLeft: 235,
+        position: 'absolute'
     },
 });

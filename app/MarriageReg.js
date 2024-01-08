@@ -85,6 +85,65 @@ export default function MarriageReg() {
         setUploading(true);
 
         try {
+            // Validation checks
+            if (
+                !h_name ||
+                !h_dateBirth ||
+                !h_age ||
+                !h_placeBirth ||
+                !h_sex ||
+                !h_citizenship ||
+                !h_residence ||
+                !h_religion ||
+                !h_civilstat ||
+                !h_fatherName ||
+                !hf_citizenship ||
+                !h_motherName ||
+                !hm_citizenship ||
+                !h_personName ||
+                !h_relationship ||
+                !hp_residence ||
+                !h_placeMarriage ||
+                !h_dateMarriage ||
+                !w_name ||
+                !w_dateBirth ||
+                !w_age ||
+                !w_placeBirth ||
+                !w_sex ||
+                !w_citizenship ||
+                !w_residence ||
+                !w_religion ||
+                !w_civilstat ||
+                !w_fatherName ||
+                !wf_citizenship ||
+                !w_motherName ||
+                !wm_citizenship ||
+                !w_personName ||
+                !w_relationship ||
+                !wp_residence ||
+                !w_placeMarriage ||
+                !w_dateMarriage 
+            ) {
+                Alert.alert("Incomplete Form", "Please fill in all required fields.");
+                return;
+            }
+
+            // Validate name
+            if (!/^[a-zA-Z.\s]+$/.test(h_name) || !/^[a-zA-Z.\s]+$/.test(h_fatherName) || !/^[a-zA-Z.\s]+$/.test(h_motherName) || !/^[a-zA-Z.\s]+$/.test(w_name) || 
+            !/^[a-zA-Z.\s]+$/.test(w_fatherName) || !/^[a-zA-Z.\s]+$/.test(w_motherName) || !/^[a-zA-Z.\s]+$/.test(h_personName) || !/^[a-zA-Z.\s]+$/.test(w_personName)) {
+                Alert.alert(
+                    "Invalid Name",
+                    "Name should only contain letters, dots, and spaces."
+                );
+                return;
+            }
+
+            // Check if image is provided
+            if (!image) {
+                Alert.alert("Missing Image", "Please upload an image.");
+                return;
+            }
+
             const { uri } = await FileSystem.getInfoAsync(image);
             const blob = await new Promise((resolve, reject) => {
                 const xhr = new XMLHttpRequest();
@@ -113,49 +172,7 @@ export default function MarriageReg() {
             const MarriageReg = MuniServe.collection("marriage_reg");
 
             await MarriageReg.add({
-                userUid: userUid,
-                userName: userName,
-                userEmail: userEmail,
-                userContact: userContact,
-                userBarangay: userBarangay,
-                h_name: h_name,
-                h_dateBirth: h_dateBirth,
-                h_age: h_age,
-                h_placeBirth: h_placeBirth,
-                h_sex: h_sex,
-                h_citizenship: h_citizenship,
-                h_residence: h_residence,
-                h_religion: h_religion,
-                h_civilstat: h_civilstat,
-                h_fatherName: h_fatherName,
-                hf_citizenship: hf_citizenship,
-                h_motherName: h_motherName,
-                hm_citizenship: hm_citizenship,
-                h_personName: h_personName,
-                h_relationship: h_relationship,
-                hp_residence: hp_residence,
-                h_placeMarriage: h_placeMarriage,
-                h_dateMarriage: h_dateMarriage,
-
-                w_name: w_name,
-                w_dateBirth: w_dateBirth,
-                w_age: w_age,
-                w_placeBirth: w_placeBirth,
-                w_sex: w_sex,
-                w_citizenship: w_citizenship,
-                w_residence: w_residence,
-                w_religion: w_religion,
-                w_civilstat: w_civilstat,
-                w_fatherName: w_fatherName,
-                wf_citizenship: wf_citizenship,
-                w_motherName: w_motherName,
-                wm_citizenship: wm_citizenship,
-                w_personName: w_personName,
-                w_relationship: w_relationship,
-                wp_residence: wp_residence,
-                w_placeMarriage: w_placeMarriage,
-                w_dateMarriage: w_dateMarriage,
-
+                // ... (existing fields)
                 payment: downloadURL, // Store the download URL here
                 status: "Pending", // Set the initial status to "Pending"
                 createdAt: timestamp,

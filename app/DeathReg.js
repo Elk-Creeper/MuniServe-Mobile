@@ -93,23 +93,45 @@ export default function DeathReg() {
                 !civilstat ||
                 !religion ||
                 !citizenship ||
+                !forChild ||
                 !residence ||
                 !occupation ||
                 !fatherName ||
                 !motherName ||
-                !ageOfMom ||
-                !metOfDelivery ||
-                !lenOfPreg ||
-                !typeOfBirth ||
-                !orderChild ||
                 !causeOfDeath ||
                 !maternalCondi ||
                 !externalCause ||
                 !autopsy ||
                 !attendant ||
                 !corpseDis ||
-                !addOfCemetery) {
+                !addOfCemetery
+            ) {
                 Alert.alert("Incomplete Form", "Please fill in all required fields.");
+                return;
+            }
+
+            // Check forChild field
+            if (forChild === "yes") {
+                // Validation for child-related fields when forChild is "yes"
+                if (!ageOfMom || !lenOfPreg || !metOfDelivery || !orderChild || !typeOfBirth) {
+                    Alert.alert("Incomplete Child Information", "Please fill in all required child-related fields.");
+                    return;
+                }
+            }
+
+            // Validate name
+            if (!/^[a-zA-Z.\s]+$/.test(name) || !/^[a-zA-Z.\s]+$/.test(fatherName) || !/^[a-zA-Z.\s]+$/.test(motherName)) 
+            {
+                Alert.alert(
+                    "Invalid Name",
+                    "Name should only contain letters, dots, and spaces."
+                );
+                return;
+            }
+
+            // Check if image is provided
+            if (!image) {
+                Alert.alert("Missing Image", "Please upload an image.");
                 return;
             }
 
@@ -457,6 +479,7 @@ export default function DeathReg() {
                                 maxLength={3}
                                 value={age}
                                 onChangeText={(age) => setAge(age)}
+                                keyboardType="number-pad"
                                 style={{
                                     width: "100%",
                                 }}

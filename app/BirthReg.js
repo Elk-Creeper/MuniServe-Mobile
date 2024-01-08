@@ -30,7 +30,6 @@ export default function BirthReg() {
   const [selectedDateText, setSelectedDateText] = useState("");
   const [selectedDatePlaceText, setSelectedDatePlaceText] = useState("");
 
-
   const [userUid, setUserUid] = useState(null);
   const [userName, setUserName] = useState(null);
   const [userEmail, setUserEmail] = useState(null);
@@ -109,6 +108,15 @@ export default function BirthReg() {
         return;
       }
 
+      // Check forChild field
+      if (typeofbirth !== "Single") {
+        // Validation for child-related fields when forChild is "yes"
+        if (!birthorder || !multiple) {
+          Alert.alert("Incomplete Child Information", "Please fill in all required child-related fields.");
+          return;
+        }
+      }
+
       const { uri } = await FileSystem.getInfoAsync(image);
       const blob = await new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
@@ -134,7 +142,7 @@ export default function BirthReg() {
 
       // Store the download URL in Firestore
       const MuniServe = firebase.firestore();
-      const birthreg = MuniServe.collection("birth");
+      const birthreg = MuniServe.collection("birth_reg");
 
       await birthreg.add({
         userUid: userUid,
@@ -144,10 +152,10 @@ export default function BirthReg() {
         userBarangay: userBarangay,
         attendant: attendant,
         birthdate: birthdate,
-        c_birthorder: birthorder,
-        c_birthplace: birthplace,
-        c_sex: sex,
-        c_typeofbirth: typeofbirth,
+        birthorder: birthorder,
+        birthplace: birthplace,
+        sex: sex,
+        typeofbirth: typeofbirth,
         c_multiple: multiple,
         c_weight: weight,
         c_fname : c_fname,

@@ -65,10 +65,16 @@ const Transaction = () => {
                             formattedCreatedAt = `${timeDiffInMinutes}m ago`;
                         } else if (timeDiffInMinutes < 1440) {
                             const hours = Math.floor(timeDiffInMinutes / 60);
-                            formattedCreatedAt = `${hours} ${hours === 1 ? "hour" : "hours"
-                                } ago`;
+                            formattedCreatedAt = `${hours} ${hours === 1 ? "hour" : "hours"} ago`;
+                        } else if (timeDiffInMinutes < 43200) { // 30 days in minutes
+                            const days = Math.floor(timeDiffInMinutes / 1440);
+                            formattedCreatedAt = `${days} ${days === 1 ? "day" : "days"} ago`;
+                        } else if (timeDiffInMinutes < 525600) { // 365 days in minutes
+                            const months = Math.floor(timeDiffInMinutes / 43200);
+                            formattedCreatedAt = `${months} ${months === 1 ? "month" : "months"} ago`;
                         } else {
-                            formattedCreatedAt = formattedDate;
+                            const years = Math.floor(timeDiffInMinutes / 525600);
+                            formattedCreatedAt = `${years} ${years === 1 ? "year" : "years"} ago`;
                         }
 
                         appointments.push({
@@ -278,7 +284,7 @@ const styles = StyleSheet.create({
         marginBottom: 270,
     },
     itemCreatedAt: {
-        marginLeft: 50,
+        marginLeft: 55,
         marginTop: 3,
         fontSize: 13,
         color: "#597ae8",

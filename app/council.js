@@ -10,13 +10,13 @@ import {
 import React, { useState, useEffect } from "react";
 import { firebase } from "../config";
 import { StatusBar } from "expo-status-bar";
-import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
 import { Link, useRouter } from "expo-router";
 
 const Council = () => {
+    const router = useRouter();
+
     const [council, setCouncil] = useState([]);
     const MuniServe = firebase.firestore().collection("council");
-    const router = useRouter();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -69,25 +69,10 @@ const Council = () => {
                 backgroundColor="#93C49E" // Change the background color as needed
             />
 
-            <View style={styles.header}>
-                <View style={styles.titleContainer}>
-                    <Image
-                        source={require("../assets/imported/Del_Gallego_Camarines_Sur.png")}
-                        style={styles.logo}
-                    />
-                    <Text style={styles.titleText}>
-                        <Text style={styles.blackText}>MUNI</Text>
-                        <Text style={styles.greenText}>SERVE</Text>
-                    </Text>
-                </View>
-                <TouchableOpacity
-                    onPress={() => {
-                        router.push("/notif");
-                    }}
-                >
-                    <Ionicons name="notifications-outline" size={24} color="black" />
-                </TouchableOpacity>
-            </View>
+            <Text style={styles.muniText}>
+                Municipal Council for the Year
+                {'\n'} 2022 - 2025
+            </Text>
 
             <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
                 <FlatList
@@ -104,24 +89,21 @@ const Council = () => {
                                 )}
                             </View>
 
-                            <Text style={styles.muniText}>
-                                Municipal Council for the Year
-                                {'\n'} 2022 - 2025
-                            </Text>
-
-                            <TouchableOpacity style={styles.imageStyle}>
+                            <TouchableOpacity style={styles.imageStyle} onPress={() => {
+                                router.push("/PC_carling");
+                            }}>
                                 <Text style={styles.title}>Mayor</Text>
                                 {item.mayor && (
                                     <Image source={{ uri: item.mayor }} style={styles.image} />
                                 )}
-                            </TouchableOpacity>
-
-                            <TouchableOpacity style={styles.name}>
+                        
                                 <Text style={styles.names}>Melanie Abarientos-Garcia</Text>
                                 <Text style={styles.dates}>2019 – Present</Text>
                             </TouchableOpacity>
 
-                            <TouchableOpacity style={styles.imageStyle}>
+                            <TouchableOpacity style={styles.imageStyle} onPress={() => {
+                                router.push("/PC_carling");
+                            }}>
                                 <Text style={styles.title}>Vice Mayor</Text>
                                 {item.viceMayor && (
                                     <Image
@@ -129,9 +111,7 @@ const Council = () => {
                                         style={styles.image}
                                     />
                                 )}
-                            </TouchableOpacity>
-
-                            <TouchableOpacity style={styles.name}>
+                           
                                 <Text style={styles.names}>Florencia “Florence” Bargo</Text>
                             </TouchableOpacity>
 
@@ -139,27 +119,28 @@ const Council = () => {
 
                             <View style={styles.boxContainer}>
                                 <View style={styles.box}>
-                                    <TouchableOpacity style={styles.imageStyle}>
+                                    <TouchableOpacity style={styles.imageStyle} onPress={() => {
+                                        router.push("/PC_carling");
+                                    }}>
                                         {item.carling && (
                                             <Image
                                                 source={{ uri: item.carling }}
                                                 style={styles.image}
                                             />
                                         )}
-                                    </TouchableOpacity>
-                                    <TouchableOpacity style={styles.name}>
+                                    
                                         <Text style={styles.names}>Carlito A. Bocago</Text>
                                     </TouchableOpacity>
                                 </View>
 
                                 <View style={styles.box}>
-                                    <TouchableOpacity style={styles.imageStyle}>
+                                    <TouchableOpacity style={styles.imageStyle} onPress={() => {
+                                        router.push("/PC_isid");
+                                    }}>
                                         {item.isid && (
                                             <Image source={{ uri: item.isid }} style={styles.image} />
                                         )}
-                                    </TouchableOpacity>
 
-                                    <TouchableOpacity style={styles.name}>
                                         <Text style={styles.names}>Isidro M. Magcawas</Text>
                                     </TouchableOpacity>
                                 </View>
@@ -167,60 +148,57 @@ const Council = () => {
 
                             <View style={styles.boxContainer}>
                                 <View style={styles.box}>
-                                    <TouchableOpacity style={styles.imageStyle}>
+                                    <TouchableOpacity style={styles.imageStyle} onPress={() => {
+                                        router.push("/PC_aaron");
+                                    }}>
                                         {item.aaron && (
-                                            <Image
-                                                source={{ uri: item.aaron }}
-                                                style={styles.image}
-                                            />
+                                            <Image source={{ uri: item.aaron }} style={styles.image} />
                                         )}
-                                    </TouchableOpacity>
 
-                                    <TouchableOpacity style={styles.name}>
-                                        <Text style={styles.names}>Aaron L. Malinao</Text>
+                                        <Text style={styles.names}>Aaron A. Malinao</Text>
                                     </TouchableOpacity>
                                 </View>
 
                                 <View style={styles.box}>
-                                    <TouchableOpacity style={styles.imageStyle}>
+                                    <TouchableOpacity style={styles.imageStyle} onPress={() => {
+                                        router.push("/PC_uy");
+                                    }}>
                                         {item.uy && (
                                             <Image source={{ uri: item.uy }} style={styles.image} />
                                         )}
-                                    </TouchableOpacity>
-
-                                    <TouchableOpacity style={styles.name}>
+                                  
                                         <Text style={styles.names}>Eduardo C. Uy Jr.</Text>
                                     </TouchableOpacity>
                                 </View>
                             </View>
 
                             <View style={styles.boxContainer}>
-                                <View style={styles.box}>
-                                    <TouchableOpacity style={styles.imageStyle}>
+                                <View style={styles.box} >
+                                    <TouchableOpacity style={styles.imageStyle} onPress={() => {
+                                        router.push("/PC_uy");
+                                    }}>
                                         {item.antet && (
                                             <Image
                                                 source={{ uri: item.antet }}
                                                 style={styles.image}
                                             />
                                         )}
-                                    </TouchableOpacity>
-
-                                    <TouchableOpacity style={styles.name}>
+                                   
                                         <Text style={styles.names}>Francisco D. Verceluz</Text>
                                     </TouchableOpacity>
                                 </View>
 
                                 <View style={styles.box}>
-                                    <TouchableOpacity style={styles.imageStyle}>
+                                    <TouchableOpacity style={styles.imageStyle} onPress={() => {
+                                        router.push("/PC_uy");
+                                    }}>
                                         {item.adulta && (
                                             <Image
                                                 source={{ uri: item.adulta }}
                                                 style={styles.image}
                                             />
                                         )}
-                                    </TouchableOpacity>
-
-                                    <TouchableOpacity style={styles.name}>
+                                   
                                         <Text style={styles.names}>Augusto R. Adulta Jr.</Text>
                                     </TouchableOpacity>
                                 </View>
@@ -228,25 +206,25 @@ const Council = () => {
 
                             <View style={styles.boxContainer}>
                                 <View style={styles.box}>
-                                    <TouchableOpacity style={styles.imageStyle}>
+                                    <TouchableOpacity style={styles.imageStyle} onPress={() => {
+                                        router.push("/PC_uy");
+                                    }}>
                                         {item.emma && (
                                             <Image source={{ uri: item.emma }} style={styles.image} />
                                         )}
-                                    </TouchableOpacity>
-
-                                    <TouchableOpacity style={styles.name}>
+                                  
                                         <Text style={styles.names}>Emma Q. Jorvina</Text>
                                     </TouchableOpacity>
                                 </View>
 
                                 <View style={styles.box}>
-                                    <TouchableOpacity style={styles.imageStyle}>
+                                    <TouchableOpacity style={styles.imageStyle} onPress={() => {
+                                        router.push("/PC_anie");
+                                    }}>
                                         {item.anie && (
                                             <Image source={{ uri: item.anie }} style={styles.image} />
                                         )}
-                                    </TouchableOpacity>
-
-                                    <TouchableOpacity style={styles.name}>
+                                  
                                         <Text style={styles.names}>Arnel T. Verdejo</Text>
                                     </TouchableOpacity>
                                 </View>
@@ -268,38 +246,6 @@ const styles = StyleSheet.create({
         backgroundColor: "white",
         padding: 20,
     },
-    header: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-        marginBottom: 20,
-        
-    },
-    titleContainer: {
-        flexDirection: "row",
-        alignItems: "center",
-    },
-    logo: {
-        width: 40,
-        height: 40,
-        marginRight: 8,
-    },
-    titleText: {
-        fontSize: 24,
-        fontWeight: "bold",
-        flexDirection: "row",
-        letterSpacing: 3,
-    },
-    blackText: {
-        color: "black",
-        fontWeight: "bold",
-        fontSize: 20,
-    },
-    greenText: {
-        color: "green",
-        fontWeight: "bold",
-        fontSize: 20,
-    },
     historyText: {
         fontSize: 17,
         textAlign: "center",
@@ -317,10 +263,11 @@ const styles = StyleSheet.create({
         textAlign: "center",
     },
     muniText: {
-        fontSize: 20,
-        fontWeight: "600",
+        fontSize: 18,
+        fontWeight: "700",
         textAlign: "center",
-        marginTop: 5,
+        marginTop: 10,
+        marginBottom: 20,
     },
     mayorsName: {
         fontSize: 16,

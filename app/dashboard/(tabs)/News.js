@@ -116,7 +116,9 @@ export default function tab4() {
           data={news}
           numColumns={1}
           renderItem={({ item }) => (
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => {
+              router.push("/NewsOpen");
+            }}>
               <View style={styles.container2}>
                 <View style={styles.container3}>
                   <View style={styles.container4}>
