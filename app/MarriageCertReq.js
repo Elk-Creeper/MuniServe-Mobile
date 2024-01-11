@@ -175,6 +175,7 @@ export default function MarriageCertReq() {
                 payment: downloadURL, // Store the download URL here
                 status: "Pending", // Set the initial status to "Pending"
                 createdAt: timestamp,
+                remarks: "",
             });
 
             setUploading(false);

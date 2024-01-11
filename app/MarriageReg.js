@@ -18,6 +18,7 @@ import { firebase } from "../config";
 import * as FileSystem from "expo-file-system";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Link, useRouter } from "expo-router";
+import { getFirestore, doc, setTimestamp, serverTimestamp } from 'firebase/firestore';
 
 export default function MarriageReg() {
     const router = useRouter();
@@ -267,6 +268,7 @@ export default function MarriageReg() {
                 payment: downloadURL, // Store the download URL here
                 status: "Pending", // Set the initial status to "Pending"
                 createdAt: timestamp,
+                remarks: "",
             });
 
             setUploading(false);

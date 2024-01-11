@@ -459,7 +459,8 @@ export default function Tab4() {
                 meo2: [],
                 contact2: contact2,
                 businessNum2: businessNum2,
-                status: "Pending", // Set the initial status to "Pending"
+                status: "Pending", 
+                remarks: "",
             };
 
             // Loop through the selected images and upload each one

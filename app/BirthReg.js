@@ -181,9 +181,9 @@ export default function BirthReg() {
         payment: downloadURL, // Store the download URL here
         status: "Pending", // Set the initial status to "Pending"
         createdAt: timestamp,
-        remarks : "N/A" 
+        remarks : "" 
       });
-
+ 
       setUploading(false);
       setImage(null);
       resetForm();
@@ -214,7 +214,6 @@ export default function BirthReg() {
   const [f_citizenship, setF_citizenship] = useState("");
   const [f_name, setF_name] = useState("");
   const [f_occur, setF_occur] = useState("");
-  const [f_placemarried, setF_placemarried] = useState("");
   const [f_residence, setF_residence] = useState("");
   const [f_religion, setF_religion] = useState("");
   const [m_age, setM_age] = useState("");
@@ -225,7 +224,6 @@ export default function BirthReg() {
   const [childAliveButNowDead, setChildAliveButNowDead] = useState("");
   const [m_occur, setM_occur] = useState("");
   const [m_religion, setM_religion] = useState("");
-  const [m_totchild, setM_totchild] = useState("");
   const [m_residence, setM_residence] = useState("");
   const [mpDate, setMpDate] = useState(new Date());
   const [mpPlace, setMpPlace] = useState("");
@@ -247,7 +245,6 @@ export default function BirthReg() {
     setF_citizenship("");
     setF_name("");
     setF_occur("");
-    setF_placemarried("");
     setF_religion("");
     setF_residence("");
     setM_age("");
@@ -258,7 +255,6 @@ export default function BirthReg() {
     setChildAliveButNowDead("");
     setM_occur("");
     setM_religion("");
-    setM_totchild("");
     setM_residence("");
     setMpDate(new Date());
     setMpPlace("");

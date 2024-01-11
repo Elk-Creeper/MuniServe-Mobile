@@ -230,6 +230,7 @@ export default function JobApplication() {
                 documents: documentInfos, // Store the download URLs of documents
                 status: "Pending", // Set the initial status to "Pending"
                 createdAt: timestamp,
+                remarks: "",
             });
 
             setUploading(false);

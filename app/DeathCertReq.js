@@ -165,6 +165,7 @@ export default function DeathCertReq() {
                 payment: downloadURL,
                 status: "Pending",
                 createdAt: timestamp,
+                remarks: "",
             });
 
             setImage(null);

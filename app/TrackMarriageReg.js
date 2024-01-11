@@ -30,7 +30,7 @@ const Transaction = () => {
                 const currentTime = new Date();
 
                 querySnapshot.forEach((doc) => {
-                    const { userName, status, createdAt } = doc.data();
+                    const { userName, status, createdAt, remarks } = doc.data();
 
                     const timeDiffInMilliseconds = currentTime - createdAt.toDate();
                     const timeDiffInMinutes = Math.floor(timeDiffInMilliseconds / (1000 * 60));
@@ -51,6 +51,7 @@ const Transaction = () => {
                         id: doc.id,
                         userName,
                         status,
+                        remarks,
                         createdAt: formattedCreatedAt,
                     });
                 });
@@ -64,17 +65,19 @@ const Transaction = () => {
     }, []);
 
     const getStatusMessage = (item) => {
-        const { userName, status } = item;
+        const { userName, status, remarks } = item;
 
         switch (status) {
             case 'Pending':
-                return `Dear ${userName}, your request for Marriage Registration is PENDING.`;
+                return `Dear ${userName}, your request for Marriage Registration is PENDING. REMARKS: ${remarks}`;
             case 'Approved':
-                return `Dear ${userName}, your request for Marriage Registration is already APPROVED and now ready to be processed.`;
+                return `Dear ${userName}, your request for Marriage Registration is already APPROVED and now ready to be processed. REMARKS: ${remarks}`;
             case 'On Process':
-                return `Dear ${userName}, your request for Marriage Registration is now ON PROCESS. Please wait for at least 10 days for it to be completed.`;
+                return `Dear ${userName}, your request for Marriage Registration is now ON PROCESS. Please wait for at least 10 days for it to be completed. REMARKS: ${remarks}`;
             case 'Completed':
-                return `Dear ${userName}, your request for Marriage Registration has been COMPLETED and ready to be claimed at the Office of Municipal Civil Registrar. Note that you can claim it during office hours and days.`;
+                return `Dear ${userName}, your request for Marriage Registration has been COMPLETED and ready to be claimed at the Office of Municipal Civil Registrar. Note that you can claim it during office hours and days. REMARKS: ${remarks}`;
+            case 'Rejected':
+                return `Dear ${userName}, your request for Marriage Registration has been REJECTED. REMARKS: ${remarks}`;
             default:
                 return ''; // Handle other statuses if needed
         }

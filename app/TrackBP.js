@@ -30,7 +30,7 @@ const Transaction = () => {
                 const currentTime = new Date();
 
                 querySnapshot.forEach((doc) => {
-                    const { userName, status, timestamp } = doc.data();
+                    const { userName, status, timestamp, remarks} = doc.data();
 
                     // Add a check to ensure timestamp is defined
                     if (timestamp) {
@@ -53,6 +53,7 @@ const Transaction = () => {
                             id: doc.id,
                             userName,
                             status,
+                            remarks,
                             timestamp: formattedTimestamp,
                         });
                     }
@@ -67,18 +68,20 @@ const Transaction = () => {
     }, []);
 
     const getStatusMessage = (item) => {
-        const { userName, status } = item;
+        const { userName, status, remarks} = item;
 
         switch (status) {
             case 'Pending':
-                return `Dear ${userName}, your request for Business Permit is PENDING.`;
+                return `Dear ${userName}, your request for Business Permit is PENDING. REMARKS: ${remarks}`;
             case 'Approved':
-                return `Dear ${userName}, your request for Business Permit is already APPROVED and now ready to be processed.`;
+                return `Dear ${userName}, your request for Business Permit is already APPROVED and now ready to be processed. REMARKS: ${remarks}`;
             case 'Rejected':
-                return `Dear ${userName}, your request for Business Permit is now REJECTED. Please wait for at least 10 days for it to be completed.`;
+                return `Dear ${userName}, your request for Business Permit is now REJECTED. Please wait for at least 10 days for it to be completed. REMARKS: ${remarks}`;
             case 'Completed':
-                return `Dear ${userName}, your request for Business Permit has been COMPLETED and ready to be claimed at the Office of Municipal Civil Registrar. Note that you can claim it during office hours and days.`;
-            default:
+                return `Dear ${userName}, your request for Business Permit has been COMPLETED and ready to be claimed at the Office of Municipal Civil Registrar. Note that you can claim it during office hours and days. REMARKS: ${remarks}`;
+            case 'On Process':
+                return `Dear ${userName}, your request for Business Permit has been ON PROCESS. REMARKS: ${remarks}`;
+                default:
                 return ''; // Handle other statuses if needed
         }
     };
