@@ -30,7 +30,7 @@ const Transaction = () => {
                 const currentTime = new Date();
 
                 querySnapshot.forEach((doc) => {
-                    const { userName, status, createdAt } = doc.data();
+                    const { userName, status, createdAt, remarks } = doc.data();
 
                     const timeDiffInMilliseconds = currentTime - createdAt.toDate();
                     const timeDiffInMinutes = Math.floor(timeDiffInMilliseconds / (1000 * 60));
@@ -51,6 +51,7 @@ const Transaction = () => {
                         id: doc.id,
                         userName,
                         status,
+                        remarks,
                         createdAt: formattedCreatedAt,
                     });
                 });
@@ -64,7 +65,7 @@ const Transaction = () => {
     }, []);
 
     const getStatusMessage = (item) => {
-        const { userName, status } = item;
+        const { userName, status, remarks } = item;
 
         switch (status) {
             case 'Pending':
@@ -75,6 +76,8 @@ const Transaction = () => {
                 return `Dear ${userName}, your request for Birth Registration is now ON PROCESS. Please wait for at least 10 days for it to be completed.`;
             case 'Completed':
                 return `Dear ${userName}, your request for Birth Registration has been COMPLETED and ready to be claimed at the Office of Municipal Civil Registrar. Note that you can claim it during office hours and days.`;
+            case 'Rejected':
+                return `Dear ${userName}, your request for Birth Registration has been REJECTED. The reason is ${remarks}`;
             default:
                 return ''; // Handle other statuses if needed
         }
@@ -265,3 +268,4 @@ const styles = StyleSheet.create({
         fontWeight: "600",
     },
 });
+    

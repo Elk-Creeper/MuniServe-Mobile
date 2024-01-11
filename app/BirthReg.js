@@ -181,6 +181,7 @@ export default function BirthReg() {
         payment: downloadURL, // Store the download URL here
         status: "Pending", // Set the initial status to "Pending"
         createdAt: timestamp,
+        remarks : "N/A" 
       });
 
       setUploading(false);

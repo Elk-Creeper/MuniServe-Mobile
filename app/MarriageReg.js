@@ -10,7 +10,7 @@ import {
     ScrollView,
     Alert,
 } from "react-native";
-import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
+import { Ionicons, FontAwesome } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import { StatusBar } from "expo-status-bar";
 import * as ImagePicker from "expo-image-picker";
@@ -27,7 +27,6 @@ export default function MarriageReg() {
     const timestamp = firebase.firestore.FieldValue.serverTimestamp();
     const [loadingModalVisible, setLoadingModalVisible] = useState(false);
     const [selectedHDateBirthText, setSelectedHDateBirthText] = useState("");
-    const [selectedHDateMarriageText, setSelectedHDateMarriageText] = useState("");
     const [selectedWDateBirthText, setSelectedWDateBirthText] = useState("");
     const [selectedWDateMarriageText, setSelectedWDateMarriageText] = useState("");
 
@@ -36,6 +35,53 @@ export default function MarriageReg() {
     const [userEmail, setUserEmail] = useState(null);
     const [userBarangay, setUserBarangay] = useState(null);
     const [userContact, setUserContact] = useState(null);
+
+    // State for time input values
+    const [selectedTime, setSelectedTime] = useState(null);
+
+    // State to control time picker visibility
+    const [showTimePicker, setShowTimePicker] = useState(false);
+    const [showTimePickerOptions, setShowTimePickerOptions] = useState({
+        minTime: new Date(),
+        maxTime: new Date(),
+    });
+
+    // Function to show time picker
+    const showTimepicker = () => {
+        const now = new Date();
+        const startHour = 8; // 8 am
+        const endHour = 16; // 4 pm
+
+        // Set minimum and maximum allowed time
+        const minTime = new Date(now);
+        minTime.setHours(startHour, 0, 0, 0);
+
+        const maxTime = new Date(now);
+        maxTime.setHours(endHour, 0, 0, 0);
+
+        setShowTimePicker(true);
+
+        // Set the minimum and maximum time for the time picker
+        setShowTimePickerOptions({
+            minTime: minTime,
+            maxTime: maxTime,
+        });
+
+        // If the current selected time is 12, change it to the minimum time
+        if (selectedTime && selectedTime.getHours() === 12) {
+            setSelectedTime(minTime);
+        } else {
+            setSelectedTime(selectedTime || minTime); // Set default value to minimum time
+        }
+    };
+
+    // Handle time change
+    const handleTimeChange = (event, selectedTime) => {
+        if (selectedTime) {
+            setSelectedTime(selectedTime);
+            setShowTimePicker(false);
+        }
+    };
 
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -105,8 +151,6 @@ export default function MarriageReg() {
                 !h_personName ||
                 !h_relationship ||
                 !hp_residence ||
-                !h_placeMarriage ||
-                !h_dateMarriage ||
                 !w_fname ||
                 !w_mname ||
                 !w_lname ||
@@ -126,14 +170,14 @@ export default function MarriageReg() {
                 !w_relationship ||
                 !wp_residence ||
                 !w_placeMarriage ||
-                !w_dateMarriage 
+                !w_dateMarriage
             ) {
                 Alert.alert("Incomplete Form", "Please fill in all required fields.");
                 return;
             }
 
             // Validate name
-            if (!/^[a-zA-Z.\s]+$/.test(h_fname) || !/^[a-zA-Z.\s]+$/.test(h_mname) || !/^[a-zA-Z.\s]+$/.test(h_lname) || !/^[a-zA-Z.\s]+$/.test(h_fatherName) || !/^[a-zA-Z.\s]+$/.test(h_motherName) || !/^[a-zA-Z.\s]+$/.test(w_fname) || 
+            if (!/^[a-zA-Z.\s]+$/.test(h_fname) || !/^[a-zA-Z.\s]+$/.test(h_mname) || !/^[a-zA-Z.\s]+$/.test(h_lname) || !/^[a-zA-Z.\s]+$/.test(h_fatherName) || !/^[a-zA-Z.\s]+$/.test(h_motherName) || !/^[a-zA-Z.\s]+$/.test(w_fname) ||
                 !/^[a-zA-Z.\s]+$/.test(w_mname) || !/^[a-zA-Z.\s]+$/.test(w_lname) || !/^[a-zA-Z.\s]+$/.test(w_fatherName) || !/^[a-zA-Z.\s]+$/.test(w_motherName) || !/^[a-zA-Z.\s]+$/.test(h_personName) || !/^[a-zA-Z.\s]+$/.test(w_personName)) {
                 Alert.alert(
                     "Invalid Name",
@@ -181,46 +225,45 @@ export default function MarriageReg() {
                 userEmail: userEmail,
                 userContact: userContact,
                 userBarangay: userBarangay,
-                h_fname : h_fname,
-                h_mname : h_mname,
-                h_lname : h_lname,
-                h_dateBirth : h_dateBirth,
-                h_age : h_age,
-                h_placeBirth : h_placeBirth,
-                h_sex : h_sex,
-                h_citizenship : h_citizenship,
-                h_residence : h_residence,
-                h_religion : h_religion,
-                h_civilstat : h_civilstat,
-                h_fatherName : h_fatherName,
-                hf_citizenship : hf_citizenship,
-                h_motherName : h_motherName,
-                hm_citizenship : hm_citizenship,
-                h_personName : h_personName,
-                h_relationship : h_relationship,
-                hp_residence : hp_residence,
-                h_placeMarriage : h_placeBirth,
-                h_dateMarriage : h_dateMarriage,
-                w_fname : w_fname,
-                w_mname : w_mname,
-                w_lname : w_lname,
-                w_dateBirth : w_dateBirth,
-                w_age : w_age,
-                w_placeBirth : w_placeBirth,
-                w_sex : w_sex,
-                w_citizenship : w_citizenship,
-                w_residence : w_residence,
-                w_religion : w_religion,
-                w_civilstat : w_civilstat,
-                w_fatherName : w_fatherName,
-                wf_citizenship : wf_citizenship,
-                w_motherName : w_motherName,
-                wm_citizenship : wm_citizenship,
-                w_personName : w_personName,
-                w_relationship : w_relationship,
-                wp_residence : wp_residence,
-                w_placeMarriage : w_placeMarriage,
-                w_dateMarriage : w_dateMarriage,
+                h_fname: h_fname,
+                h_mname: h_mname,
+                h_lname: h_lname,
+                h_dateBirth: h_dateBirth,
+                h_age: h_age,
+                h_placeBirth: h_placeBirth,
+                h_sex: h_sex,
+                h_citizenship: h_citizenship,
+                h_residence: h_residence,
+                h_religion: h_religion,
+                h_civilstat: h_civilstat,
+                h_fatherName: h_fatherName,
+                hf_citizenship: hf_citizenship,
+                h_motherName: h_motherName,
+                hm_citizenship: hm_citizenship,
+                h_personName: h_personName,
+                h_relationship: h_relationship,
+                hp_residence: hp_residence,
+                w_fname: w_fname,
+                w_mname: w_mname,
+                w_lname: w_lname,
+                w_dateBirth: w_dateBirth,
+                w_age: w_age,
+                w_placeBirth: w_placeBirth,
+                w_sex: w_sex,
+                w_citizenship: w_citizenship,
+                w_residence: w_residence,
+                w_religion: w_religion,
+                w_civilstat: w_civilstat,
+                w_fatherName: w_fatherName,
+                wf_citizenship: wf_citizenship,
+                w_motherName: w_motherName,
+                wm_citizenship: wm_citizenship,
+                w_personName: w_personName,
+                w_relationship: w_relationship,
+                wp_residence: wp_residence,
+                w_placeMarriage: w_placeMarriage,
+                w_dateMarriage: w_dateMarriage,
+                timeMarriage : selectedTime,
                 payment: downloadURL, // Store the download URL here
                 status: "Pending", // Set the initial status to "Pending"
                 createdAt: timestamp,
@@ -244,8 +287,8 @@ export default function MarriageReg() {
     const [h_fname, setH_fname] = useState("");
     const [h_mname, setH_mname] = useState("");
     const [h_lname, setH_lname] = useState("");
-    const [h_age, setH_age] =  useState("");
-    const [h_placeBirth, setH_placeBirth] =  useState("");
+    const [h_age, setH_age] = useState("");
+    const [h_placeBirth, setH_placeBirth] = useState("");
     const [h_sex, setH_sex] = useState("");
     const [h_citizenship, setH_citizenship] = useState("");
     const [h_residence, setH_residence] = useState("");
@@ -258,7 +301,6 @@ export default function MarriageReg() {
     const [h_personName, setH_personName] = useState("");
     const [h_relationship, setH_relationship] = useState("");
     const [hp_residence, setHp_residence] = useState("");
-    const [h_placeMarriage, setH_placeMarriage] = useState("");
 
     const [w_fname, setW_fname] = useState("");
     const [w_mname, setW_mname] = useState("");
@@ -281,7 +323,6 @@ export default function MarriageReg() {
 
     const [h_dateBirth, setH_dateBirth] = useState(new Date());
     const [w_dateBirth, setW_dateBirth] = useState(new Date());
-    const [h_dateMarriage, setH_dateMarriage] = useState(new Date());
     const [w_dateMarriage, setW_dateMarriage] = useState(new Date());
 
     const [payment, setPayment] = useState("");
@@ -305,8 +346,6 @@ export default function MarriageReg() {
         setH_personName("");
         setH_relationship("");
         setHp_residence("");
-        setH_placeMarriage("");
-        setH_dateMarriage(new Date());
 
         setW_fname("");
         setW_mname("");
@@ -328,46 +367,17 @@ export default function MarriageReg() {
         setWp_residence("");
         setW_placeMarriage("");
         setW_dateMarriage(new Date());
+        setSelectedTime(null);
         setPayment("");
 
         setSelectedHDateBirthText("");
-        setSelectedHDateMarriageText("");
         setSelectedWDateBirthText("");
         setSelectedWDateMarriageText("");
     };
 
-    const [serve, setServe] = useState([]);
-    const MuniServe = firebase.firestore().collection("services");
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const querySnapshot = await MuniServe.get(); // Use get() to fetch the data
-                const serve = [];
-
-                querySnapshot.forEach((doc) => {
-                    const { service_name, service_desc, service_proc } = doc.data();
-                    serve.push({
-                        id: doc.id,
-                        service_name,
-                        service_desc,
-                        service_proc,
-                    });
-                });
-
-                setServe(serve);
-            } catch (error) {
-                console.error("Error fetching data: ", error);
-            }
-        };
-
-        fetchData();
-    }, []);
-
     const [maxDate, setMaxDate] = useState(new Date());
 
     const [showHDateBirthPicker, setShowHDateBirthPicker] = useState(false);
-    const [showHDateMarriagePicker, setShowHDateMarriagePicker] = useState(false);
     const [showWDateBirthPicker, setShowWDateBirthPicker] = useState(false);
     const [showWDateMarriagePicker, setShowWDateMarriagePicker] = useState(false);
 
@@ -382,19 +392,6 @@ export default function MarriageReg() {
         setShowHDateBirthPicker(Platform.OS === 'ios');
         setH_dateBirth(currentDate);
         setSelectedHDateBirthText(formatDate(currentDate));
-    };
-
-    const onHDateMarriageChange = (event, selectedDate) => {
-        const currentDate = selectedDate || new Date();
-
-        // Set maxDate only once when the component mounts
-        if (!maxDate.getTime()) {
-            setMaxDate(new Date());
-        }
-
-        setShowHDateMarriagePicker(Platform.OS === 'ios');
-        setH_dateMarriage(currentDate);
-        setSelectedHDateMarriageText(formatDate(currentDate));
     };
 
     const onWDateBirthChange = (event, selectedDate) => {
@@ -500,7 +497,7 @@ export default function MarriageReg() {
                             placeholder=""
                             maxLength={50}
                             value={h_mname}
-                            onChangeText={(h_mname) => setH_name(h_mname)}
+                            onChangeText={(h_mname) => setH_mname(h_mname)}
                             style={{
                                 width: "100%",
                             }}
@@ -516,7 +513,7 @@ export default function MarriageReg() {
                             placeholder=""
                             maxLength={50}
                             value={h_lname}
-                            onChangeText={(h_lname) => setH_name(h_lname)}
+                            onChangeText={(h_lname) => setH_lname(h_lname)}
                             style={{
                                 width: "100%",
                             }}
@@ -525,43 +522,43 @@ export default function MarriageReg() {
                 </View>
 
                 <View style={styles.boxContainer}>
-              <View style={{ marginBottom: 10 }}>
-                    <Text style={styles.label}>DATE OF BIRTH</Text>
+                    <View style={{ marginBottom: 10 }}>
+                        <Text style={styles.label}>DATE OF BIRTH</Text>
 
-                    <TouchableOpacity
-                        onPress={() => setShowHDateBirthPicker(true)} // for DATE OF BIRTH
-                        style={styles.placeholder2}
-                    >
+                        <TouchableOpacity
+                            onPress={() => setShowHDateBirthPicker(true)} // for DATE OF BIRTH
+                            style={styles.placeholder2}
+                        >
                             <Text>{selectedHDateBirthText}</Text>
-                    </TouchableOpacity>
+                        </TouchableOpacity>
 
                         {showHDateBirthPicker && (
-                        <DateTimePicker
-                            value={h_dateBirth}
-                            mode="date"
-                            display="default"
-                            onChange={onHDateBirthChange}
-                            maximumDate={maxDate}
-                        />
-                    )}
-                </View>
-
-                <View style={{ marginBottom: 10 }}>
-                    <Text style={styles.label}>AGE</Text>
-
-                    <View style={styles.placeholder2}>
-                        <TextInput
-                            placeholder=""
-                            maxLength={3}
-                            keyboardType="number-pad"
-                            value={h_age}
-                            onChangeText={(h_age) => setH_age(h_age)}
-                            style={{
-                                width: "100%",
-                            }}
-                        ></TextInput>
+                            <DateTimePicker
+                                value={h_dateBirth}
+                                mode="date"
+                                display="default"
+                                onChange={onHDateBirthChange}
+                                maximumDate={maxDate}
+                            />
+                        )}
                     </View>
-                </View>
+
+                    <View style={{ marginBottom: 10 }}>
+                        <Text style={styles.label}>AGE</Text>
+
+                        <View style={styles.placeholder2}>
+                            <TextInput
+                                placeholder=""
+                                maxLength={3}
+                                keyboardType="number-pad"
+                                value={h_age}
+                                onChangeText={(h_age) => setH_age(h_age)}
+                                style={{
+                                    width: "100%",
+                                }}
+                            ></TextInput>
+                        </View>
+                    </View>
                 </View>
 
                 <View style={{ marginBottom: 10 }}>
@@ -580,21 +577,21 @@ export default function MarriageReg() {
                 </View>
 
 
-                    <View style={{ marginBottom: 10 }}>
-                        <Text style={styles.label}>SEX</Text>
+                <View style={{ marginBottom: 10 }}>
+                    <Text style={styles.label}>SEX</Text>
 
-                        <View style={styles.placeholder}>
-                            <Picker
-                                selectedValue={h_sex}
-                                onValueChange={(itemValue, itemIndex) => setH_sex(itemValue)}
-                                style={{ width: "100%" }}
-                            >
-                                <Picker.Item label="Select" value="" />
-                                <Picker.Item label="Male" value="Male" />
-                                <Picker.Item label="Female" value="Female" />
-                            </Picker>
-                        </View>
+                    <View style={styles.placeholder}>
+                        <Picker
+                            selectedValue={h_sex}
+                            onValueChange={(itemValue, itemIndex) => setH_sex(itemValue)}
+                            style={{ width: "100%" }}
+                        >
+                            <Picker.Item label="Select" value="" />
+                            <Picker.Item label="Male" value="Male" />
+                            <Picker.Item label="Female" value="Female" />
+                        </Picker>
                     </View>
+                </View>
 
                 <View style={{ marginBottom: 10 }}>
                     <Text style={styles.label}>CITIZENSHIP</Text>
@@ -627,26 +624,26 @@ export default function MarriageReg() {
                 </View>
 
                 <View style={styles.boxContainer}>
-                <View style={{ marginBottom: 10 }}>
-                    <Text style={styles.label}>RELIGION</Text>
+                    <View style={{ marginBottom: 10 }}>
+                        <Text style={styles.label}>RELIGION</Text>
 
-                    <View style={styles.placeholder2}>
-                        <Picker
-                            selectedValue={h_religion}
-                            onValueChange={(itemValue, itemIndex) => setH_religion(itemValue)}
-                            style={{ width: "100%" }}
-                        >
-                            <Picker.Item label="Select" value="" />
-                            <Picker.Item label="Roman Catholic" value="Roman Catholic" />
-                            <Picker.Item label="INC" value="INC" />
-                            <Picker.Item label="Christian" value="Christian" />
-                            <Picker.Item
-                                label="7th Day Adventist"
-                                value="7th Day Adventist"
-                            />
-                        </Picker>
+                        <View style={styles.placeholder2}>
+                            <Picker
+                                selectedValue={h_religion}
+                                onValueChange={(itemValue, itemIndex) => setH_religion(itemValue)}
+                                style={{ width: "100%" }}
+                            >
+                                <Picker.Item label="Select" value="" />
+                                <Picker.Item label="Roman Catholic" value="Roman Catholic" />
+                                <Picker.Item label="INC" value="INC" />
+                                <Picker.Item label="Christian" value="Christian" />
+                                <Picker.Item
+                                    label="7th Day Adventist"
+                                    value="7th Day Adventist"
+                                />
+                            </Picker>
+                        </View>
                     </View>
-                </View> 
 
                     <View style={{ marginBottom: 10 }}>
                         <Text style={styles.label}>CIVIL STATUS</Text>
@@ -775,42 +772,6 @@ export default function MarriageReg() {
                             }}
                         ></TextInput>
                     </View>
-                </View>               
-
-                <View style={{ marginBottom: 10 }}>
-                    <Text style={styles.label}>PLACE OF MARRIAGE</Text>
-                    <View style={styles.placeholder}>
-                        <TextInput
-                            placeholder=""
-                            maxLength={50}
-                            value={h_placeMarriage}
-                            onChangeText={(h_placeMarriage) => setH_placeMarriage(h_placeMarriage)}
-                            style={{
-                                width: "100%",
-                            }}
-                        ></TextInput>
-                    </View>
-                </View>
-
-                <View style={{ marginBottom: 10 }}>
-                    <Text style={styles.label}>DATE OF MARRIAGE</Text>
-
-                    <TouchableOpacity
-                        onPress={() => setShowHDateMarriagePicker(true)}
-                        style={styles.placeholder}
-                    >
-                        <Text>{selectedHDateMarriageText}</Text>
-                    </TouchableOpacity>
-
-                    {showHDateMarriagePicker && (
-                        <DateTimePicker
-                            value={h_dateMarriage}
-                            mode="date"
-                            display="default"
-                            onChange={onHDateMarriageChange}
-                            maximumDate={maxDate}
-                        />
-                    )}
                 </View>
 
                 <Text style={styles.noteText1}>Wife</Text>
@@ -823,7 +784,7 @@ export default function MarriageReg() {
                             placeholder=""
                             maxLength={50}
                             value={w_fname}
-                            onChangeText={(w_fname) => setW_name(w_fname)}
+                            onChangeText={(w_fname) => setW_fname(w_fname)}
                             style={{
                                 width: "100%",
                             }}
@@ -839,7 +800,7 @@ export default function MarriageReg() {
                             placeholder=""
                             maxLength={50}
                             value={w_mname}
-                            onChangeText={(w_mname) => setW_name(w_mname)}
+                            onChangeText={(w_mname) => setW_mname(w_mname)}
                             style={{
                                 width: "100%",
                             }}
@@ -855,7 +816,7 @@ export default function MarriageReg() {
                             placeholder=""
                             maxLength={50}
                             value={w_lname}
-                            onChangeText={(w_lname) => setW_name(w_lname)}
+                            onChangeText={(w_lname) => setW_lname(w_lname)}
                             style={{
                                 width: "100%",
                             }}
@@ -966,26 +927,26 @@ export default function MarriageReg() {
                 </View>
 
                 <View style={styles.boxContainer}>
-                <View style={{ marginBottom: 10 }}>
-                    <Text style={styles.label}>RELIGION</Text>
+                    <View style={{ marginBottom: 10 }}>
+                        <Text style={styles.label}>RELIGION</Text>
 
-                    <View style={styles.placeholder2}>
-                        <Picker
-                            selectedValue={w_religion}
-                            onValueChange={(itemValue, itemIndex) => setW_religion(itemValue)}
-                            style={{ width: "100%" }}
-                        >
-                            <Picker.Item label="Select" value="" />
-                            <Picker.Item label="Roman Catholic" value="Roman Catholic" />
-                            <Picker.Item label="INC" value="INC" />
-                            <Picker.Item label="Christian" value="Christian" />
-                            <Picker.Item
-                                label="7th Day Adventist"
-                                value="7th Day Adventist"
-                            />
-                        </Picker>
+                        <View style={styles.placeholder2}>
+                            <Picker
+                                selectedValue={w_religion}
+                                onValueChange={(itemValue, itemIndex) => setW_religion(itemValue)}
+                                style={{ width: "100%" }}
+                            >
+                                <Picker.Item label="Select" value="" />
+                                <Picker.Item label="Roman Catholic" value="Roman Catholic" />
+                                <Picker.Item label="INC" value="INC" />
+                                <Picker.Item label="Christian" value="Christian" />
+                                <Picker.Item
+                                    label="7th Day Adventist"
+                                    value="7th Day Adventist"
+                                />
+                            </Picker>
+                        </View>
                     </View>
-                </View>
 
                     <View style={{ marginBottom: 10 }}>
                         <Text style={styles.label}>CIVIL STATUS</Text>
@@ -1152,6 +1113,34 @@ export default function MarriageReg() {
                     )}
                 </View>
 
+                <View style={{ marginBottom: 10 }}>
+                    <Text style={styles.label}>TIME OF MARRIAGE</Text>                
+                <View style={styles.inputContainer}>
+                    <FontAwesome
+                        name="clock-o"
+                        size={20}
+                        color="#aaa"
+                        style={styles.icon}
+                    />
+                    <TextInput
+                        placeholder="Choose Time"
+                        placeholderTextColor="black"
+                        style={styles.input}
+                        value={selectedTime ? selectedTime.toLocaleTimeString() : ""}
+                        onFocus={showTimepicker}
+                    />
+                    {showTimePicker && (
+                        <DateTimePicker
+                            value={selectedTime}
+                            mode="time"
+                            is24Hour={true}
+                            display="default"
+                            onChange={handleTimeChange}
+                        />
+                    )}
+                </View>
+                </View>
+
                 <Text style={styles.noteText}>
                     Note: Upload first your proof of payment before submitting your
                     application. Lack of needed information will cause delay or rejection.
@@ -1283,17 +1272,15 @@ const styles = StyleSheet.create({
     inputContainer: {
         flexDirection: "row",
         alignItems: "center",
-        borderWidth: 2,
-        borderColor: "#307A59",
-        borderRadius: 5,
+        borderWidth: 1,
+        borderRadius: 10,
         paddingVertical: 8,
         paddingHorizontal: 10,
-        marginTop: 25,
-        height: 60,
+        height: 50,
     },
     icon: {
         marginRight: 10,
-        color: "#307A59", // Change the color to match your design
+        color: "#000", // Change the color to match your design
     },
     input: {
         flex: 1,

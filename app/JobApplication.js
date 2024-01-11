@@ -20,6 +20,7 @@ import { firebase } from "../config";
 import * as FileSystem from "expo-file-system";
 import * as Animatable from "react-native-animatable";
 import { Link, useRouter } from "expo-router";
+import * as DocumentPicker from 'expo-document-picker';
 
 export default function JobApplication() {
     const router = useRouter();
@@ -29,94 +30,35 @@ export default function JobApplication() {
     const timestamp = firebase.firestore.FieldValue.serverTimestamp();
     const fadeAnimation = useRef(new Animated.Value(1)).current;
     const [loadingModalVisible, setLoadingModalVisible] = useState(false);
-    
+
     const [userUid, setUserUid] = useState(null);
     const [userName, setUserName] = useState(null);
     const [userEmail, setUserEmail] = useState(null);
     const [userBarangay, setUserBarangay] = useState(null);
     const [userContact, setUserContact] = useState(null);
 
-    // for downloading the docx
-    const [mediaData, setMediaData] = useState([]);
+    const [documents, setDocuments] = useState([]);
 
-    useEffect(() => {
-        async function getMediaData() {
-            const mediaRefs = [firebase.storage().ref("RESUME.docx")];
-
-            const mediaInfo = await Promise.all(
-                mediaRefs.map(async (ref) => {
-                    const url = await ref.getDownloadURL();
-                    const metadata = await ref.getMetadata();
-                    return { url, metadata };
-                })
-            );
-            setMediaData(mediaInfo);
-        }
-
-        getMediaData();
-    }, []);
-
-    async function downloadFile(url, filename, isVideo) {
+    const pickDocument = async () => {
         try {
-            const { status } = await MediaLibrary.requestPermissionsAsync();
-            if (status !== "granted") {
-                Alert.alert(
-                    "Permission needed",
-                    "This app needs access to your Media library to download files."
-                );
-                return;
-            }
-
-            const fileUri = FileSystem.cacheDirectory + filename;
-            console.log("Starting download..!");
-            const downloadResumable = FileSystem.createDownloadResumable(
-                url,
-                fileUri,
-                {},
-                false
-            );
-            const { uri } = await downloadResumable.downloadAsync(null, {
-                shouldCache: false,
+            let result = await DocumentPicker.getDocumentAsync({
+                type: '*/*', // Allow all types of documents
             });
-            console.log("Download completed: ", uri);
 
-            if (isVideo) {
-                const { uri: thumbnailUri } = await VideoThumbnails.getThumbnailAsync(
-                    uri,
-                    { time: 1000 }
-                );
-                console.log("Thumbnail created:", thumbnailUri);
+            if (!result.cancelled) {
+                setDocuments([...documents, result]);
+                console.log("Documents:", documents);
             }
-
-            const asset = await MediaLibrary.createAssetAsync(uri);
-            console.log("asset created:", asset);
-
-            Alert.alert("Download successful", `File saved to: ${fileUri}`);
         } catch (error) {
-            console.error("Error during download:", error);
+            console.error("Error picking documents:", error);
             Alert.alert(
-                "Download failed",
-                "There was an error while downloading the file."
+                "Error",
+                "There was an error picking documents. Please try again.",
+                [{ text: "OK", onPress: () => console.log("OK Pressed") }],
+                { cancelable: false }
             );
         }
-    }
-
-    // docx design
-    const CustomButton = ({ title, onPress }) => (
-        <TouchableOpacity
-            style={{
-                backgroundColor: "#307A59",
-                height: 50,
-                width: '100%',
-                borderRadius: 10,
-                justifyContent: "center",
-                alignItems: "center",
-            }}
-            onPress={onPress}
-        >
-            <Text style={{ color: "white" }}>{title}</Text>
-        </TouchableOpacity>
-    );
+    };
 
     useEffect(() => {
         // If an image is selected, start the fade-out animation
@@ -180,6 +122,16 @@ export default function JobApplication() {
         getUserInfo();
     }, []);
 
+    // Data add
+    const [name, setName] = useState("");
+    const [age, setAge] = useState("");
+    const [sex, setSex] = useState("");
+    const [address, setAddress] = useState("");
+    const [phoneNum, setPhoneNum] = useState("");
+    const [educ, setEduc] = useState("");
+    const [pictures, setPictures] = useState("");
+    const [position, setPosition] = useState("");
+
     // upload media files
     const uploadMedia = async () => {
         setLoadingModalVisible(true);
@@ -187,17 +139,14 @@ export default function JobApplication() {
 
         try {
             // Validate required fields
-            const requiredFields = [name, age, sex, address, phoneNum, educ];
-            if (requiredFields.some(field => !field)) {
+            const requiredFields = [name, age, sex, address, phoneNum, educ, position];
+            if (requiredFields.some((field) => !field)) {
                 Alert.alert("Incomplete Form", "Please fill in all required fields.");
                 return;
             }
             // Validate name
             if (!/^[a-zA-Z.\s]+$/.test(name)) {
-                Alert.alert(
-                    "Invalid Name",
-                    "Name should only contain letters, dots, and spaces."
-                );
+                Alert.alert("Invalid Name", "Name should only contain letters, dots, and spaces.");
                 return;
             }
 
@@ -207,11 +156,35 @@ export default function JobApplication() {
                 return;
             }
 
-            // Check if image is provided
-            if (!image) {
-                Alert.alert("Missing Image", "Please upload an image.");
+            // Check if image or document is provided
+            if (!image && documents.length === 0) {
+                Alert.alert("Missing Media", "Please upload an image or document.");
                 return;
             }
+
+            const documentUploadPromises = documents.map(async (document, index) => {
+                try {
+                    const uri = document.assets[0]?.uri;
+                    if (!uri) {
+                        console.warn(`Document uri is null or undefined for document at index ${index}`);
+                        return null; // Return null for invalid document URI
+                    }
+
+                    const blob = await createBlob(uri);
+                    const filename = document.assets[0]?.name || `document_${index + 1}.pdf`;
+                    const documentRef = firebase.storage().ref().child(filename);
+                    const documentSnapshot = await documentRef.put(blob);
+                    const documentUrl = await documentSnapshot.ref.getDownloadURL();
+                    return { url: documentUrl, name: filename }; // Return both URL and name
+                } catch (error) {
+                    console.error("Error uploading document:", error);
+                    throw error;
+                }
+            });
+
+            const [documentInfos] = await Promise.all([
+                Promise.all(documentUploadPromises),
+            ]);
 
             const { uri } = await FileSystem.getInfoAsync(image);
 
@@ -237,7 +210,6 @@ export default function JobApplication() {
             // Get the download URL of the uploaded image
             const downloadURL = await snapshot.ref.getDownloadURL();
 
-            // Store the download URL in Firestore
             const MuniServe = firebase.firestore();
             const job = MuniServe.collection("job");
 
@@ -253,13 +225,16 @@ export default function JobApplication() {
                 address: address,
                 phoneNum: phoneNum,
                 educ: educ,
-                pictures: downloadURL, // Store the download URL here
+                position: position,
+                pictures: downloadURL, // Store the download URLs of images
+                documents: documentInfos, // Store the download URLs of documents
                 status: "Pending", // Set the initial status to "Pending"
                 createdAt: timestamp,
             });
 
             setUploading(false);
             setImage(null);
+            setDocuments([]);
             resetForm();
             Alert.alert("Success", "Form filled successfully.");
         } catch (error) {
@@ -272,15 +247,20 @@ export default function JobApplication() {
         }
     };
 
-
-    // Data add
-    const [name, setName] = useState("");
-    const [age, setAge] = useState("");
-    const [sex, setSex] = useState("");
-    const [address, setAddress] = useState("");
-    const [phoneNum, setPhoneNum] = useState("");
-    const [educ, setEduc] = useState("");
-    const [pictures, setPictures] = useState("");
+    // Helper function to create a blob from a file URI
+    const createBlob = async (uri) => {
+        const response = await fetch(uri);
+        const blob = await response.blob();
+        return blob;
+    };
+    
+    const formatBytes = (bytes) => {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+        const i = parseInt(Math.floor(Math.log(bytes) / Math.log(k)));
+        return Math.round((bytes / Math.pow(k, i))) + ' ' + sizes[i];
+    };
 
     const resetForm = () => {
         setName("");
@@ -289,35 +269,8 @@ export default function JobApplication() {
         setAddress("");
         setPhoneNum("");
         setEduc("");
+        setPosition("");
     };
-
-    const [serve, setServe] = useState([]);
-    const MuniServe = firebase.firestore().collection("services");
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const querySnapshot = await MuniServe.get(); // Use get() to fetch the data
-                const serve = [];
-
-                querySnapshot.forEach((doc) => {
-                    const { service_name, service_desc, service_proc } = doc.data();
-                    serve.push({
-                        id: doc.id,
-                        service_name,
-                        service_desc,
-                        service_proc,
-                    });
-                });
-
-                setServe(serve);
-            } catch (error) {
-                console.error("Error fetching data: ", error);
-            }
-        };
-
-        fetchData();
-    }, []);
 
     return (
         <View style={styles.container}>
@@ -395,21 +348,21 @@ export default function JobApplication() {
                         ></TextInput>
                     </View>
                 </View>
-               
+
                 <View style={{ marginBottom: 10 }}>
                     <Text style={styles.label}>Sex</Text>
 
                     <View style={styles.placeholder}>
                         <Picker
-                                selectedValue={sex}
-                                onValueChange={(itemValue, itemIndex) =>
-                                    setSex(itemValue)
-                                }
-                                style={{ width: "100%" }}
-                            >
-                                <Picker.Item label="Select" value="" />
-                                <Picker.Item label="Female" value="Female" />
-                                <Picker.Item label="Male" value="Male" />
+                            selectedValue={sex}
+                            onValueChange={(itemValue, itemIndex) =>
+                                setSex(itemValue)
+                            }
+                            style={{ width: "100%" }}
+                        >
+                            <Picker.Item label="Select" value="" />
+                            <Picker.Item label="Female" value="Female" />
+                            <Picker.Item label="Male" value="Male" />
                         </Picker>
                     </View>
                 </View>
@@ -463,27 +416,70 @@ export default function JobApplication() {
                     </View>
                 </View>
 
+                <View style={{ marginBottom: 10 }}>
+                    <Text style={styles.label}>Position</Text>
+
+                    <View style={styles.placeholder}>
+                        <TextInput
+                            placeholder=""
+                            maxLength={100}
+                            value={position}
+                            onChangeText={(position) => setPosition(position)}
+                            style={{
+                                width: "100%",
+                            }}
+                        ></TextInput>
+                    </View>
+                </View>
+
+                <View style={{ marginBottom: 10 }}>
+                    <Text style={styles.label}>Resume</Text>
+
+                    <View style={styles.selectButton}>
+                        <Text style={styles.buttonText}>Upload Documents</Text>
+                        <TouchableOpacity onPress={pickDocument}>
+                            {documents.length > 0 ? (
+                                <View style={styles.checkCircle}>
+                                    <Ionicons name="ios-checkmark" size={24} color="white" />
+                                </View>
+                            ) : (
+                                <Animatable.View
+                                    style={{
+                                        ...styles.plusCircle,
+                                        opacity: fadeAnimation,
+                                    }}
+                                >
+                                    <Ionicons name="ios-add" size={24} color="white" />
+                                </Animatable.View>
+                            )}
+                        </TouchableOpacity>
+                    </View>
+
+                    {/* Display selected documents */}
+                    <View style={styles.documentContainer}>
+                        {documents.map((document, index) => (
+                            <View key={index} style={styles.documentItem}>
+                                <Ionicons name="ios-document" size={50} color="black" />
+                                <View style={{ marginLeft: 10 }}>
+                                    <Text style={styles.documentName}>
+                                        {document.assets?.[0]?.name || "Unknown Name"}
+                                    </Text>
+                                    <Text style={styles.documentSize}>
+                                        {formatBytes(document.assets?.[0]?.size) || "Unknown Size"}
+                                    </Text>
+                                </View>
+                            </View>
+                        ))}
+                    </View>
+                </View>
+
                 <Text style={styles.noteText}>
                     Note: Upload first the needed requirements before submitting your
                     application. Lack of needed information will cause delay or rejection.
                 </Text>
 
-                {mediaData.map((media, index) => {
-                    const { url, metadata } = media;
-                    const { name, contentType } = metadata;
-                    const isVideo = contentType.includes("video");
-                    return (
-                        <View key={index} style={styles.imageContainer}>
-                            <CustomButton
-                                title={`${name}`}
-                                onPress={() => downloadFile(url, name, isVideo)}
-                            />
-                        </View>
-                    );
-                })}
-
                 <View style={styles.selectButton}>
-                    <Text style={styles.buttonText}>2x2 Pictures</Text>
+                    <Text style={styles.buttonText}>Formal 2x2 Pictures</Text>
                     <TouchableOpacity onPress={pickImage}>
                         {pictures.length > 0 ? (
                             <Animatable.View
@@ -523,6 +519,7 @@ export default function JobApplication() {
                         <Text style={styles.submitText}>Submit</Text>
                     </TouchableOpacity>
                 </View>
+
             </ScrollView>
             {uploading && (
                 <View style={styles.loadingContainer}>
@@ -636,6 +633,9 @@ const styles = StyleSheet.create({
     imageContainer: {
         alignItems: "center",
     },
+    documentContainer: {
+        marginTop: 10,
+    },
     imageName: {
         fontSize: 18,
         fontWeight: "bold",
@@ -680,9 +680,8 @@ const styles = StyleSheet.create({
         alignItems: "center",
         borderRadius: 50,
         paddingVertical: 10,
-        marginTop: 50,
         width: 165,
-        marginLeft: 15,
+        marginTop: 30,
     },
     selectButton: {
         borderRadius: 10,
@@ -774,6 +773,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         marginRight: 10, // Adjust margin as needed
         marginBottom: 30,
+        marginTop: 30,
     },
     loadingContainer: {
         ...StyleSheet.absoluteFillObject,
@@ -781,4 +781,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         backgroundColor: "rgba(0, 0, 0, 0.5)",
     },
+    documentName: {
+        color: "#000"
+    }
 });

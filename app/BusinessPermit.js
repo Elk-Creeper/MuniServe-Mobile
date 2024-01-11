@@ -52,9 +52,9 @@ export default function Tab4() {
     const [meo2, setMeo2] = useState([]);
     const [contact2, setContact2] = useState([]);
     const [businessNum2, setBusinessNum2] = useState([]);
-  
+
     const [uploading, setUploading] = useState(false);
-    const [loadingModalVisible, setLoadingModalVisible] = useState(false); 
+    const [loadingModalVisible, setLoadingModalVisible] = useState(false);
 
     // for storing user info
     const [userUid, setUserUid] = useState(null);
@@ -179,7 +179,7 @@ export default function Tab4() {
             picture2.length > 0 &&
             mayorsPermit2.length > 0 &&
             mpdc2.length > 0 &&
-            meo2.length > 0 
+            meo2.length > 0
         ) {
             Animated.timing(fadeAnimation, {
                 toValue: 0,
@@ -187,7 +187,7 @@ export default function Tab4() {
                 useNativeDriver: true,
             }).start();
         }
-    }, [cedula1, barangayClearance1, dti1, sec1, fire1, sanitary1, police1, picture1, mayorsPermit1, mpdc1, meo1, 
+    }, [cedula1, barangayClearance1, dti1, sec1, fire1, sanitary1, police1, picture1, mayorsPermit1, mpdc1, meo1,
         cedula2, barangayClearance2, dti2, sec2, fire2, sanitary2, police2, picture2, mayorsPermit2, mpdc2, meo2
     ]);
 
@@ -418,7 +418,7 @@ export default function Tab4() {
             const newImages = [...meo2];
             newImages.splice(index, 1);
             setMeo2(newImages);
-        } 
+        }
     };
 
     const uploadMedia = async () => {
@@ -426,12 +426,6 @@ export default function Tab4() {
         setUploading(true);
 
         try {
-
-            // Validate phone number
-            if (!/^\d{11}$/.test(contact1) || !/^\d{11}$/.test(contact2)) {
-                Alert.alert("Invalid Phone Number", "Phone number must be exactly 11 digits.");
-                return;
-            }
 
             const imageURLs = {
                 userUid: userUid,
@@ -465,6 +459,7 @@ export default function Tab4() {
                 meo2: [],
                 contact2: contact2,
                 businessNum2: businessNum2,
+                status: "Pending", // Set the initial status to "Pending"
             };
 
             // Loop through the selected images and upload each one
@@ -1252,7 +1247,7 @@ export default function Tab4() {
                 </View>
 
                 <Text style={styles.noteText}>
-                    Direction: Select the application type, then proceed to upload the requirements.                
+                    Direction: Select the application type, then proceed to upload the requirements.
                 </Text>
 
                 <View style={styles.choices}>
@@ -1592,7 +1587,7 @@ export default function Tab4() {
                                 )}
                             />
                         </View>
-                        
+
                         <View style={styles.selectButton}>
                             <Text style={styles.buttonText}>
                                 Picture 2x2 (1 piece)
@@ -1799,21 +1794,6 @@ export default function Tab4() {
 
                 {selectedApplicationType === "renew" && (
                     <>
-                        {mediaData.map((media, index) => {
-                            const { url, metadata } = media;
-                            const { name, contentType } = metadata;
-                            const isVideo = contentType.includes("video");
-                            const isImage = contentType.includes("image");
-                            return (
-                                <View key={index} style={styles.imageContainer}>
-                                    <CustomButton
-                                        title={`${name}`}
-                                        onPress={() => downloadFile(url, name, isVideo)}
-                                    />
-                                </View>
-                            );
-                        })}
-
                         <Text style={styles.noteText}>
                             Note: Upload the requirements needed before submitting your
                             application. Lack of needed information will cause delay or
@@ -2372,7 +2352,15 @@ export default function Tab4() {
                                         [{ text: "OK", onPress: () => console.log("OK Pressed") }],
                                         { cancelable: false }
                                     );
-                                } else {
+                                }  
+                                
+                                // Validate phone number
+                                if (!/^\d{11}$/.test(contact1)) {
+                                    Alert.alert("Invalid Phone Number", "Phone number must be exactly 11 digits.");
+                                    return;
+                                }
+                                
+                                else {
                                     uploadMedia();
                                 }
                             } else if (selectedApplicationType === "renew") {
@@ -2414,7 +2402,15 @@ export default function Tab4() {
                                         [{ text: "OK", onPress: () => console.log("OK Pressed") }],
                                         { cancelable: false }
                                     );
-                                } else {
+                                }
+
+                                // Validate phone number
+                                if (!/^\d{11}$/.test(contact2)) {
+                                    Alert.alert("Invalid Phone Number", "Phone number must be exactly 11 digits.");
+                                    return;
+                                }
+                                
+                                 else {
                                     uploadMedia();
                                 }
                             }

@@ -30,29 +30,32 @@ const Transaction = () => {
                 const currentTime = new Date();
 
                 querySnapshot.forEach((doc) => {
-                    const { userName, status, createdAt } = doc.data();
+                    const { userName, status, timestamp } = doc.data();
 
-                    const timeDiffInMilliseconds = currentTime - createdAt.toDate();
-                    const timeDiffInMinutes = Math.floor(timeDiffInMilliseconds / (1000 * 60));
+                    // Add a check to ensure timestamp is defined
+                    if (timestamp) {
+                        const timeDiffInMilliseconds = currentTime - timestamp.toDate();
+                        const timeDiffInMinutes = Math.floor(timeDiffInMilliseconds / (1000 * 60));
 
-                    let formattedCreatedAt;
-                    if (timeDiffInMinutes < 1) {
-                        formattedCreatedAt = "Just now";
-                    } else if (timeDiffInMinutes < 60) {
-                        formattedCreatedAt = `${timeDiffInMinutes}m ago`;
-                    } else if (timeDiffInMinutes < 1440) {
-                        const hours = Math.floor(timeDiffInMinutes / 60);
-                        formattedCreatedAt = `${hours} ${hours === 1 ? "hour" : "hours"} ago`;
-                    } else {
-                        formattedCreatedAt = createdAt.toDate().toLocaleDateString();
+                        let formattedTimestamp;
+                        if (timeDiffInMinutes < 1) {
+                            formattedTimestamp = "Just now";
+                        } else if (timeDiffInMinutes < 60) {
+                            formattedTimestamp = `${timeDiffInMinutes}m ago`;
+                        } else if (timeDiffInMinutes < 1440) {
+                            const hours = Math.floor(timeDiffInMinutes / 60);
+                            formattedTimestamp = `${hours} ${hours === 1 ? "hour" : "hours"} ago`;
+                        } else {
+                            formattedTimestamp = timestamp.toDate().toLocaleDateString();
+                        }
+
+                        appointments.push({
+                            id: doc.id,
+                            userName,
+                            status,
+                            timestamp: formattedTimestamp,
+                        });
                     }
-
-                    appointments.push({
-                        id: doc.id,
-                        userName,
-                        status,
-                        createdAt: formattedCreatedAt,
-                    });
                 });
 
                 setAppointmentData(appointments);
@@ -71,8 +74,8 @@ const Transaction = () => {
                 return `Dear ${userName}, your request for Business Permit is PENDING.`;
             case 'Approved':
                 return `Dear ${userName}, your request for Business Permit is already APPROVED and now ready to be processed.`;
-            case 'On Process':
-                return `Dear ${userName}, your request for Business Permit is now ON PROCESS. Please wait for at least 10 days for it to be completed.`;
+            case 'Rejected':
+                return `Dear ${userName}, your request for Business Permit is now REJECTED. Please wait for at least 10 days for it to be completed.`;
             case 'Completed':
                 return `Dear ${userName}, your request for Business Permit has been COMPLETED and ready to be claimed at the Office of Municipal Civil Registrar. Note that you can claim it during office hours and days.`;
             default:
@@ -120,8 +123,8 @@ const Transaction = () => {
                                             style={styles.boxIcon}
                                         />
                                         <Text style={styles.appText}>Transaction</Text>
-                                        <Text style={styles.itemCreatedAt}>
-                                            {item.createdAt}
+                                        <Text style={styles.itemTimestamp}>
+                                            {item.timestamp}
                                         </Text>
                                     </View>
                                     <Text style={styles.itemPersonnel}>
@@ -257,7 +260,7 @@ const styles = StyleSheet.create({
         fontWeight: "600",
         marginBottom: 270,
     },
-    itemCreatedAt: {
+    itemTimestamp: {
         marginLeft: 70,
         marginTop: 3,
         fontSize: 13,

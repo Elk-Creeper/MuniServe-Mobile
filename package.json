@@ -21,6 +21,7 @@
     "expo": "~49.0.8",
     "expo-av": "~13.4.1",
     "expo-checkbox": "~2.4.0",
+    "expo-document-picker": "~11.5.4",
     "expo-file-system": "~15.4.5",
     "expo-firebase-recaptcha": "^2.3.1",
     "expo-font": "~11.4.0",

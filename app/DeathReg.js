@@ -120,8 +120,7 @@ export default function DeathReg() {
             }
 
             // Validate name
-            if (!/^[a-zA-Z.\s]+$/.test(name) || !/^[a-zA-Z.\s]+$/.test(fatherName) || !/^[a-zA-Z.\s]+$/.test(motherName)) 
-            {
+            if (!/^[a-zA-Z.\s]+$/.test(name) || !/^[a-zA-Z.\s]+$/.test(motherName) || !/^[a-zA-Z.\s]+$/.test(fatherName)) {
                 Alert.alert(
                     "Invalid Name",
                     "Name should only contain letters, dots, and spaces."
