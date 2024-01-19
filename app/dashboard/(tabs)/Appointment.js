@@ -7,7 +7,6 @@ import {
   TextInput,
   ScrollView,
   SafeAreaView,
-  Button,
   Alert
 } from "react-native";
 import React, { useState, useEffect } from "react";
@@ -33,6 +32,7 @@ export default function tab1() {
   const [userEmail, setUserEmail] = useState(null);
   const [userBarangay, setUserBarangay] = useState(null);
   const [userContact, setUserContact] = useState(null);
+  const [userLastName, setUserLastName] = useState(null);
 
   // State for date and time input values
   const [selectedDate, setSelectedDate] = useState(null);
@@ -234,6 +234,7 @@ export default function tab1() {
             setUserEmail(userDoc.data().email);
             setUserBarangay(userDoc.data().barangay);
             setUserContact(userDoc.data().contact);
+            setUserLastName(userDoc.data().lastName);
 
           } else {
             console.log("User data not found in Firestore");
@@ -274,6 +275,7 @@ export default function tab1() {
       await appointmentsRef.add({
         userUid: userUid,
         userName: userName,
+        userLastName: userLastName,
         userEmail: userEmail,
         userContact: userContact,
         userBarangay: userBarangay,

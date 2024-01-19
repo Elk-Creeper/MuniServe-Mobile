@@ -30,11 +30,11 @@ const Transaction = () => {
                 const currentTime = new Date();
 
                 querySnapshot.forEach((doc) => {
-                    const { userName, status, timestamp, remarks} = doc.data();
+                    const { userName, status, createdAt, remarks} = doc.data();
 
-                    // Add a check to ensure timestamp is defined
-                    if (timestamp) {
-                        const timeDiffInMilliseconds = currentTime - timestamp.toDate();
+                    // Add a check to ensure createdAt is defined
+                    if (createdAt) {
+                        const timeDiffInMilliseconds = currentTime - createdAt.toDate();
                         const timeDiffInMinutes = Math.floor(timeDiffInMilliseconds / (1000 * 60));
 
                         let formattedTimestamp;
@@ -46,7 +46,7 @@ const Transaction = () => {
                             const hours = Math.floor(timeDiffInMinutes / 60);
                             formattedTimestamp = `${hours} ${hours === 1 ? "hour" : "hours"} ago`;
                         } else {
-                            formattedTimestamp = timestamp.toDate().toLocaleDateString();
+                            formattedTimestamp = createdAt.toDate().toLocaleDateString();
                         }
 
                         appointments.push({
@@ -54,7 +54,7 @@ const Transaction = () => {
                             userName,
                             status,
                             remarks,
-                            timestamp: formattedTimestamp,
+                            createdAt: formattedTimestamp,
                         });
                     }
                 });
@@ -127,7 +127,7 @@ const Transaction = () => {
                                         />
                                         <Text style={styles.appText}>Transaction</Text>
                                         <Text style={styles.itemTimestamp}>
-                                            {item.timestamp}
+                                            {item.createdAt}
                                         </Text>
                                     </View>
                                     <Text style={styles.itemPersonnel}>

@@ -88,7 +88,11 @@ const NewsOpen = () => {
                         <Text style={styles.greenText}>SERVE</Text>
                     </Text>
                 </View>
-                <TouchableOpacity>
+                <TouchableOpacity
+                    onPress={() => {
+                        router.push("/notif");
+                    }}
+                >
                     <Ionicons name="notifications-outline" size={24} color="black" />
                 </TouchableOpacity>
             </View>

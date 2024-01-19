@@ -25,6 +25,7 @@ export default function MarriageCertReq() {
     const [userEmail, setUserEmail] = useState(null);
     const [userBarangay, setUserBarangay] = useState(null);
     const [userContact, setUserContact] = useState(null);
+    const [userLastName, setUserLastName] = useState(null);
 
     useEffect(() => {
         const getUserInfo = async () => {
@@ -39,6 +40,7 @@ export default function MarriageCertReq() {
                         setUserEmail(userDoc.data().email);
                         setUserBarangay(userDoc.data().barangay);
                         setUserContact(userDoc.data().contact);
+                        setUserLastName(userDoc.data().lastName);
 
                     } else {
                         console.log("User data not found in Firestore");
@@ -161,6 +163,7 @@ export default function MarriageCertReq() {
             await marriageCert.add({
                 userUid: userUid,
                 userName: userName,
+                userLastName: userLastName,
                 userEmail: userEmail,
                 userContact: userContact,
                 userBarangay: userBarangay,

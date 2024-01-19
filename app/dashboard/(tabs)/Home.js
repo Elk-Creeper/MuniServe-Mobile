@@ -5,8 +5,7 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
-  BackHandler,
-  Alert,
+  RefreshControl,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons"; // Import the Ionicons library for the bell icon
@@ -20,30 +19,37 @@ export default function tab1() {
   const [name, setName] = useState("");
   const [contact, setContact] = useState("");
   const [profileImage, setProfileImage] = useState("");
+  const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
+  const onRefresh = async () => {
+    setRefreshing(true);
+    // Fetch updated user data or perform any other refreshing logic here
+    // For example, you can re-fetch data from Firebase
+    await fetchDataFromFirebase();
+    setRefreshing(false);
+  };
+
+  const fetchDataFromFirebase = async () => {
     const currentUser = firebase.auth().currentUser;
     if (currentUser) {
       const userId = currentUser.uid;
 
-      const unsubscribe = firebase
-        .firestore()
-        .collection("users")
-        .doc(userId)
-        .onSnapshot((snapshot) => {
-          if (snapshot.exists) {
-            const userData = snapshot.data();
-            console.log("User Data:", userData);
-            setName(userData.firstName || "");
-            setContact(userData.contact || "");
-            setProfileImage(userData.profileImage || "");
-          } else {
-            console.log("User does not exist");
-          }
-        });
+      const snapshot = await firebase.firestore().collection("users").doc(userId).get();
 
-      return () => unsubscribe(); // Unsubscribe when the component unmounts
+      if (snapshot.exists) {
+        const userData = snapshot.data();
+        console.log("User Data:", userData);
+        setName(userData.firstName || "");
+        setContact(userData.contact || "");
+        setProfileImage(userData.profileImage || "");
+      } else {
+        console.log("User does not exist");
+      }
     }
+  };
+
+  useEffect(() => {
+    fetchDataFromFirebase();
   }, []);
   
   return (
@@ -71,7 +77,9 @@ export default function tab1() {
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
+      <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }>
         <View style={styles.greenContainer}>
           <View style={styles.profileContainer}>
             <Image

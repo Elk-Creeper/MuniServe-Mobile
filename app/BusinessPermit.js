@@ -18,8 +18,6 @@ import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { firebase } from "../config";
 import * as FileSystem from "expo-file-system";
-import * as MediaLibrary from "expo-media-library";
-import * as VideoThumbnails from "expo-video-thumbnails";
 import { Link, useRouter } from "expo-router";
 
 export default function Tab4() {
@@ -62,97 +60,13 @@ export default function Tab4() {
     const [userEmail, setUserEmail] = useState(null);
     const [userBarangay, setUserBarangay] = useState(null);
     const [userContact, setUserContact] = useState(null);
+    const [userLastName, setUserLastName] = useState(null);
 
     const [selectedApplicationType, setSelectedApplicationType] = useState(null);
-    const timestamp = firebase.firestore.FieldValue.serverTimestamp();
+    const createdAt = firebase.firestore.FieldValue.serverTimestamp();
 
     const fadeAnimation = useRef(new Animated.Value(1)).current;
     const colorAnimation = useRef(new Animated.Value(0)).current;
-
-    // for downloading the docx
-    const [mediaData, setMediaData] = useState([]);
-
-    useEffect(() => {
-        async function getMediaData() {
-            const mediaRefs = [
-                firebase.storage().ref("Business Permit Form.docx"),
-            ];
-
-            const mediaInfo = await Promise.all(
-                mediaRefs.map(async (ref) => {
-                    const url = await ref.getDownloadURL();
-                    const metadata = await ref.getMetadata();
-                    return { url, metadata };
-                })
-            );
-            setMediaData(mediaInfo);
-        }
-
-        getMediaData();
-    }, []);
-
-    async function downloadFile(url, filename, isVideo) {
-        try {
-            const { status } = await MediaLibrary.requestPermissionsAsync();
-            if (status !== "granted") {
-                Alert.alert(
-                    "Permission needed",
-                    "This app needs access to your Media library to download files."
-                );
-                return;
-            }
-
-            const fileUri = FileSystem.cacheDirectory + filename;
-            console.log("Starting download..!");
-            const downloadResumable = FileSystem.createDownloadResumable(
-                url,
-                fileUri,
-                {},
-                false
-            );
-            const { uri } = await downloadResumable.downloadAsync(null, {
-                shouldCache: false,
-            });
-            console.log("Download completed: ", uri);
-
-            if (isVideo) {
-                const { uri: thumbnailUri } = await VideoThumbnails.getThumbnailAsync(
-                    uri,
-                    { time: 1000 }
-                );
-                console.log("Thumbnail created:", thumbnailUri);
-            }
-
-            const asset = await MediaLibrary.createAssetAsync(uri);
-            console.log("asset created:", asset);
-
-            Alert.alert("Download successful", `File saved to: ${fileUri}`);
-        } catch (error) {
-            console.error("Error during download:", error);
-            Alert.alert(
-                "Download failed",
-                "There was an error while downloading the file."
-            );
-        }
-    }
-
-    // docx design 
-    const CustomButton = ({ title, onPress }) => (
-        <TouchableOpacity
-            style={{
-                backgroundColor: "#307A59",
-                height: 50,
-                borderRadius: 10,
-                justifyContent: "center",
-                alignItems: "center",
-                marginBottom: 10,
-                marginTop: 15,
-            }}
-            onPress={onPress}
-        >
-            <Text style={{ color: "white" }}>{title}</Text>
-        </TouchableOpacity>
-    );
 
     useEffect(() => {
         // If an image is selected, start the fade-out animation
@@ -314,6 +228,7 @@ export default function Tab4() {
                         setUserEmail(userDoc.data().email);
                         setUserBarangay(userDoc.data().barangay);
                         setUserContact(userDoc.data().contact);
+                        setUserLastName(userDoc.data().lastName);
 
                     } else {
                         console.log("User data not found in Firestore");
@@ -430,6 +345,7 @@ export default function Tab4() {
             const imageURLs = {
                 userUid: userUid,
                 userName: userName,
+                userLastName: userLastName,
                 userEmail: userEmail,
                 userContact: userContact,
                 userBarangay: userBarangay,
@@ -1087,7 +1003,7 @@ export default function Tab4() {
                 .add({
                     typeOfApplication: selectedApplicationType,
                     ...imageURLs,
-                    timestamp, // Move the timestamp field inside uploadMedia function
+                    createdAt, // Move the createdAt field inside uploadMedia function
                     // Add other relevant fields as needed
                 });
 

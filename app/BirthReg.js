@@ -35,6 +35,7 @@ export default function BirthReg() {
   const [userEmail, setUserEmail] = useState(null);
   const [userBarangay, setUserBarangay] = useState(null);
   const [userContact, setUserContact] = useState(null);
+  const [userLastName, setUserLastName] = useState(null);
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -62,6 +63,7 @@ export default function BirthReg() {
             setUserEmail(userDoc.data().email);
             setUserBarangay(userDoc.data().barangay);
             setUserContact(userDoc.data().contact);
+            setUserLastName(userDoc.data().lastName);
 
           } else {
             console.log("User data not found in Firestore");
@@ -147,6 +149,7 @@ export default function BirthReg() {
       await birthreg.add({
         userUid: userUid,
         userName: userName,
+        userLastName : userLastName,
         userEmail: userEmail,
         userContact: userContact,
         userBarangay: userBarangay,

@@ -36,6 +36,7 @@ export default function JobApplication() {
     const [userEmail, setUserEmail] = useState(null);
     const [userBarangay, setUserBarangay] = useState(null);
     const [userContact, setUserContact] = useState(null);
+    const [userLastName, setUserLastName] = useState(null);
 
     const [documents, setDocuments] = useState([]);
 
@@ -107,6 +108,7 @@ export default function JobApplication() {
                         setUserEmail(userDoc.data().email);
                         setUserBarangay(userDoc.data().barangay);
                         setUserContact(userDoc.data().contact);
+                        setUserLastName(userDoc.data().lastName);
 
                     } else {
                         console.log("User data not found in Firestore");
@@ -216,6 +218,7 @@ export default function JobApplication() {
             await job.add({
                 userUid: userUid,
                 userName: userName,
+                userLastName: userLastName,
                 userEmail: userEmail,
                 userContact: userContact,
                 userBarangay: userBarangay,
