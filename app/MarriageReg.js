@@ -13,17 +13,13 @@ import {
 import { Ionicons, FontAwesome } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import { StatusBar } from "expo-status-bar";
-import * as ImagePicker from "expo-image-picker";
 import { firebase } from "../config";
-import * as FileSystem from "expo-file-system";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { Link, useRouter } from "expo-router";
-import { getFirestore, doc, setTimestamp, serverTimestamp } from 'firebase/firestore';
+import { useRouter } from "expo-router";
 
 export default function MarriageReg() {
     const router = useRouter();
 
-    const [image, setImage] = useState(null);
     const [uploading, setUploading] = useState(false);
     const timestamp = firebase.firestore.FieldValue.serverTimestamp();
     const [loadingModalVisible, setLoadingModalVisible] = useState(false);
@@ -85,19 +81,6 @@ export default function MarriageReg() {
         }
     };
 
-    const pickImage = async () => {
-        let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.All, //All, Image, Videos
-            allowsEditing: false,
-            aspect: [4, 3],
-            quality: 1,
-        });
-
-        if (!result.canceled) {
-            setImage(result.assets[0].uri);
-        }
-    };
-
     //to get user identity
     useEffect(() => {
         const getUserInfo = async () => {
@@ -128,6 +111,49 @@ export default function MarriageReg() {
         getUserInfo();
     }, []);
 
+    // Data add
+    const [regType, setRegType] = useState("");
+    const [h_fname, setH_fname] = useState("");
+    const [h_mname, setH_mname] = useState("");
+    const [h_lname, setH_lname] = useState("");
+    const [h_age, setH_age] = useState("");
+    const [h_placeBirth, setH_placeBirth] = useState("");
+    const [h_sex, setH_sex] = useState("");
+    const [h_citizenship, setH_citizenship] = useState("");
+    const [h_residence, setH_residence] = useState("");
+    const [h_religion, setH_religion] = useState("");
+    const [h_civilstat, setH_civilstat] = useState("");
+    const [h_fatherName, setH_fatherName] = useState("");
+    const [hf_citizenship, setHf_citizenship] = useState("");
+    const [h_motherName, setH_motherName] = useState("");
+    const [hm_citizenship, setHm_citizenship] = useState("");
+    const [h_personName, setH_personName] = useState("");
+    const [h_relationship, setH_relationship] = useState("");
+    const [hp_residence, setHp_residence] = useState("");
+
+    const [w_fname, setW_fname] = useState("");
+    const [w_mname, setW_mname] = useState("");
+    const [w_lname, setW_lname] = useState("");
+    const [w_age, setW_age] = useState("");
+    const [w_placeBirth, setW_placeBirth] = useState("");
+    const [w_sex, setW_sex] = useState("");
+    const [w_citizenship, setW_citizenship] = useState("");
+    const [w_residence, setW_residence] = useState("");
+    const [w_religion, setW_religion] = useState("");
+    const [w_civilstat, setW_civilstat] = useState("");
+    const [w_fatherName, setW_fatherName] = useState("");
+    const [wf_citizenship, setWf_citizenship] = useState("");
+    const [w_motherName, setW_motherName] = useState("");
+    const [wm_citizenship, setWm_citizenship] = useState("");
+    const [w_personName, setW_personName] = useState("");
+    const [w_relationship, setW_relationship] = useState("");
+    const [wp_residence, setWp_residence] = useState("");
+    const [w_placeMarriage, setW_placeMarriage] = useState("");
+
+    const [h_dateBirth, setH_dateBirth] = useState(new Date());
+    const [w_dateBirth, setW_dateBirth] = useState(new Date());
+    const [w_dateMarriage, setW_dateMarriage] = useState(new Date());
+
     // upload media files
     const uploadMedia = async () => {
         setLoadingModalVisible(true);
@@ -136,6 +162,7 @@ export default function MarriageReg() {
         try {
             // Validation checks
             if (
+                !regType ||
                 !h_fname ||
                 !h_mname ||
                 !h_lname ||
@@ -189,35 +216,6 @@ export default function MarriageReg() {
                 return;
             }
 
-            // Check if image is provided
-            if (!image) {
-                Alert.alert("Missing Image", "Please upload an image.");
-                return;
-            }
-
-            const { uri } = await FileSystem.getInfoAsync(image);
-            const blob = await new Promise((resolve, reject) => {
-                const xhr = new XMLHttpRequest();
-                xhr.onload = () => {
-                    resolve(xhr.response);
-                };
-                xhr.onerror = (e) => {
-                    reject(new TypeError("Network request failed"));
-                };
-                xhr.responseType = "blob";
-                xhr.open("GET", uri, true);
-                xhr.send(null);
-            });
-
-            const filename = image.substring(image.lastIndexOf("/") + 1);
-            const ref = firebase.storage().ref().child(filename);
-
-            // Upload the image to Firebase Storage
-            const snapshot = await ref.put(blob);
-
-            // Get the download URL of the uploaded image
-            const downloadURL = await snapshot.ref.getDownloadURL();
-
             // Store the download URL in Firestore
             const MuniServe = firebase.firestore();
             const MarriageReg = MuniServe.collection("marriage_reg");
@@ -229,6 +227,7 @@ export default function MarriageReg() {
                 userEmail: userEmail,
                 userContact: userContact,
                 userBarangay: userBarangay,
+                regType: regType,
                 h_fname: h_fname,
                 h_mname: h_mname,
                 h_lname: h_lname,
@@ -268,71 +267,37 @@ export default function MarriageReg() {
                 w_placeMarriage: w_placeMarriage,
                 w_dateMarriage: w_dateMarriage,
                 timeMarriage : selectedTime,
-                payment: downloadURL, // Store the download URL here
                 status: "Pending", // Set the initial status to "Pending"
                 createdAt: timestamp,
                 remarks: "",
             });
 
             setUploading(false);
-            setImage(null);
             resetForm();
-            Alert.alert("Success", "Form filled successfully.");
+
+            setTimeout(() => {
+                if (regType === "On Time") {
+                    Alert.alert("Successfully Filled", "Please prepare P50 pesos to be paid at the Treasurer's Office, and ensure you have one valid ID for claiming your document at the Civil Registrar's Office.");
+                } else if (regType === "Delayed") {
+                    Alert.alert("Successfully Filled", "Please prepare the specified amount for payment at the Treasurer's Office, and ensure you have one valid ID for claiming your document at the Civil Registrar's Office.");
+                }
+
+                // Hide loading indicators
+                setUploading(false);
+                setLoadingModalVisible(false);
+            }, 100);
+
         } catch (error) {
             console.error(error);
-            setUploading(false);
             Alert.alert("Error", "Form filling failed.");
         } finally {
             setUploading(false);
-            setLoadingModalVisible(false); // Hide loading modal
+            setLoadingModalVisible(false);
         }
     };
 
-    // Data add
-    const [h_fname, setH_fname] = useState("");
-    const [h_mname, setH_mname] = useState("");
-    const [h_lname, setH_lname] = useState("");
-    const [h_age, setH_age] = useState("");
-    const [h_placeBirth, setH_placeBirth] = useState("");
-    const [h_sex, setH_sex] = useState("");
-    const [h_citizenship, setH_citizenship] = useState("");
-    const [h_residence, setH_residence] = useState("");
-    const [h_religion, setH_religion] = useState("");
-    const [h_civilstat, setH_civilstat] = useState("");
-    const [h_fatherName, setH_fatherName] = useState("");
-    const [hf_citizenship, setHf_citizenship] = useState("");
-    const [h_motherName, setH_motherName] = useState("");
-    const [hm_citizenship, setHm_citizenship] = useState("");
-    const [h_personName, setH_personName] = useState("");
-    const [h_relationship, setH_relationship] = useState("");
-    const [hp_residence, setHp_residence] = useState("");
-
-    const [w_fname, setW_fname] = useState("");
-    const [w_mname, setW_mname] = useState("");
-    const [w_lname, setW_lname] = useState("");
-    const [w_age, setW_age] = useState("");
-    const [w_placeBirth, setW_placeBirth] = useState("");
-    const [w_sex, setW_sex] = useState("");
-    const [w_citizenship, setW_citizenship] = useState("");
-    const [w_residence, setW_residence] = useState("");
-    const [w_religion, setW_religion] = useState("");
-    const [w_civilstat, setW_civilstat] = useState("");
-    const [w_fatherName, setW_fatherName] = useState("");
-    const [wf_citizenship, setWf_citizenship] = useState("");
-    const [w_motherName, setW_motherName] = useState("");
-    const [wm_citizenship, setWm_citizenship] = useState("");
-    const [w_personName, setW_personName] = useState("");
-    const [w_relationship, setW_relationship] = useState("");
-    const [wp_residence, setWp_residence] = useState("");
-    const [w_placeMarriage, setW_placeMarriage] = useState("");
-
-    const [h_dateBirth, setH_dateBirth] = useState(new Date());
-    const [w_dateBirth, setW_dateBirth] = useState(new Date());
-    const [w_dateMarriage, setW_dateMarriage] = useState(new Date());
-
-    const [payment, setPayment] = useState("");
-
     const resetForm = () => {
+        setRegType("");
         setH_fname("");
         setH_mname("");
         setH_lname("");
@@ -373,7 +338,6 @@ export default function MarriageReg() {
         setW_placeMarriage("");
         setW_dateMarriage(new Date());
         setSelectedTime(null);
-        setPayment("");
 
         setSelectedHDateBirthText("");
         setSelectedWDateBirthText("");
@@ -465,10 +429,39 @@ export default function MarriageReg() {
                         <Text style={styles.itemService_name}>Certificate of Marriage</Text>
                     </View>
                 </View>
+
                 <View style={styles.innerContainer}>
                     <Text style={styles.itemService_desc}>
-                        A Marriage Certificate is a document that shows social union or a legal contract between people that creates kinship. Such a union, often formalized via a wedding ceremony, may also be called matrimony. A general definition of marriage is that it is a social contract between two individuals that unites their lives legally, economically and emotionally.  It is an institution in which interpersonal relationships, usually intimate and sexual, are acknowledged in a variety of ways, depending on the culture or subculture in which it is found. The state of being united to a person of the opposite sex as husband or wife in a legal, consensual, and contractual relationship recognized and sanctioned by and dissolvable only by law.  A marriage certificate is a document containing the important details of marriage, signed by the couple and by all in attendance. Marriage occurs during the meeting for worship after approval is obtained from the meetings of which the two people are members. Approval is based on a statement of good character and clearness from any other engagements. The clerk usually records a copy of the marriage certificate in the meeting's records.
+                        Note: Marriage Registration must be filed within 30 days after the death.
+                        The day after 30th day is considered as Delayed registration, some documents
+                        are required to be submitted and you need to fill out the affidavit personally.
                     </Text>
+                </View>
+
+                <Text style={styles.feesNote}>
+                    LOCAL CIVIL REGISTRY FEES:
+                </Text>
+
+                <Text style={styles.feesDesc}>
+                    P50.00 - For On Time Registration
+                    {"\n"}{"\n"}
+                    Additional P17.00 - For Delayed Registration of Document for every year of delay.
+                </Text>
+
+                <View style={{ marginBottom: 10 }}>
+                    <Text style={styles.label}>Type of Registration</Text>
+
+                    <View style={styles.placeholder}>
+                        <Picker
+                            selectedValue={regType}
+                            onValueChange={(itemValue, itemIndex) => setRegType(itemValue)}
+                            style={{ width: "100%" }}
+                        >
+                            <Picker.Item label="Select" value="" />
+                            <Picker.Item label="On Time" value="On Time" />
+                            <Picker.Item label="Delayed" value="Delayed" />
+                        </Picker>
+                    </View>
                 </View>
 
                 <Text style={styles.noteText}>
@@ -1146,49 +1139,7 @@ export default function MarriageReg() {
                 </View>
                 </View>
 
-                <Text style={styles.noteText}>
-                    Note: Upload first your proof of payment before submitting your
-                    application. Lack of needed information will cause delay or rejection.
-                </Text>
-
-                <Text style={styles.noteText2}>
-                    FEE FOR REGISTRATION: 50 PESOS
-                </Text>
-
-                <View style={styles.selectButton}>
-                    <Text style={styles.buttonText}>
-                        Proof of Payment(G-CASH RECEIPT)
-                    </Text>
-                    <TouchableOpacity onPress={pickImage}>
-                        {payment.length > 0 ? (
-                            <Animatable.View
-                                style={{
-                                    ...styles.plusCircle,
-                                    opacity: fadeAnimation,
-                                }}
-                            >
-                                <Ionicons name="ios-add" size={24} color="white" />
-                            </Animatable.View>
-                        ) : (
-                            <View style={styles.plusCircle}>
-                                <Ionicons name="ios-add" size={24} color="white" />
-                            </View>
-                        )}
-                        {payment.length > 0 && (
-                            <View style={styles.checkCircle}>
-                                <Ionicons name="ios-checkmark" size={24} color="white" />
-                            </View>
-                        )}
-                    </TouchableOpacity>
-                </View>
-
                 <View style={styles.imageContainer}>
-                    {image && (
-                        <Image
-                            source={{ uri: image }}
-                            style={{ width: 300, height: 300 }}
-                        />
-                    )}
                     <TouchableOpacity
                         style={styles.button}
                         onPress={() => {
@@ -1259,7 +1210,8 @@ const styles = StyleSheet.create({
         height: 65,
         backgroundColor: "#307A59",
         borderRadius: 15,
-        marginBottom: 30,
+        marginBottom: 15,
+        marginTop: 15,
     },
     boxAcc: {
         flexDirection: "row",
@@ -1323,10 +1275,11 @@ const styles = StyleSheet.create({
         marginTop: 19,
     },
     itemService_desc: {
-        fontWeight: "300",
-        fontSize: 15,
+        fontSize: 16,
         textAlign: "justify",
         lineHeight: 30,
+        fontWeight: '400',
+        marginBottom: 30
     },
     itemService_proc: {
         fontWeight: "300",
@@ -1419,7 +1372,6 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         marginTop: 20,
         width: 165,
-        marginBottom: 40,
     },
     selectButton: {
         borderRadius: 10,
@@ -1515,5 +1467,14 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         backgroundColor: "rgba(0, 0, 0, 0.5)",
+    },
+    feesNote: {
+        fontSize: 16,
+        fontWeight: '700',
+        marginBottom: 8,
+    },
+    feesDesc: {
+        fontSize: 16,
+        marginBottom: 15,
     },
 });

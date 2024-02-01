@@ -166,11 +166,10 @@ const styles = StyleSheet.create({
         marginBottom: 50,
     },
     image: {
-        width: 300, // Adjust the width as needed
-        height: 200, // Adjust the height as needed
-        resizeMode: "center", // Adjust the resizeMode as needed
-        borderRadius: 10, // Optional: add border radius for rounded corners
-        marginTop: 10, // Optional: add margin for spacing
+        width: 300, 
+        height: 200, 
+        resizeMode: "center", 
+        marginTop: 10, 
     },
     imageStyle: {
         alignItems: "center",

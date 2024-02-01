@@ -16,10 +16,9 @@ export default function Service() {
 
   const servicesData = [
     { id: 1, name: "Registration of Live Birth" },
-    { id: 2, name: "Business Permit" },
-    { id: 3, name: "Death Certificate" },
-    { id: 4, name: "Job Application" },
-    { id: 5, name: "Marriage Certificate" },
+    { id: 2, name: "Death Certificate" },
+    { id: 3, name: "Job Application" },
+    { id: 4, name: "Marriage Certificate" },
   ];
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -44,18 +43,15 @@ export default function Service() {
         router.push("/BirthReg");
         break;
       case 2:
-        router.push("/BusinessPermit");
-        break;
-      case 3:
         router.push("/DeathCertificate");
         break;
-      case 4:
+      case 3:
         router.push("/JobApplication");
         break;
-      case 5:
+      case 4:
         router.push("/MarriageCert");
         break;
-      case 6:
+      case 5:
         router.push("/PSA");
         break;
       default:

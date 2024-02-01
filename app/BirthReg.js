@@ -11,19 +11,16 @@ import {
   Platform,
   Alert,
 } from "react-native";
-import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import { StatusBar } from "expo-status-bar";
-import * as ImagePicker from "expo-image-picker";
 import { firebase } from "../config";
-import * as FileSystem from "expo-file-system";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { Link, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 
 export default function BirthReg() {
   const router = useRouter();
 
-  const [image, setImage] = useState(null);
   const [uploading, setUploading] = useState(false);
   const timestamp = firebase.firestore.FieldValue.serverTimestamp();
   const [loadingModalVisible, setLoadingModalVisible] = useState(false);
@@ -36,19 +33,6 @@ export default function BirthReg() {
   const [userBarangay, setUserBarangay] = useState(null);
   const [userContact, setUserContact] = useState(null);
   const [userLastName, setUserLastName] = useState(null);
-
-  const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All, //All, Image, Videos
-      allowsEditing: false,
-      aspect: [4, 3],
-      quality: 1,
-    });
-
-    if (!result.canceled) {
-      setImage(result.assets[0].uri);
-    }
-  };
 
   useEffect(() => {
     const getUserInfo = async () => {
@@ -79,129 +63,8 @@ export default function BirthReg() {
     getUserInfo();
   }, []);
 
-  // upload media files
-  const uploadMedia = async () => {
-    setLoadingModalVisible(true);
-    setUploading(true);
-
-    try { 
-      // Validation checks
-      if (!c_fname || !c_mname || !c_lname || !birthdate || !birthplace || !sex || !typeofbirth || !weight ||
-        !m_name || !m_citizenship || !m_religion || !bornAlive || !childStillLiving ||
-        !childAliveButNowDead || !m_occur || !m_age || !m_residence || !f_name ||
-        !f_citizenship || !f_religion || !f_occur || !f_age || !f_residence || !mpDate ||
-        !mpPlace || !attendant) {
-        Alert.alert("Incomplete Form", "Please fill in all required fields.");
-        return;
-      }
-
-      // Validate child's name components
-      if (!/^[a-zA-Z.\s]+$/.test(c_fname) || !/^[a-zA-Z.\s]+$/.test(c_mname) || !/^[a-zA-Z.\s]+$/.test(c_lname)) {
-        Alert.alert(
-          "Invalid Input",
-          "Name of the newborn child should only contain letters, dots, and spaces."
-        );
-        return;
-      }
-
-      // Check if image is provided
-      if (!image) {
-        Alert.alert("Missing Image", "Please upload an image.");
-        return;
-      }
-
-      // Check forChild field
-      if (typeofbirth !== "Single") {
-        // Validation for child-related fields when forChild is "yes"
-        if (!birthorder || !multiple) {
-          Alert.alert("Incomplete Child Information", "Please fill in all required child-related fields.");
-          return;
-        }
-      }
-
-      const { uri } = await FileSystem.getInfoAsync(image);
-      const blob = await new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        xhr.onload = () => {
-          resolve(xhr.response);
-        };
-        xhr.onerror = (e) => {
-          reject(new TypeError("Network request failed"));
-        };
-        xhr.responseType = "blob";
-        xhr.open("GET", uri, true);
-        xhr.send(null);
-      });
-
-      const filename = image.substring(image.lastIndexOf("/") + 1);
-      const ref = firebase.storage().ref().child(filename);
-
-      // Upload the image to Firebase Storage
-      const snapshot = await ref.put(blob);
-
-      // Get the download URL of the uploaded image
-      const downloadURL = await snapshot.ref.getDownloadURL();
-
-      // Store the download URL in Firestore
-      const MuniServe = firebase.firestore();
-      const birthreg = MuniServe.collection("birth_reg");
-
-      await birthreg.add({
-        userUid: userUid,
-        userName: userName,
-        userLastName : userLastName,
-        userEmail: userEmail,
-        userContact: userContact,
-        userBarangay: userBarangay,
-        attendant: attendant,
-        birthdate: birthdate,
-        birthorder: birthorder,
-        birthplace: birthplace,
-        sex: sex,
-        typeofbirth: typeofbirth,
-        c_multiple: multiple,
-        c_weight: weight,
-        c_fname : c_fname,
-        c_mname : c_mname,
-        c_lname : c_lname,
-        f_age: f_age,
-        f_citizenship: f_citizenship,
-        f_name: f_name,
-        f_occur: f_occur,
-        f_religion: f_religion,
-        f_residence: f_residence,
-        m_age: m_age,
-        m_citizenship: m_citizenship,
-        m_name: m_name,
-        bornAlive : bornAlive,
-        childStillLiving: childStillLiving,
-        childAliveButNowDead: childAliveButNowDead,
-        m_occur: m_occur,
-        m_religion: m_religion,
-        m_residence: m_residence,
-        mpDate : mpDate,
-        mpPlace : mpPlace,
-        payment: downloadURL, // Store the download URL here
-        status: "Pending", // Set the initial status to "Pending"
-        createdAt: timestamp,
-        remarks : "" 
-      });
- 
-      setUploading(false);
-      setImage(null);
-      resetForm();
-      Alert.alert("Success", "Form filled successfully.");
-    } catch (error) {
-      console.error(error);
-      setUploading(false);
-      Alert.alert("Error", "Form filling failed.");
-    } finally {
-      setUploading(false);
-      setLoadingModalVisible(false); // Hide loading modal
-    }
-  };
-
   // Data add
+  const [regType, setRegType] = useState("");
   const [attendant, setAttendant] = useState("");
   const [birthdate, setBirthdate] = useState(new Date());
   const [birthorder, setBirthorder] = useState("");
@@ -230,9 +93,112 @@ export default function BirthReg() {
   const [m_residence, setM_residence] = useState("");
   const [mpDate, setMpDate] = useState(new Date());
   const [mpPlace, setMpPlace] = useState("");
-  const [payment, setPayment] = useState("");
+
+  // upload media files
+  const uploadMedia = async () => {
+    setLoadingModalVisible(true);
+    setUploading(true);
+
+    try {
+      // Validation checks
+      if (!regType || !c_fname || !c_mname || !c_lname || !birthdate || !birthplace || !sex || !typeofbirth || !weight ||
+        !m_name || !m_citizenship || !m_religion || !bornAlive || !childStillLiving ||
+        !childAliveButNowDead || !m_occur || !m_age || !m_residence || !f_name ||
+        !f_citizenship || !f_religion || !f_occur || !f_age || !f_residence || !mpDate ||
+        !mpPlace || !attendant) {
+        Alert.alert("Incomplete Form", "Please fill in all required fields.");
+        return;
+      }
+
+      // Validate child's name components
+      if (!/^[a-zA-Z.\s]+$/.test(c_fname) || !/^[a-zA-Z.\s]+$/.test(c_mname) || !/^[a-zA-Z.\s]+$/.test(c_lname)) {
+        Alert.alert(
+          "Invalid Input",
+          "Name of the newborn child should only contain letters, dots, and spaces."
+        );
+        return;
+      }
+
+      // Check forChild field
+      if (typeofbirth !== "Single") {
+        // Validation for child-related fields when forChild is "yes"
+        if (!birthorder || !multiple) {
+          Alert.alert("Incomplete Child Information", "Please fill in all required child-related fields.");
+          return;
+        }
+      }
+
+      // Store the download URL in Firestore
+      const MuniServe = firebase.firestore();
+      const birthreg = MuniServe.collection("birth_reg");
+
+      await birthreg.add({
+        userUid: userUid,
+        userName: userName,
+        userLastName: userLastName,
+        userEmail: userEmail,
+        userContact: userContact,
+        userBarangay: userBarangay,
+        regType: regType,
+        attendant: attendant,
+        birthdate: birthdate,
+        birthorder: birthorder,
+        birthplace: birthplace,
+        sex: sex,
+        typeofbirth: typeofbirth,
+        c_multiple: multiple,
+        c_weight: weight,
+        c_fname: c_fname,
+        c_mname: c_mname,
+        c_lname: c_lname,
+        f_age: f_age,
+        f_citizenship: f_citizenship,
+        f_name: f_name,
+        f_occur: f_occur,
+        f_religion: f_religion,
+        f_residence: f_residence,
+        m_age: m_age,
+        m_citizenship: m_citizenship,
+        m_name: m_name,
+        bornAlive: bornAlive,
+        childStillLiving: childStillLiving,
+        childAliveButNowDead: childAliveButNowDead,
+        m_occur: m_occur,
+        m_religion: m_religion,
+        m_residence: m_residence,
+        mpDate: mpDate,
+        mpPlace: mpPlace,
+        status: "Pending", // Set the initial status to "Pending"
+        createdAt: timestamp,
+        remarks: ""
+      });
+
+      setUploading(false);
+      resetForm();
+
+      setTimeout(() => {
+        if (regType === "On Time") {
+          Alert.alert("Successfully Filled", "Please prepare P50 pesos to be paid at the Treasurer's Office, and ensure you have one valid ID for claiming your document at the Civil Registrar's Office.");
+        } else if (regType === "Delayed") {
+          Alert.alert("Successfully Filled", "Please prepare the specified amount for payment at the Treasurer's Office, and ensure you have one valid ID for claiming your document at the Civil Registrar's Office.");
+        }
+
+        // Hide loading indicators
+        setUploading(false);
+        setLoadingModalVisible(false);
+      }, 100);
+
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Error", "Form filling failed.");
+    } finally {
+      setUploading(false);
+      setLoadingModalVisible(false);
+    }
+  };
 
   const resetForm = () => {
+    setRegType("");
     setAttendant("");
     setBirthdate(new Date());
     setBirthorder("");
@@ -265,34 +231,6 @@ export default function BirthReg() {
     setSelectedDateText("");
     setSelectedDatePlaceText("");
   };
-
-  const [serve, setServe] = useState([]);
-  const MuniServe = firebase.firestore().collection("services");
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const querySnapshot = await MuniServe.get(); // Use get() to fetch the data
-        const serve = [];
-
-        querySnapshot.forEach((doc) => {
-          const { service_name, service_desc, service_proc } = doc.data();
-          serve.push({
-            id: doc.id,
-            service_name,
-            service_desc,
-            service_proc,
-          });
-        });
-
-        setServe(serve);
-      } catch (error) {
-        console.error("Error fetching data: ", error);
-      }
-    };
-
-    fetchData();
-  }, []);
 
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showDatePlacePicker, setShowDatePlacePicker] = useState(false);
@@ -367,15 +305,36 @@ export default function BirthReg() {
         </View>
         <View style={styles.innerContainer}>
           <Text style={styles.itemService_desc}>
-            Registration of live birth or birth certificate is a very important
-            document needed by every citizen. This is usually a requirement for
-            school, employment, marriage, passport and many other things. Its
-            authenticity can only be verified through the civil registrar. They
-            issue a certified true copy of this document, if your birth is
-            indeed registered in this Municipality. The fee is 30 pesos per
-            application and is processed and issued within the same day upon
-            payment of the fee.
+            Note: Birth Registration must be filed within 30 days after the birth.
+            The day after 30th day is considered as late registration and parents who are not married, 
+            are required to be submit some documents and you need to fill out the affidavit personally.
           </Text>
+        </View>
+
+        <Text style={styles.feesNote}>
+          LOCAL CIVIL REGISTRY FEES:
+        </Text>
+
+        <Text style={styles.feesDesc}>
+          P50.00 - For On Time Registration
+          {"\n"}{"\n"}
+          Additional P17.00 - For Delayed Registration of Document for every year of delay.
+        </Text>
+
+        <View style={{ marginBottom: 10 }}>
+          <Text style={styles.label}>Type of Registration</Text>
+
+          <View style={styles.placeholder}>
+            <Picker
+              selectedValue={regType}
+              onValueChange={(itemValue, itemIndex) => setRegType(itemValue)}
+              style={{ width: "100%" }}
+            >
+              <Picker.Item label="Select" value="" />
+              <Picker.Item label="On Time" value="On Time" />
+              <Picker.Item label="Delayed" value="Delayed" />
+            </Picker>
+          </View>
         </View>
 
         <Text style={styles.noteText}>
@@ -384,7 +343,7 @@ export default function BirthReg() {
         </Text>
 
         <Text style={styles.noteText}>Child's Information</Text>
-        
+
         <View style={{ marginBottom: 10 }}>
           <Text style={styles.label}>FIRST NAME</Text>
 
@@ -504,30 +463,30 @@ export default function BirthReg() {
                 <Picker.Item label="Quadruplets" value="Quadruplets" />
               </Picker>
             </View>
-          </View> 
+          </View>
         </View>
 
-          {typeofbirth !== 'Single' && (
-            <View style={{ marginBottom: 10 }}>
-              <Text style={styles.label}>IF MULTIPLE BIRTH, CHILD WAS</Text>
+        {typeofbirth !== 'Single' && (
+          <View style={{ marginBottom: 10 }}>
+            <Text style={styles.label}>IF MULTIPLE BIRTH, CHILD WAS</Text>
 
-              <View style={styles.placeholder}>
-                <Picker
-                  selectedValue={multiple}
-                  onValueChange={(itemValue, itemIndex) => setMultiple(itemValue)}
-                  style={{ width: "100%" }}
-                >
-                  <Picker.Item label="Select" value="" />
-                  <Picker.Item label="First" value="First" />
-                  <Picker.Item label="Second" value="Second" />
-                  <Picker.Item label="Third" value="Third" />
-                </Picker>
-              </View>
+            <View style={styles.placeholder}>
+              <Picker
+                selectedValue={multiple}
+                onValueChange={(itemValue, itemIndex) => setMultiple(itemValue)}
+                style={{ width: "100%" }}
+              >
+                <Picker.Item label="Select" value="" />
+                <Picker.Item label="First" value="First" />
+                <Picker.Item label="Second" value="Second" />
+                <Picker.Item label="Third" value="Third" />
+              </Picker>
+            </View>
 
             <View style={{ marginBottom: 10 }}>
               <Text style={styles.label}>BIRTH ORDER</Text>
 
-             <View style={styles.placeholder}>
+              <View style={styles.placeholder}>
                 <Picker
                   selectedValue={birthorder}
                   onValueChange={(itemValue, itemIndex) => setBirthorder(itemValue)}
@@ -540,24 +499,24 @@ export default function BirthReg() {
                 </Picker>
               </View>
             </View>
-            </View>
-          )}
-
-          <View style={{ marginBottom: 10 }}>
-            <Text style={styles.label}>WEIGHT AT BIRTH (grams)</Text>
-
-            <View style={styles.placeholder}>
-              <TextInput
-                placeholder=""
-                maxLength={6}
-                value={weight}
-                onChangeText={(weight) => setWeight(weight)}
-                style={{
-                  width: "100%",
-                }}
-              ></TextInput>
-            </View>
           </View>
+        )}
+
+        <View style={{ marginBottom: 10 }}>
+          <Text style={styles.label}>WEIGHT AT BIRTH (grams)</Text>
+
+          <View style={styles.placeholder}>
+            <TextInput
+              placeholder=""
+              maxLength={6}
+              value={weight}
+              onChangeText={(weight) => setWeight(weight)}
+              style={{
+                width: "100%",
+              }}
+            ></TextInput>
+          </View>
+        </View>
 
         <Text style={styles.noteText}>Mother's Information:</Text>
         <View style={{ marginBottom: 10 }}>
@@ -691,21 +650,21 @@ export default function BirthReg() {
           </View>
         </View>
 
-          <View style={{ marginBottom: 10 }}>
-            <Text style={styles.label}>AGE AT THE TIME OF THIS BIRTH</Text>
+        <View style={{ marginBottom: 10 }}>
+          <Text style={styles.label}>AGE AT THE TIME OF THIS BIRTH</Text>
 
-            <View style={styles.placeholder}>
-              <TextInput
-                placeholder=""
-                maxLength={6}
-                value={m_age}
-                onChangeText={(m_age) => setM_age(m_age)}
-                style={{
-                  width: "100%",
-                }}
-              ></TextInput>
-            </View>
+          <View style={styles.placeholder}>
+            <TextInput
+              placeholder=""
+              maxLength={6}
+              value={m_age}
+              onChangeText={(m_age) => setM_age(m_age)}
+              style={{
+                width: "100%",
+              }}
+            ></TextInput>
           </View>
+        </View>
 
         <View style={{ marginBottom: 10 }}>
           <Text style={styles.label}>RESIDENCE (brgy, municipality, province, country)</Text>
@@ -888,66 +847,24 @@ export default function BirthReg() {
 
         <View style={{ marginBottom: 10 }}>
           <Text style={styles.label}>ATTENDANT</Text>
-            <View style={styles.placeholder}>
-              <Picker
-                selectedValue={attendant}
-                onValueChange={(itemValue, itemIndex) =>
-                  setAttendant(itemValue)
-                }
-                style={{ width: "100%" }}
-              >
-                <Picker.Item label="Select" value="" />
-                <Picker.Item label="Physician" value="Physician" />
-                <Picker.Item label="Nurse" value="Nurse" />
-                <Picker.Item label="Midwife" value="Midwife" />
-                <Picker.Item label=" Hilot (traditional Midwife)" value=" Hilot (traditional Midwife)" />
-              </Picker>
-            </View>
-        </View>
-
-        <Text style={styles.noteText}>
-          Note: Upload first your proof of payment before submitting your
-          application. Lack of needed information will cause delay or rejection.
-        </Text>
-
-        <Text style={styles.noteText2}>
-          FEE FOR REGISTRATION: 50 PESOS
-        </Text>
-
-        <View style={styles.selectButton}>
-          <Text style={styles.buttonText}>
-            Proof of Payment(G-CASH RECEIPT)
-          </Text>
-          <TouchableOpacity onPress={pickImage}>
-            {payment.length > 0 ? (
-              <Animatable.View
-                style={{
-                  ...styles.plusCircle,
-                  opacity: fadeAnimation,
-                }}
-              >
-                <Ionicons name="ios-add" size={24} color="white" />
-              </Animatable.View>
-            ) : (
-              <View style={styles.plusCircle}>
-                <Ionicons name="ios-add" size={24} color="white" />
-              </View>
-            )}
-            {payment.length > 0 && (
-              <View style={styles.checkCircle}>
-                <Ionicons name="ios-checkmark" size={24} color="white" />
-              </View>
-            )}
-          </TouchableOpacity>
+          <View style={styles.placeholder}>
+            <Picker
+              selectedValue={attendant}
+              onValueChange={(itemValue, itemIndex) =>
+                setAttendant(itemValue)
+              }
+              style={{ width: "100%" }}
+            >
+              <Picker.Item label="Select" value="" />
+              <Picker.Item label="Physician" value="Physician" />
+              <Picker.Item label="Nurse" value="Nurse" />
+              <Picker.Item label="Midwife" value="Midwife" />
+              <Picker.Item label=" Hilot (traditional Midwife)" value=" Hilot (traditional Midwife)" />
+            </Picker>
+          </View>
         </View>
 
         <View style={styles.imageContainer}>
-          {image && (
-            <Image
-              source={{ uri: image }}
-              style={{ width: 300, height: 300 }}
-            />
-          )}
           <TouchableOpacity
             style={styles.button}
             onPress={() => {
@@ -1019,7 +936,7 @@ const styles = StyleSheet.create({
     height: 65,
     backgroundColor: "#307A59",
     borderRadius: 15,
-    marginBottom: 30,
+    marginBottom: 15,
     marginTop: 15,
   },
   box: {
@@ -1093,9 +1010,10 @@ const styles = StyleSheet.create({
   },
   itemService_desc: {
     fontWeight: "300",
-    fontSize: 15,
+    fontSize: 16,
     textAlign: "justify",
     lineHeight: 30,
+    fontWeight: '400'
   },
   itemService_proc: {
     fontWeight: "300",
@@ -1181,7 +1099,6 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     marginTop: 20,
     width: 165,
-    marginBottom: 40,
   },
   selectButton: {
     borderRadius: 10,
@@ -1287,5 +1204,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  feesNote: {
+    fontSize: 16,
+    fontWeight: '700',
+    marginBottom: 8,
+    marginTop: 25,
+  },
+  feesDesc: {
+    fontSize: 16,
+    marginBottom: 15,
   },
 });

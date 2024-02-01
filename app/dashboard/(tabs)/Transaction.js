@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { View, TextInput, Text, StyleSheet, Image, TouchableOpacity, ActivityIndicator, ScrollView, SafeAreaView, Alert } from "react-native";
-import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, SafeAreaView } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
-import { Link, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 
 export default function Transaction() {
   const router = useRouter();
@@ -46,16 +45,16 @@ export default function Transaction() {
             <Text style={styles.selectionText}>Live Birth Registration</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[
-              styles.selection
-            ]}
-            onPress={() => {
-              router.push("../../TrackBP");
-            }}                    >
-            <Image source={require("../../../assets/imported/form.png")} style={styles.form} />
-            <Text style={styles.selectionText}>Business Permit</Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.selection
+              ]}
+              onPress={() => {
+                router.push("../../TrackJobApp");
+              }}                    >
+              <Image source={require("../../../assets/imported/form.png")} style={styles.form} />
+              <Text style={styles.selectionText}>Job Application</Text>
+            </TouchableOpacity>
         </View>
 
         <View style={styles.choices}>
@@ -106,18 +105,6 @@ export default function Transaction() {
           </TouchableOpacity>
         </View>
 
-        <View style={styles.choice}>
-          <TouchableOpacity
-            style={[
-              styles.selection
-            ]}
-            onPress={() => {
-              router.push("../../TrackJobApp");
-            }}                    >
-            <Image source={require("../../../assets/imported/form.png")} style={styles.form} />
-            <Text style={styles.selectionText}>Job Application</Text>
-          </TouchableOpacity>
-        </View>
       </ScrollView>
     </SafeAreaView>
   );

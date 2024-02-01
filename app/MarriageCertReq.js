@@ -1,23 +1,17 @@
 import React, { useState, useEffect, useRef } from "react";
 import { View, TextInput, Text, StyleSheet, Animated, Image, ActivityIndicator, TouchableOpacity, ScrollView, Platform, Alert } from "react-native";
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
-import { Picker } from "@react-native-picker/picker";
 import { StatusBar } from "expo-status-bar";
-import * as ImagePicker from "expo-image-picker";
 import { firebase } from '../config';
-import * as FileSystem from 'expo-file-system';
 import DateTimePicker from "@react-native-community/datetimepicker";
-import * as Animatable from "react-native-animatable";
 import { Link, useRouter } from "expo-router";
 
 export default function MarriageCertReq() {
     const router = useRouter();
 
-    const [image, setImage] = useState(null);
     const [uploading, setUploading] = useState(false);
     const timestamp = firebase.firestore.FieldValue.serverTimestamp();
     const [selectedDateText, setSelectedDateText] = useState("");
-    const fadeAnimation = useRef(new Animated.Value(1)).current;
     const [loadingModalVisible, setLoadingModalVisible] = useState(false);
 
     const [userUid, setUserUid] = useState(null);
@@ -55,39 +49,6 @@ export default function MarriageCertReq() {
 
         getUserInfo();
     }, []);
-
-    useEffect(() => {
-        // If an image is selected, start the fade-out animation
-        if (payment.length > 0) {
-            Animated.timing(fadeAnimation, {
-                toValue: 0,
-                duration: 500,
-                useNativeDriver: true,
-            }).start();
-        }
-    }, [payment, fadeAnimation]);
-
-    const pickImage = async () => {
-        try {
-            let result = await ImagePicker.launchImageLibraryAsync({
-                mediaTypes: ImagePicker.MediaTypeOptions.All, //All, Image, Videos
-                allowsEditing: false,
-                aspect: [4, 3],
-                quality: 1,
-            });
-
-            if (!result.canceled) {
-                setImage(result.assets[0].uri);
-            }
-        } catch (error) {
-            Alert.alert(
-                "Error",
-                "There was an error picking images. Please try again.",
-                [{ text: "OK", onPress: () => console.log("OK Pressed") }],
-                { cancelable: false }
-            );
-        }
-    };
 
     // upload media files
     const uploadMedia = async () => {
@@ -127,35 +88,6 @@ export default function MarriageCertReq() {
                 return;
             }
 
-            // Check if the user has selected an image
-            if (!image) {
-                Alert.alert("Missing Image", "Please select an image for proof of payment.");
-                return;
-            }
-
-            const { uri } = await FileSystem.getInfoAsync(image);
-            const blob = await new Promise((resolve, reject) => {
-                const xhr = new XMLHttpRequest();
-                xhr.onload = () => {
-                    resolve(xhr.response);
-                };
-                xhr.onerror = (e) => {
-                    reject(new TypeError("Network request failed"));
-                };
-                xhr.responseType = "blob";
-                xhr.open("GET", uri, true);
-                xhr.send(null);
-            });
-
-            const filename = image.substring(image.lastIndexOf("/") + 1);
-            const ref = firebase.storage().ref().child(filename);
-
-            // Upload the image to Firebase Storage
-            const snapshot = await ref.put(blob);
-
-            // Get the download URL of the uploaded image
-            const downloadURL = await snapshot.ref.getDownloadURL();
-
             // Store the download URL in Firestore
             const MuniServe = firebase.firestore();
             const marriageCert = MuniServe.collection("marriageCert");
@@ -175,16 +107,14 @@ export default function MarriageCertReq() {
                 address: address,
                 copies: copies,
                 purpose: purpose,
-                payment: downloadURL, // Store the download URL here
                 status: "Pending", // Set the initial status to "Pending"
                 createdAt: timestamp,
                 remarks: "",
             });
 
             setUploading(false);
-            setImage(null);
             resetForm();
-            Alert.alert("Success", "Form filled successfully.");
+            Alert.alert("Success", "Form filled successfully. \n\nPlease prepare P110 pesos to be paid at Treasurer's Office and 1 valid ID for claiming your document at Civil Registrar Office.");
         } catch (error) {
             console.error(error);
             setUploading(false);
@@ -205,7 +135,6 @@ export default function MarriageCertReq() {
     const [address, setAddress] = useState("");
     const [copies, setCopies] = useState("");
     const [purpose, setPurpose] = useState("");
-    const [payment, setPayment] = useState("");
 
     const resetForm = () => {
         setHname("");
@@ -218,34 +147,6 @@ export default function MarriageCertReq() {
         setPurpose("");
         setSelectedDateText("");
     };
-
-    const [serve, setServe] = useState([]);
-    const MuniServe = firebase.firestore().collection("services");
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const querySnapshot = await MuniServe.get(); // Use get() to fetch the data
-                const serve = [];
-
-                querySnapshot.forEach((doc) => {
-                    const { service_name, service_desc, service_proc } = doc.data();
-                    serve.push({
-                        id: doc.id,
-                        service_name,
-                        service_desc,
-                        service_proc,
-                    });
-                });
-
-                setServe(serve);
-            } catch (error) {
-                console.error("Error fetching data: ", error);
-            }
-        };
-
-        fetchData();
-    }, []);
 
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [maxDate, setMaxDate] = useState(new Date());
@@ -303,11 +204,6 @@ export default function MarriageCertReq() {
                             Marriage Certificate
                         </Text>
                     </View>
-                </View>
-                <View style={styles.innerContainer}>
-                    <Text style={styles.itemService_desc}>
-                        A Marriage Certificate is a document that shows social union or a legal contract between people that creates kinship. Such a union, often formalized via a wedding ceremony, may also be called matrimony. A general definition of marriage is that it is a social contract between two individuals that unites their lives legally, economically and emotionally.  It is an institution in which interpersonal relationships, usually intimate and sexual, are acknowledged in a variety of ways, depending on the culture or subculture in which it is found. The state of being united to a person of the opposite sex as husband or wife in a legal, consensual, and contractual relationship recognized and sanctioned by and dissolvable only by law.  A marriage certificate is a document containing the important details of marriage, signed by the couple and by all in attendance. Marriage occurs during the meeting for worship after approval is obtained from the meetings of which the two people are members. Approval is based on a statement of good character and clearness from any other engagements. The clerk usually records a copy of the marriage certificate in the meeting's records.
-                    </Text>
                 </View>
 
                 <Text style={styles.noteText}>
@@ -438,6 +334,7 @@ export default function MarriageCertReq() {
                             value={copies}
                             onChangeText={(copies) => setCopies(copies)}
                             maxLength={10}
+                            keyboardType="number-pad"
                             style={{
                                 width: "100%",
                             }}
@@ -464,46 +361,8 @@ export default function MarriageCertReq() {
                         ></TextInput>
                     </View>
                 </View>
-
-                <Text style={styles.noteText}>Note: Upload first your proof of payment before submitting your application. Lack of needed information will cause delay or rejection.</Text>
-                
-                <Text style={styles.noteText2}>
-                    FEE FOR REGISTRATION: 110 PESOS
-                </Text>
-                
-                <View style={styles.selectButton}>
-                    <Text style={styles.buttonText}>Proof of Payment(G-CASH RECEIPT)</Text>
-                    <TouchableOpacity onPress={pickImage}>
-                        {payment.length > 0 ? (
-                            <Animatable.View
-                                style={{
-                                    ...styles.plusCircle,
-                                    opacity: fadeAnimation,
-                                }}
-                            >
-                                <Ionicons name="ios-add" size={24} color="white" />
-                            </Animatable.View>
-                        ) : (
-                            <View style={styles.plusCircle}>
-                                <Ionicons name="ios-add" size={24} color="white" />
-                            </View>
-                        )}
-                        {payment.length > 0 && (
-                            <View style={styles.checkCircle}>
-                                <Ionicons name="ios-checkmark" size={24} color="white" />
-                            </View>
-                        )}
-
-                    </TouchableOpacity>
-                </View>
-
+              
                 <View style={styles.imageContainer}>
-                    {image && (
-                        <Image
-                            source={{ uri: image }}
-                            style={{ width: 300, height: 300 }}
-                        />
-                    )}
                     <TouchableOpacity
                         style={styles.button}
                         onPress={() => {
@@ -736,7 +595,6 @@ const styles = StyleSheet.create({
         marginTop: 10,
         width: 165,
         marginLeft: 15,
-        marginBottom: 40,
     },
     selectButton: {
         borderRadius: 10,

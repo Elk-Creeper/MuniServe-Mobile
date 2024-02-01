@@ -5,6 +5,7 @@ import {
     TextInput,
     TouchableOpacity,
     Alert,
+    ActivityIndicator
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
@@ -15,6 +16,8 @@ const Contact = () => {
     const [c_sub, setAddSubject] = useState("");
     const [c_mess, setAddMessage] = useState("");
     const [charCount, setCharCount] = useState(200); // Initial character count
+    const [loadingModalVisible, setLoadingModalVisible] = useState(false);
+    const [uploading, setUploading] = useState(false);
 
     const [userUid, setUserUid] = useState(null);
     const [userName, setUserName] = useState(null);
@@ -62,7 +65,16 @@ const Contact = () => {
     }, []);
 
     const contactForm = async () => {
+        setLoadingModalVisible(true);
+        setUploading(true);
+
         try {
+            // Validation checks
+            if (!c_sub || !c_mess) {
+                Alert.alert("Incomplete Form", "Please fill in all required fields.");
+                return;
+            }
+
             const MuniServe = getFirestore(app);
             const contact = collection(MuniServe, "contact");
 
@@ -76,13 +88,18 @@ const Contact = () => {
                 userBarangay: userBarangay,
             });
 
-            // Data is stored in Firestore
+            // Data is stored in 
+            setUploading(false);
             resetForm(); // Reset the form after successful booking
             Alert.alert("Success", "Form filled successfully.");
         } catch (error) {
+            setUploading(false);
             console.error("Error storing form data:", error);
             Alert.alert("Error", "Form filling failed.");
-        }
+        } finally {
+            setUploading(false);
+            setLoadingModalVisible(false); // Hide loading modal
+        } 
     };
 
     return (
@@ -155,6 +172,11 @@ const Contact = () => {
             <TouchableOpacity style={styles.button} onPress={contactForm}>
                 <Text style={styles.buttonText}>Submit</Text>
             </TouchableOpacity>
+            {uploading && (
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color="#307A59" />
+                </View>
+            )}
         </View>
     );
 };
@@ -209,5 +231,11 @@ const styles = StyleSheet.create({
         color: "white",
         fontSize: 18,
         fontWeight: "500"
+    },
+    loadingContainer: {
+        ...StyleSheet.absoluteFillObject,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "rgba(0, 0, 0, 0.5)",
     },
 });

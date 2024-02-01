@@ -69,11 +69,11 @@ const Transaction = () => {
 
         switch (status) {
             case 'Pending':
-                return `Dear ${userName}, your request for Job Application is PENDING. REMARKS: ${remarks}`;
+                return `Dear ${userName}, your request for Job Application is PENDING.\n\nREMARKS: ${remarks}`;
             case 'Approved':
-                return `Dear ${userName}, your request for Job Application is already APPROVED and now ready to be processed. REMARKS: ${remarks}`;
+                return `Dear ${userName}, your request for Job Application is already APPROVED and now ready to be processed.\n\nREMARKS: ${remarks}`;
             case 'Rejected':
-                return `Dear ${userName}, your request for Job Application has been REJECTED. REMARKS: ${remarks}`; 
+                return `Dear ${userName}, your request for Job Application has been REJECTED.\n\nREMARKS: ${remarks}`; 
                 default:
                 return ''; // Handle other statuses if needed
         }

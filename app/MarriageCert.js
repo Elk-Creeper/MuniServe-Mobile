@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { View, TextInput, Text, StyleSheet, Image, TouchableOpacity, ActivityIndicator, ScrollView, SafeAreaView, Alert } from "react-native";
-import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, SafeAreaView, } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
-import { Link, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 
 export default function DeathCert() {
     const router = useRouter();

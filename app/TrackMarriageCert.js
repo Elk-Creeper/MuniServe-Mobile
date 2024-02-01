@@ -69,15 +69,15 @@ const Transaction = () => {
 
         switch (status) {
             case 'Pending':
-                return `Dear ${userName}, your request for Marriage Certificate is PENDING. REMARKS: ${remarks}`;
+                return `Dear ${userName}, your request for Marriage Certificate is PENDING.\n\nREMARKS: ${remarks}`;
             case 'Approved':
-                return `Dear ${userName}, your request for Marriage Certificate is already APPROVED and now ready to be processed. REMARKS: ${remarks}`;
+                return `Dear ${userName}, your request for Marriage Certificate is already APPROVED and now ready to be processed.\n\nREMARKS: ${remarks}`;
             case 'On Process':
-                return `Dear ${userName}, your request for Marriage Certificate is now ON PROCESS. Please wait for at least 10 days for it to be completed. REMARKS: ${remarks}`;
+                return `Dear ${userName}, your request for Marriage Certificate is now ON PROCESS. Please wait for at least 10 days for it to be completed.\n\nREMARKS: ${remarks}`;
             case 'Completed':
-                return `Dear ${userName}, your request for Marriage Certificate has been COMPLETED and ready to be claimed at the Office of Municipal Civil Registrar. Note that you can claim it during office hours and days. REMARKS: ${remarks}`;
+                return `Dear ${userName}, your request for Marriage Certificate has been COMPLETED and ready to be claimed at the Office of Municipal Civil Registrar. Note that you can claim it during office hours and days.\n\nREMARKS: ${remarks}`;
             case 'Rejected':
-                return `Dear ${userName}, your request for Marriage Certificate has been REJECTED. REMARKS: ${remarks}`;
+                return `Dear ${userName}, your request for Marriage Certificate has been REJECTED.\n\nREMARKS: ${remarks}`;
             default:
                 return ''; // Handle other statuses if needed
         }

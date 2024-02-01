@@ -7,7 +7,6 @@ import {
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
-import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
 import { Link, useRouter } from "expo-router";
 
 const Settings = () => {

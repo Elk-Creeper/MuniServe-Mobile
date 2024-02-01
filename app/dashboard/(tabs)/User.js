@@ -345,7 +345,7 @@ const styles = StyleSheet.create({
     marginLeft: 20,
     color: "black",
     fontSize: 17,
-    marginTop: 13,
+    marginTop: 17,
   },
   boxAcc: {
     flexDirection: "row",

@@ -2,16 +2,13 @@ import React, { useState, useEffect } from "react";
 import { View, TextInput, Text, StyleSheet, Image, TouchableOpacity, ActivityIndicator, ScrollView, SafeAreaView, Alert } from "react-native";
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
-import * as ImagePicker from "expo-image-picker";
 import { firebase } from '../config';
-import * as FileSystem from 'expo-file-system';
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Link, useRouter } from "expo-router";
 
 export default function DeathCertReq() {
     const router = useRouter();
 
-    const [image, setImage] = useState(null);
     const [uploading, setUploading] = useState(false);
     const timestamp = firebase.firestore.FieldValue.serverTimestamp();
     const [selectedDateText, setSelectedDateText] = useState("");
@@ -23,28 +20,6 @@ export default function DeathCertReq() {
     const [userBarangay, setUserBarangay] = useState(null);
     const [userContact, setUserContact] = useState(null);
     const [userLastName, setUserLastName] = useState(null);
-
-    const pickImage = async () => {
-        try {
-            let result = await ImagePicker.launchImageLibraryAsync({
-                mediaTypes: ImagePicker.MediaTypeOptions.All,
-                allowsEditing: false,
-                aspect: [4, 3],
-                quality: 1,
-            });
-
-            if (!result.canceled) {
-                setImage(result.assets[0].uri);
-            }
-        } catch (error) {
-            Alert.alert(
-                "Error",
-                "There was an error picking images. Please try again.",
-                [{ text: "OK", onPress: () => console.log("OK Pressed") }],
-                { cancelable: false }
-            );
-        }
-    };
 
     useEffect(() => {
         const getUserInfo = async () => {
@@ -74,6 +49,15 @@ export default function DeathCertReq() {
 
         getUserInfo();
     }, []);
+
+    // Data add
+    const [name, setName] = useState("");
+    const [date, setDate] = useState(new Date());
+    const [place, setPlace] = useState("");
+    const [rname, setRname] = useState("");
+    const [address, setAddress] = useState("");
+    const [copies, setCopies] = useState("");
+    const [purpose, setPurpose] = useState("");
 
     const uploadMedia = async () => {
         setLoadingModalVisible(true);
@@ -122,32 +106,6 @@ export default function DeathCertReq() {
                 return;
             }
 
-            // Check if the user has selected an image
-            if (!image) {
-                Alert.alert("Missing Image", "Please select an image for proof of payment.");
-                return;
-            }
-
-            const { uri } = await FileSystem.getInfoAsync(image);
-            const blob = await new Promise((resolve, reject) => {
-                const xhr = new XMLHttpRequest();
-                xhr.onload = () => {
-                    resolve(xhr.response);
-                };
-                xhr.onerror = (e) => {
-                    reject(new TypeError("Network request failed"));
-                };
-                xhr.responseType = "blob";
-                xhr.open("GET", uri, true);
-                xhr.send(null);
-            });
-
-            const filename = image.substring(image.lastIndexOf("/") + 1);
-            const ref = firebase.storage().ref().child(filename);
-
-            const snapshot = await ref.put(blob);
-            const downloadURL = await snapshot.ref.getDownloadURL();
-
             const MuniServe = firebase.firestore();
             const deathCert = MuniServe.collection("deathCert");
 
@@ -165,15 +123,13 @@ export default function DeathCertReq() {
                 address: address,
                 copies: parsedCopies,
                 purpose: purpose,
-                payment: downloadURL,
                 status: "Pending",
                 createdAt: timestamp,
                 remarks: "",
             });
 
-            setImage(null);
             resetForm();
-            Alert.alert("Success", "Form filled successfully.");
+            Alert.alert("Success", "Form filled successfully. \n\nPlease prepare P110 pesos to be paid at Treasurer's Office and 1 valid ID for claiming your document at Civil Registrar Office.");
         } catch (error) {
             console.error(error);
             Alert.alert("Error", "Form filling failed.");
@@ -183,16 +139,6 @@ export default function DeathCertReq() {
         }
     };
 
-    // Data add
-    const [name, setName] = useState("");
-    const [date, setDate] = useState(new Date());
-    const [place, setPlace] = useState("");
-    const [rname, setRname] = useState("");
-    const [address, setAddress] = useState("");
-    const [copies, setCopies] = useState("");
-    const [purpose, setPurpose] = useState("");
-    const [payment, setPayment] = useState("");
-
     const resetForm = () => {
         setName("");
         setDate(new Date());
@@ -201,39 +147,10 @@ export default function DeathCertReq() {
         setAddress("");
         setCopies("");
         setPurpose("");
-        setPayment("");
 
         // Reset date related states
         setSelectedDateText("");
     };
-
-    const [serve, setServe] = useState([]);
-    const MuniServe = firebase.firestore().collection("services");
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const querySnapshot = await MuniServe.get(); // Use get() to fetch the data
-                const serve = [];
-
-                querySnapshot.forEach((doc) => {
-                    const { service_name, service_desc, service_proc } = doc.data();
-                    serve.push({
-                        id: doc.id,
-                        service_name,
-                        service_desc,
-                        service_proc,
-                    });
-                });
-
-                setServe(serve);
-            } catch (error) {
-                console.error("Error fetching data: ", error);
-            }
-        };
-
-        fetchData();
-    }, []);
 
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [maxDate, setMaxDate] = useState(new Date());
@@ -293,12 +210,6 @@ export default function DeathCertReq() {
                         </Text>
                     </View>
                 </View>
-                <View style={styles.innerContainer}>
-                    <Text style={styles.itemService_desc}>
-                        A Death Certificate is an official document setting forth particulars relating to a dead person, including the name of the individual, the date of birth and the date of death.  When requesting for death certificate, the interested party shall provide the following information to facilitate verification and issuance of certification.
-                    </Text>
-                </View>
-
 
                 <Text style={styles.noteText}>
                     Please be ready to supply the following information. Fill the form below:</Text>
@@ -410,6 +321,7 @@ export default function DeathCertReq() {
                             value={copies}
                             onChangeText={(copies) => setCopies(copies)}
                             maxLength={10}
+                            keyboardType="number-pad"
                             style={{
                                 width: "100%",
                             }}
@@ -419,7 +331,7 @@ export default function DeathCertReq() {
 
                 <View style={{ marginBottom: 10 }}>
                     <Text style={styles.label}>
-                        Purpose of the certification
+                        PURPOSE OF THE CERTIFICATION
                     </Text>
 
                     <View style={styles.placeholder3}>
@@ -437,45 +349,7 @@ export default function DeathCertReq() {
                     </View>
                 </View>
 
-                <Text style={styles.noteText}>Note: Upload first your proof of payment before submitting your application. Lack of needed information will cause delay or rejection.</Text>
-                
-                <Text style={styles.noteText2}>
-                    FEE FOR REGISTRATION: 110 PESOS
-                </Text>
-                
-                <View style={styles.selectButton}>
-                    <Text style={styles.buttonText}>Proof of Payment(G-CASH RECEIPT)</Text>
-                    <TouchableOpacity onPress={pickImage}>
-                        {payment.length > 0 ? (
-                            <Animatable.View
-                                style={{
-                                    ...styles.plusCircle,
-                                    opacity: fadeAnimation,
-                                }}
-                            >
-                                <Ionicons name="ios-add" size={24} color="white" />
-                            </Animatable.View>
-                        ) : (
-                            <View style={styles.plusCircle}>
-                                <Ionicons name="ios-add" size={24} color="white" />
-                            </View>
-                        )}
-                        {payment.length > 0 && (
-                            <View style={styles.checkCircle}>
-                                <Ionicons name="ios-checkmark" size={24} color="white" />
-                            </View>
-                        )}
-
-                    </TouchableOpacity>
-                </View>
-
                 <View style={styles.imageContainer}>
-                    {image && (
-                        <Image
-                            source={{ uri: image }}
-                            style={{ width: 300, height: 300 }}
-                        />
-                    )}
                     <TouchableOpacity
                         style={styles.button}
                         onPress={() => {
@@ -485,6 +359,7 @@ export default function DeathCertReq() {
                         <Text style={styles.submitText}>Submit</Text>
                     </TouchableOpacity>
                 </View>
+
             </ScrollView>
             {uploading && (
                 <View style={styles.loadingContainer}>
@@ -758,7 +633,6 @@ const styles = StyleSheet.create({
     },
     imageContainer: {
         marginTop: 30,
-        marginBottom: 50,
         alignItems: "center",
     },
     placeholder: {

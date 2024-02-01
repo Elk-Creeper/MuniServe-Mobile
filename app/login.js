@@ -6,6 +6,7 @@ import {
     TextInput,
     StyleSheet,
     StatusBar,
+    ActivityIndicator
 } from "react-native";
 import { firebase } from "../config";
 import { useRouter } from "expo-router";
@@ -16,6 +17,8 @@ const Login = () => {
     const [password, setPassword] = useState("");
     const [initialAuthCheckComplete, setInitialAuthCheckComplete] = useState(false);
     const router = useRouter();
+    const [loadingModalVisible, setLoadingModalVisible] = useState(false);
+    const [uploading, setUploading] = useState(false);
 
     const [showPassword, setShowPassword] = useState(false);
 
@@ -58,6 +61,9 @@ const Login = () => {
     };
 
     const loginUser = async () => {
+        setLoadingModalVisible(true);
+        setUploading(true);
+
         try {
             await firebase.auth().signInWithEmailAndPassword(email, password);
 
@@ -74,9 +80,15 @@ const Login = () => {
                     // Optionally, you can also resend the verification email here
                 }
             }
+
+            setUploading(false);
         } catch (error) {
+            setUploading(false);
             console.error("loginUser error", error);
             alert(error.message);
+        } finally {
+            setUploading(false);
+            setLoadingModalVisible(false); // Hide loading modal
         }
     };
 
@@ -162,6 +174,11 @@ const Login = () => {
                     </TouchableOpacity>
                 </View>
             </View>
+            {uploading && (
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color="#307A59" />
+                </View>
+            )}
         </View>
     );
 };
@@ -270,5 +287,11 @@ const styles = StyleSheet.create({
         marginLeft: 235,
         marginTop: 5,
         position: 'absolute'
+    },
+    loadingContainer: {
+        ...StyleSheet.absoluteFillObject,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "rgba(0, 0, 0, 0.5)",
     },
 });

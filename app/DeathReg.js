@@ -10,19 +10,16 @@ import {
     ScrollView,
     Alert,
 } from "react-native";
-import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import { StatusBar } from "expo-status-bar";
-import * as ImagePicker from "expo-image-picker";
 import { firebase } from "../config";
-import * as FileSystem from "expo-file-system";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { Link, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 
 export default function DeathReg() {
     const router = useRouter();
 
-    const [image, setImage] = useState(null);
     const [uploading, setUploading] = useState(false);
     const timestamp = firebase.firestore.FieldValue.serverTimestamp();
     const [loadingModalVisible, setLoadingModalVisible] = useState(false);
@@ -35,19 +32,6 @@ export default function DeathReg() {
     const [userBarangay, setUserBarangay] = useState(null);
     const [userContact, setUserContact] = useState(null);
     const [userLastName, setUserLastName] = useState(null);
-
-    const pickImage = async () => {
-        let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.All, //All, Image, Videos
-            allowsEditing: false,
-            aspect: [4, 3],
-            quality: 1,
-        });
-
-        if (!result.canceled) {
-            setImage(result.assets[0].uri);
-        }
-    };
 
     useEffect(() => {
         const getUserInfo = async () => {
@@ -78,6 +62,35 @@ export default function DeathReg() {
         getUserInfo();
     }, []);
 
+    // Data add
+    const [regType, setRegType] = useState("");
+    const [name, setName] = useState("");
+    const [sex, setSex] = useState("");
+    const [dateDeath, setDateDeath] = useState(new Date());
+    const [dateBirth, setDateBirth] = useState(new Date());
+    const [age, setAge] = useState("");
+    const [place, setPlace] = useState("");
+    const [civilstat, setCivilstat] = useState("");
+    const [religion, setReligion] = useState("");
+    const [citizenship, setCitizenship] = useState("");
+    const [residence, setResidence] = useState("");
+    const [occupation, setOccupation] = useState("");
+    const [fatherName, setFatherName] = useState("");
+    const [motherName, setMotherName] = useState("");
+    const [ageOfMom, setAgeOfMom] = useState("");
+    const [metOfDelivery, setMetOfDelivery] = useState("");
+    const [lenOfPreg, setLenOfPreg] = useState("");
+    const [typeOfBirth, setTypeOfBirth] = useState("");
+    const [orderChild, setOrderChild] = useState("");
+    const [causeOfDeath, setCauseOfDeath] = useState("");
+    const [maternalCondi, setMaternalCondi] = useState("");
+    const [externalCause, setExternalCause] = useState("");
+    const [autopsy, setAutopsy] = useState("");
+    const [attendant, setAttendant] = useState("");
+    const [corpseDis, setCorpseDis] = useState("");
+    const [addOfCemetery, setAddOfCemetery] = useState("");
+    const [forChild, setForChild] = useState("");
+
     // upload media files
     const uploadMedia = async () => {
         setLoadingModalVisible(true);
@@ -86,6 +99,7 @@ export default function DeathReg() {
         try {
             // Validation checks
             if (
+                !regType ||
                 !name ||
                 !sex ||
                 !dateDeath ||
@@ -114,9 +128,9 @@ export default function DeathReg() {
 
             // Check forChild field
             if (forChild === "yes") {
-                // Validation for child-related fields when forChild is "yes"
+                // Validation for child-reDelayedd fields when forChild is "yes"
                 if (!ageOfMom || !lenOfPreg || !metOfDelivery || !orderChild || !typeOfBirth) {
-                    Alert.alert("Incomplete Child Information", "Please fill in all required child-related fields.");
+                    Alert.alert("Incomplete Child Information", "Please fill in all required child-reDelayedd fields.");
                     return;
                 }
             }
@@ -130,35 +144,6 @@ export default function DeathReg() {
                 return;
             }
 
-            // Check if image is provided
-            if (!image) {
-                Alert.alert("Missing Image", "Please upload an image.");
-                return;
-            }
-
-            const { uri } = await FileSystem.getInfoAsync(image);
-            const blob = await new Promise((resolve, reject) => {
-                const xhr = new XMLHttpRequest();
-                xhr.onload = () => {
-                    resolve(xhr.response);
-                };
-                xhr.onerror = (e) => {
-                    reject(new TypeError("Network request failed"));
-                };
-                xhr.responseType = "blob";
-                xhr.open("GET", uri, true);
-                xhr.send(null);
-            });
-
-            const filename = image.substring(image.lastIndexOf("/") + 1);
-            const ref = firebase.storage().ref().child(filename);
-
-            // Upload the image to Firebase Storage
-            const snapshot = await ref.put(blob);
-
-            // Get the download URL of the uploaded image
-            const downloadURL = await snapshot.ref.getDownloadURL();
-
             // Store the download URL in Firestore
             const MuniServe = firebase.firestore();
             const deathreg = MuniServe.collection("death_reg");
@@ -170,6 +155,7 @@ export default function DeathReg() {
                 userEmail: userEmail,
                 userContact: userContact,
                 userBarangay: userBarangay,
+                regType : regType,
                 name: name,
                 sex: sex,
                 dateDeath: dateDeath,
@@ -196,56 +182,37 @@ export default function DeathReg() {
                 corpseDis: corpseDis,
                 addOfCemetery: addOfCemetery,
                 forChild : forChild,
-                payment: downloadURL, // Store the download URL here
-                status: "Pending", // Set the initial status to "Pending"
+                status: "Pending", 
                 createdAt: timestamp,
                 remarks: "",
             });
 
             setUploading(false);
-            setImage(null);
             resetForm();
-            Alert.alert("Success", "Form filled successfully.");
+
+            setTimeout(() => {
+                if (regType === "On Time") {
+                    Alert.alert("Successfully Filled", "Please prepare P50 pesos to be paid at the Treasurer's Office, and ensure you have one valid ID for claiming your document at the Civil Registrar's Office.");
+                } else if (regType === "Delayed") {
+                    Alert.alert("Successfully Filled", "Please prepare the specified amount for payment at the Treasurer's Office, and ensure you have one valid ID for claiming your document at the Civil Registrar's Office.");
+                }
+
+                // Hide loading indicators
+                setUploading(false);
+                setLoadingModalVisible(false);
+            }, 100);
+
         } catch (error) {
             console.error(error);
-            setUploading(false);
             Alert.alert("Error", "Form filling failed.");
         } finally {
             setUploading(false);
-            setLoadingModalVisible(false); // Hide loading modal
+            setLoadingModalVisible(false);
         }
-    };
-
-    // Data add
-    const [name, setName] = useState("");
-    const [sex, setSex] = useState("");
-    const [dateDeath, setDateDeath] = useState(new Date());
-    const [dateBirth, setDateBirth] = useState(new Date());
-    const [age, setAge] = useState("");
-    const [place, setPlace] = useState("");
-    const [civilstat, setCivilstat] = useState("");
-    const [religion, setReligion] = useState("");
-    const [citizenship, setCitizenship] = useState("");
-    const [residence, setResidence] = useState("");
-    const [occupation, setOccupation] = useState("");
-    const [fatherName, setFatherName] = useState("");
-    const [motherName, setMotherName] = useState("");
-    const [ageOfMom, setAgeOfMom] = useState("");
-    const [metOfDelivery, setMetOfDelivery] = useState("");
-    const [lenOfPreg, setLenOfPreg] = useState("");
-    const [typeOfBirth, setTypeOfBirth] = useState("");
-    const [orderChild, setOrderChild] = useState("");
-    const [causeOfDeath, setCauseOfDeath] = useState("");
-    const [maternalCondi, setMaternalCondi] = useState("");
-    const [externalCause, setExternalCause] = useState("");
-    const [autopsy, setAutopsy] = useState("");
-    const [attendant, setAttendant] = useState("");
-    const [corpseDis, setCorpseDis] = useState("");
-    const [addOfCemetery, setAddOfCemetery] = useState("");
-    const [forChild, setForChild] = useState("");
-    const [payment, setPayment] = useState("");
+    }; 
 
     const resetForm = () => {
+        setRegType("");
         setName("");
         setSex("");
         setDateDeath(new Date());
@@ -272,9 +239,8 @@ export default function DeathReg() {
         setAutopsy("");
         setAttendant("");
         setForChild("");
-        setPayment("");
 
-        // Reset date related states
+        // Reset date reDelayedd states
         setSelectedDateBirthText("");
         setSelectedDateDeathText("");
 
@@ -353,13 +319,36 @@ export default function DeathReg() {
                 </View>
                 <View style={styles.innerContainer}>
                     <Text style={styles.itemService_desc}>
-                        A Death Certificate is an official document setting forth
-                        particulars relating to a dead person, including the name of the
-                        individual, the date of birth and the date of death. When requesting
-                        for death certificate, the interested party shall provide the
-                        following information to facilitate verification and issuance of
-                        certification.
+                        Note: Death Registration must be filed within 30 days after the death.
+                        The day after 30th day is considered as Delayed registration, some documents 
+                        are required to be submitted and you need to fill out the affidavit personally.
                     </Text>
+                </View>
+
+                <Text style={styles.feesNote}>
+                    LOCAL CIVIL REGISTRY FEES:                     
+                </Text>
+
+                <Text style={styles.feesDesc}>
+                    P50.00 - For On Time Registration 
+                    {"\n"}{"\n"}
+                    Additional P17.00 - For Delayed Registration of Document for every year of delay.
+                </Text>
+
+                <View style={{ marginBottom: 10 }}>
+                    <Text style={styles.label}>Type of Registration</Text>
+
+                    <View style={styles.placeholder}>
+                        <Picker
+                            selectedValue={regType}
+                            onValueChange={(itemValue, itemIndex) => setRegType(itemValue)}
+                            style={{ width: "100%" }}
+                        >
+                            <Picker.Item label="Select" value="" />
+                            <Picker.Item label="On Time" value="On Time" />
+                            <Picker.Item label="Delayed" value="Delayed" />
+                        </Picker>
+                    </View>
                 </View>
 
                 <Text style={styles.noteText}>
@@ -850,49 +839,7 @@ export default function DeathReg() {
                     </View>
                 </View>
 
-                <Text style={styles.noteText1}>
-                    Note: Upload first your proof of payment before submitting your
-                    application. Lack of needed information will cause delay or rejection.
-                </Text>
-
-                <Text style={styles.noteText2}>
-                    FEE FOR REGISTRATION: 50 PESOS
-                </Text>
-
-                <View style={styles.selectButton}>
-                    <Text style={styles.buttonText}>
-                        Proof of Payment(G-CASH RECEIPT)
-                    </Text>
-                    <TouchableOpacity onPress={pickImage}>
-                        {payment.length > 0 ? (
-                            <Animatable.View
-                                style={{
-                                    ...styles.plusCircle,
-                                    opacity: fadeAnimation,
-                                }}
-                            >
-                                <Ionicons name="ios-add" size={24} color="white" />
-                            </Animatable.View>
-                        ) : (
-                            <View style={styles.plusCircle}>
-                                <Ionicons name="ios-add" size={24} color="white" />
-                            </View>
-                        )}
-                        {payment.length > 0 && (
-                            <View style={styles.checkCircle}>
-                                <Ionicons name="ios-checkmark" size={24} color="white" />
-                            </View>
-                        )}
-                    </TouchableOpacity>
-                </View>
-
                 <View style={styles.imageContainer}>
-                    {image && (
-                        <Image
-                            source={{ uri: image }}
-                            style={{ width: 300, height: 300 }}
-                        />
-                    )}
                     <TouchableOpacity
                         style={styles.button}
                         onPress={() => {
@@ -964,7 +911,7 @@ const styles = StyleSheet.create({
         height: 65,
         backgroundColor: "#307A59",
         borderRadius: 15,
-        marginBottom: 30,
+        marginBottom: 15,
         marginTop: 15,
     },
     box: {
@@ -1037,16 +984,10 @@ const styles = StyleSheet.create({
         marginTop: 19,
     },
     itemService_desc: {
-        fontWeight: "300",
-        fontSize: 15,
+        fontSize: 16,
         textAlign: "justify",
         lineHeight: 30,
-    },
-    itemService_proc: {
-        fontWeight: "300",
-        fontSize: 15,
-        textAlign: "justify",
-        lineHeight: 30,
+        fontWeight: '400'
     },
     imageContainer: {
         marginTop: 20,
@@ -1133,7 +1074,6 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         marginTop: 20,
         width: 165,
-        marginBottom: 40,
     },
     selectButton: {
         borderRadius: 10,
@@ -1230,5 +1170,14 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         backgroundColor: "rgba(0, 0, 0, 0.5)",
+    },
+    feesNote: {
+        fontSize: 16,
+        fontWeight: '700',
+        marginBottom: 8,
+    },
+    feesDesc: {
+        fontSize: 16,
+        marginBottom: 15,
     },
 });

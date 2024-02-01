@@ -8,8 +8,8 @@ import {
   RefreshControl,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import { Ionicons, FontAwesome5 } from "@expo/vector-icons"; // Import the Ionicons library for the bell icon
-import { Link, useRouter } from "expo-router";
+import { Ionicons } from "@expo/vector-icons"; 
+import { useRouter } from "expo-router";
 import React, { useState, useEffect } from "react";
 import { firebase } from "../../../config";
 
@@ -209,13 +209,13 @@ export default function tab1() {
             <TouchableOpacity
               style={styles.redContainer}
               onPress={() => {
-                router.push("/BusinessPermit");
+                router.push("/DeathCertificate");
               }}
             >
               <View style={styles.serviceContainer}>
-                <Text style={styles.text}>Business {"\n"}Permit</Text>
+                <Text style={styles.text}>Death {"\n"}Registration</Text>
                 <Image
-                  source={require("../../../assets/imported/doh.jpg")} // Replace with the user's profile image
+                  source={require("../../../assets/imported/death.jpg")} // Replace with the user's profile image
                   style={styles.logoImage}
                 />
               </View>

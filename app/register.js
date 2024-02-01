@@ -6,6 +6,8 @@ import {
     StyleSheet,
     StatusBar,
     Alert,
+    ScrollView,
+    ActivityIndicator
 } from "react-native";
 import React, { useState } from "react";
 import { firebase } from "../config";
@@ -21,6 +23,11 @@ const Registration = () => {
     const [barangay, setBarangay] = useState("");
     const [contact, setContact] = useState("");
     const router = useRouter();
+    const [loadingModalVisible, setLoadingModalVisible] = useState(false);
+    const [uploading, setUploading] = useState(false);
+
+    const [otherBarangay, setOtherBarangay] = useState("");
+    const [selectedBarangay, setSelectedBarangay] = useState("");
 
     const [showPassword, setShowPassword] = useState(false);
     const togglePasswordVisibility = () => {
@@ -30,70 +37,79 @@ const Registration = () => {
     const isInputValid = (input) => /^[a-zA-Z\s]+$/.test(input);
 
     const registerUser = async () => {
+        setLoadingModalVisible(true);
+        setUploading(true);
+
         try {
-            if (!firstName.trim()) {
-                Alert.alert("Invalid First Name", "Please enter a valid first name.");
-                return;
-            }
-
-            if (!lastName.trim()) {
-                Alert.alert("Invalid Last Name", "Please enter a valid last name.");
-                return;
-            }
-
-            if (!isInputValid(firstName)) {
+            // Validation checks
+            if (!firstName.trim() || !isInputValid(firstName)) {
                 Alert.alert("Invalid First Name", "Please enter a valid first name with only letters.");
                 return;
             }
 
-            if (!isInputValid(lastName)) {
+            if (!lastName.trim() || !isInputValid(lastName)) {
                 Alert.alert("Invalid Last Name", "Please enter a valid last name with only letters.");
                 return;
             }
+
             if (!contact || !contact.trim() || !/^\d{11}$/.test(contact.trim())) {
                 Alert.alert("Invalid Contact", "Please enter a valid 11-digit contact number with only numbers.");
                 return;
             }
-            if (!barangay) {
-                Alert.alert("Invalid Barangay", "Please select a valid barangay.");
+
+            if (!selectedBarangay || (selectedBarangay === "From Other Town" && (!otherBarangay.trim() || !isInputValid(otherBarangay)))) {
+                Alert.alert("Invalid Barangay", "Please enter/select a valid barangay.");
                 return;
             }
-            await firebase
-                .auth()
-                .createUserWithEmailAndPassword(email, password)
-                .then(async () => {
-                    await firebase
-                        .auth()
-                        .currentUser.sendEmailVerification({
-                            handleCodeInApp: true,
-                            url: "https://muniserve-4dc11.firebaseapp.com",
-                        });
 
-                    await firebase
-                        .firestore()
-                        .collection("users")
-                        .doc(firebase.auth().currentUser.uid)
-                        .set({
-                            firstName,
-                            lastName,
-                            barangay,
-                            email,
-                            contact,
-                            password,
-                        });
+            // Create user with email and password
+            const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
 
-                    alert("Successfully Registered, Please Verify Your Email.");
-                    // Proceed to the login page
-                    router.push("/login");
-                })
-                .catch((error) => {
-                    alert(error.message);
-                });
+            // Send email verification
+            await firebase.auth().currentUser.sendEmailVerification({
+                handleCodeInApp: true,
+                url: "https://muniserve-4dc11.firebaseapp.com",
+            });
+
+            // Set the correct value for barangay based on selection
+            const userBarangay = selectedBarangay === "From Other Town" ? otherBarangay : selectedBarangay;
+
+            // Update Firestore with user information
+            const userDocRef = firebase.firestore().collection("users").doc(userCredential.user.uid);
+            const userData = {
+                firstName,
+                lastName,
+                email,
+                contact,
+                password,
+                barangay: userBarangay,
+            };
+
+            await userDocRef.set(userData);
+
+            setUploading(false);
+            resetForm();
+            alert("Successfully Registered", "Please Verify Your Email.");
+            // Proceed to the login page
+            router.push("/login");
         } catch (error) {
+            setUploading(false);
             alert(error.message);
+        } finally {
+            setUploading(false);
+            setLoadingModalVisible(false); // Hide loading modal
         }
     };
 
+    const resetForm = () => {
+        setEmail("");
+        setFirstName("");
+        setLastName("");
+        setContact("");
+        setBarangay("");
+        setEmail("");
+        setPassword("");
+    };
 
     return (
         <View style={styles.container1}>
@@ -105,130 +121,145 @@ const Registration = () => {
                 </Text>
             </View>
 
-            <View style={styles.container2}>
-                <Text style={styles.regText}>Let's Sign you Up!</Text>
-                <Text style={styles.text}>To sign up, please enter the following.</Text>
-                <View style={{ marginTop: 30 }}>
-                    <TextInput
-                        style={styles.textInput}
-                        placeholder="First Name"
-                        onChangeText={(firstName) => setFirstName(firstName)}
-                        autoCorrect={false}
-                    />
-                    <TextInput
-                        style={styles.textInput}
-                        placeholder="Last Name"
-                        onChangeText={(lastName) => setLastName(lastName)}
-                        autoCorrect={false}
-                    />
-                    <TextInput
-                        style={styles.textInput}
-                        placeholder="Mobile Number"
-                        onChangeText={(contact) => setContact(contact)}
-                        autoCapitalize="none"
-                        autoCorrect={false}
-                        keyboardType="number-pad"
-                        maxLength={11}
-                    />
-                    <View style={styles.placeholder}>
-                        <Picker
-                            selectedValue={barangay}
-                            onValueChange={(itemValue, itemIndex) =>
-                                setBarangay(itemValue)
-                            }
-                            style={{ width: "100%" }}
-                        >
-                            <Picker.Item label="Barangay" value="" />
-                            <Picker.Item label="Bagong Silang" value="Bagong Silang" />
-                            <Picker.Item label="Bucal" value="Bucal" />
-                            <Picker.Item label="Cabasag" value="Cabasag" />
-                            <Picker.Item label="Comadaycaday" value="Comadaycaday" />
-                            <Picker.Item label="Comadogcadog" value="Comadogcadog" />
-                            <Picker.Item label="Domagondong" value="Domagondong" />
-                            <Picker.Item label="Kinalangan" value="Kinalangan" />
-                            <Picker.Item label="Mabini" value="Mabini" />
-                            <Picker.Item label="Magais 1" value="Magais 1" />
-                            <Picker.Item label="Magais 2" value="Magais 2" />
-                            <Picker.Item label="Mansalaya" value="Mansalaya" />
-                            <Picker.Item label="Nagkalit" value="Nagkalit" />
-                            <Picker.Item label="Palaspas" value="Palaspas" />
-                            <Picker.Item label="Pamplona" value="Pamplona" />
-                            <Picker.Item label="Pasay" value="Pasay" />
-                            <Picker.Item label="Peñafrancia" value="Peñafrancia" />
-                            <Picker.Item label="Pinagdapian" value="Pinagdapian" />
-                            <Picker.Item label="Pinugusan" value="Pinugusan" />
-                            <Picker.Item label="Poblacion Zone 1" value="Poblacion Zone 1" />
-                            <Picker.Item label="Poblacion Zone 2" value="Poblacion Zone 2" />
-                            <Picker.Item label="Poblacion Zone 3" value="Poblacion Zone 3" />
-                            <Picker.Item label="Sabang" value="Sabang" />
-                            <Picker.Item label="Salvacion" value="Salvacion" />
-                            <Picker.Item label="San Juan" value="San Juan" />
-                            <Picker.Item label="San Pablo" value="San Pablo" />
-                            <Picker.Item label="Santa Rita 1" value="Santa Rita 1" />
-                            <Picker.Item label="Santa Rita 2" value="Santa Rita 2" />
-                            <Picker.Item label="Sinuknipan 1" value="Sinuknipan 1" />
-                            <Picker.Item label="Sinuknipan 2" value="Sinuknipan 2" />
-                            <Picker.Item label="Sugsugin" value="Sugsugin" />
-                            <Picker.Item label="Tabion" value="Tabion" />
-                            <Picker.Item label="Tomagoktok" value="Tomagoktok" />
-                        </Picker>
-                    </View>
-
-                    <TextInput
-                        style={styles.textInput}
-                        placeholder="Email"
-                        onChangeText={(email) => setEmail(email)}
-                        autoCapitalize="none"
-                        autoCorrect={false}
-                        keyboardType="email-address"
-                    />
-                    <View style={styles.con}>
+            <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
+                <View style={styles.container2}>
+                    <Text style={styles.regText}>Let's Sign you Up!</Text>
+                    <Text style={styles.text}>To sign up, please enter the following.</Text>
+                    <View style={{ marginTop: 30 }}>
                         <TextInput
                             style={styles.textInput}
-                            placeholder="Password"
-                            onChangeText={(password) => setPassword(password)}
+                            placeholder="First Name"
+                            onChangeText={(firstName) => setFirstName(firstName)}
+                            autoCorrect={false}
+                        />
+                        <TextInput
+                            style={styles.textInput}
+                            placeholder="Last Name"
+                            onChangeText={(lastName) => setLastName(lastName)}
+                            autoCorrect={false}
+                        />
+                        <TextInput
+                            style={styles.textInput}
+                            placeholder="Mobile Number"
+                            onChangeText={(contact) => setContact(contact)}
                             autoCapitalize="none"
                             autoCorrect={false}
-                            secureTextEntry={!showPassword}
+                            keyboardType="number-pad"
+                            maxLength={11}
                         />
-                        <TouchableOpacity style={styles.eyeIcon} onPress={togglePasswordVisibility}>
-                            <MaterialIcons
-                                name={showPassword ? 'visibility' : 'visibility-off'}
-                                size={22}
-                                color="black"
+                        <View style={styles.placeholder}>
+                            <Picker
+                                selectedValue={selectedBarangay}
+                                onValueChange={(itemValue, itemIndex) => setSelectedBarangay(itemValue)}
+                                style={{ width: "100%" }}
+                            >
+                                <Picker.Item label="Select Your Address" value="" />
+                                <Picker.Item label="From Other Town" value="From Other Town" />
+                                <Picker.Item label="Bagong Silang" value="Bagong Silang" />
+                                <Picker.Item label="Bucal" value="Bucal" />
+                                <Picker.Item label="Cabasag" value="Cabasag" />
+                                <Picker.Item label="Comadaycaday" value="Comadaycaday" />
+                                <Picker.Item label="Comadogcadog" value="Comadogcadog" />
+                                <Picker.Item label="Domagondong" value="Domagondong" />
+                                <Picker.Item label="Kinalangan" value="Kinalangan" />
+                                <Picker.Item label="Mabini" value="Mabini" />
+                                <Picker.Item label="Magais 1" value="Magais 1" />
+                                <Picker.Item label="Magais 2" value="Magais 2" />
+                                <Picker.Item label="Mansalaya" value="Mansalaya" />
+                                <Picker.Item label="Nagkalit" value="Nagkalit" />
+                                <Picker.Item label="Palaspas" value="Palaspas" />
+                                <Picker.Item label="Pamplona" value="Pamplona" />
+                                <Picker.Item label="Pasay" value="Pasay" />
+                                <Picker.Item label="Peñafrancia" value="Peñafrancia" />
+                                <Picker.Item label="Pinagdapian" value="Pinagdapian" />
+                                <Picker.Item label="Pinugusan" value="Pinugusan" />
+                                <Picker.Item label="Poblacion Zone 1" value="Poblacion Zone 1" />
+                                <Picker.Item label="Poblacion Zone 2" value="Poblacion Zone 2" />
+                                <Picker.Item label="Poblacion Zone 3" value="Poblacion Zone 3" />
+                                <Picker.Item label="Sabang" value="Sabang" />
+                                <Picker.Item label="Salvacion" value="Salvacion" />
+                                <Picker.Item label="San Juan" value="San Juan" />
+                                <Picker.Item label="San Pablo" value="San Pablo" />
+                                <Picker.Item label="Santa Rita 1" value="Santa Rita 1" />
+                                <Picker.Item label="Santa Rita 2" value="Santa Rita 2" />
+                                <Picker.Item label="Sinuknipan 1" value="Sinuknipan 1" />
+                                <Picker.Item label="Sinuknipan 2" value="Sinuknipan 2" />
+                                <Picker.Item label="Sugsugin" value="Sugsugin" />
+                                <Picker.Item label="Tabion" value="Tabion" />
+                                <Picker.Item label="Tomagoktok" value="Tomagoktok" />
+                            </Picker>
+                        </View>
+
+                        {selectedBarangay === "From Other Town" && (
+                            <TextInput
+                                style={styles.textInput}
+                                placeholder="Complete Address"
+                                onChangeText={(otherBarangay) => setOtherBarangay(otherBarangay)}
+                                autoCorrect={false}
                             />
+                        )}
+
+                        <TextInput
+                            style={styles.textInput}
+                            placeholder="Email"
+                            onChangeText={(email) => setEmail(email)}
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                            keyboardType="email-address"
+                        />
+                        <View style={styles.con}>
+                            <TextInput
+                                style={styles.textInput}
+                                placeholder="Password"
+                                onChangeText={(password) => setPassword(password)}
+                                autoCapitalize="none"
+                                autoCorrect={false}
+                                secureTextEntry={!showPassword}
+                            />
+                            <TouchableOpacity style={styles.eyeIcon} onPress={togglePasswordVisibility}>
+                                <MaterialIcons
+                                    name={showPassword ? 'visibility' : 'visibility-off'}
+                                    size={22}
+                                    color="black"
+                                />
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                    <TouchableOpacity
+                        onPress={() => registerUser(email, password, firstName, lastName, barangay, contact)}
+                        style={styles.button}
+                    >
+                        <Text style={{ fontWeight: "500", fontSize: 20, color: "white" }}>
+                            Register
+                        </Text>
+                    </TouchableOpacity>
+
+                    <View style={styles.texts}>
+                        <Text
+                            style={{
+                                fontWeight: "500",
+                                fontSize: 16,
+                                textAlign: "center",
+                                marginTop: 20,
+                            }}
+                        >
+                            Already have an account?
+                        </Text>
+                        <TouchableOpacity onPress={() => {
+                            router.push("/login");
+                        }}>
+                            <View style={styles.box}>
+                                <Text style={styles.itemService_name}>  Login Now</Text>
+                            </View>
                         </TouchableOpacity>
                     </View>
                 </View>
-                <TouchableOpacity
-                    onPress={() => registerUser(email, password, firstName, lastName, barangay, contact)}
-                    style={styles.button}
-                >
-                    <Text style={{ fontWeight: "500", fontSize: 20, color: "white" }}>
-                        Register
-                    </Text>
-                </TouchableOpacity>
-
-                <View style={styles.texts}>
-                    <Text
-                        style={{
-                            fontWeight: "500",
-                            fontSize: 16,
-                            textAlign: "center",
-                            marginTop: 20,
-                        }}
-                    >
-                        Already have an account?
-                    </Text>
-                    <TouchableOpacity onPress={() => {
-                        router.push("/login");
-                    }}>
-                        <View style={styles.box}>
-                            <Text style={styles.itemService_name}>  Login Now</Text>
-                        </View>
-                    </TouchableOpacity>
+            </ScrollView>
+            {uploading && (
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color="#307A59" />
                 </View>
-            </View>
+            )}
         </View>
     );
 };
@@ -346,5 +377,11 @@ const styles = StyleSheet.create({
         marginLeft: 240,
         marginTop: 5,
         position: 'absolute'
+    },
+    loadingContainer: {
+        ...StyleSheet.absoluteFillObject,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "rgba(0, 0, 0, 0.5)",
     },
 });

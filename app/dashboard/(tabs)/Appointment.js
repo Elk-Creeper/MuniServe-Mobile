@@ -7,7 +7,8 @@ import {
   TextInput,
   ScrollView,
   SafeAreaView,
-  Alert
+  Alert,
+  ActivityIndicator
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
@@ -23,6 +24,8 @@ export default function tab1() {
   const [selectedDepartment, setSelectedDepartment] = useState("");
   const [selectedPersonnel, setSelectedPersonnel] = useState("");
   const [showPersonnelDropdown, setShowPersonnelDropdown] = useState(false); 
+  const [loadingModalVisible, setLoadingModalVisible] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   const router = useRouter();
 
@@ -251,21 +254,15 @@ export default function tab1() {
   }, []);
 
   const storeAppointmentData = async () => {
+    setLoadingModalVisible(true);
+    setUploading(true);
+
     try {
       // Validate required fields
-      const requiredFields = [name, selectedDepartment, selectedPersonnel, selectedDate, selectedTime, textMessage];
+      const requiredFields = [selectedDepartment, selectedPersonnel, selectedDate, selectedTime, textMessage];
 
       if (requiredFields.some(field => !field)) {
         Alert.alert("Incomplete Form", "Please fill in all required fields.");
-        return;
-      }
-
-      // Validate name
-      if (!/^[a-zA-Z.\s]+$/.test(name)) {
-        Alert.alert(
-          "Invalid Name",
-          "Name should only contain letters, dots, and spaces."
-        );
         return;
       }
 
@@ -279,7 +276,6 @@ export default function tab1() {
         userEmail: userEmail,
         userContact: userContact,
         userBarangay: userBarangay,
-        name: name,
         department: selectedDepartment,
         personnel: selectedPersonnel,
         date: selectedDate,
@@ -290,12 +286,17 @@ export default function tab1() {
       });
 
       // Data is stored in Firestore
+      setUploading(false);
       resetForm(); // Reset the form after successful booking
       Alert.alert("Success", "Appointment booked successfully.");
     } catch (error) {
+      setUploading(false);
       console.error("Error storing appointment data:", error);
       Alert.alert("Error", "Appointment booking failed.");
-    }
+    } finally {
+      setUploading(false);
+      setLoadingModalVisible(false); // Hide loading modal
+    } 
   };
 
 
@@ -437,6 +438,11 @@ export default function tab1() {
           </TouchableOpacity>
         </SafeAreaView>
       </ScrollView>
+      {uploading && (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#307A59" />
+        </View>
+      )}
     </View>
   );
 }
@@ -597,5 +603,11 @@ const styles = StyleSheet.create({
     color: "green",
     fontSize: 16,
     marginBottom: 10,
+  },
+  loadingContainer: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
 });
