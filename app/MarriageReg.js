@@ -611,7 +611,7 @@ export default function MarriageReg() {
                     <View style={styles.placeholder}>
                         <TextInput
                             placeholder=""
-                            maxLength={50}
+                            maxLength={100}
                             value={h_residence}
                             onChangeText={(h_residence) => setH_residence(h_residence)}
                             style={{
@@ -1080,7 +1080,7 @@ export default function MarriageReg() {
                     <View style={styles.placeholder}>
                         <TextInput
                             placeholder=""
-                            maxLength={50}
+                            maxLength={100}
                             value={w_placeMarriage}
                             onChangeText={(w_placeMarriage) => setW_placeMarriage(w_placeMarriage)}
                             style={{

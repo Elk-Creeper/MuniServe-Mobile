@@ -34,7 +34,11 @@ const Registration = () => {
         setShowPassword(!showPassword);
     };
 
-    const isInputValid = (input) => /^[a-zA-Z\s]+$/.test(input);
+    function isInputValid(input) {
+        // Allow letters, dots, and spaces in the input
+        const regex = /^[a-zA-Z.\s]+$/;
+        return regex.test(input);
+    }
 
     const registerUser = async () => {
         setLoadingModalVisible(true);
@@ -43,12 +47,12 @@ const Registration = () => {
         try {
             // Validation checks
             if (!firstName.trim() || !isInputValid(firstName)) {
-                Alert.alert("Invalid First Name", "Please enter a valid first name with only letters.");
+                Alert.alert("Invalid First Name", "Please enter a valid first name with only letters, dots, and spaces.");
                 return;
             }
 
             if (!lastName.trim() || !isInputValid(lastName)) {
-                Alert.alert("Invalid Last Name", "Please enter a valid last name with only letters.");
+                Alert.alert("Invalid Last Name", "Please enter a valid last name with only letters, dots, and spaces.");
                 return;
             }
 
@@ -81,7 +85,6 @@ const Registration = () => {
                 lastName,
                 email,
                 contact,
-                password,
                 barangay: userBarangay,
             };
 

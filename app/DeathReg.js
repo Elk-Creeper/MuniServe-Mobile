@@ -531,7 +531,7 @@ export default function DeathReg() {
                     <View style={styles.placeholder}>
                         <TextInput
                             placeholder=""
-                            maxLength={50}
+                            maxLength={100}
                             value={residence}
                             onChangeText={(residence) => setResidence(residence)}
                             style={{
@@ -829,7 +829,7 @@ export default function DeathReg() {
                     <View style={styles.placeholder}>
                         <TextInput
                             placeholder=""
-                            maxLength={50}
+                            maxLength={100}
                             value={addOfCemetery}
                             onChangeText={(addOfCemetery) => setAddOfCemetery(addOfCemetery)}
                             style={{

@@ -104,8 +104,7 @@ export default function BirthReg() {
       if (!regType || !c_fname || !c_mname || !c_lname || !birthdate || !birthplace || !sex || !typeofbirth || !weight ||
         !m_name || !m_citizenship || !m_religion || !bornAlive || !childStillLiving ||
         !childAliveButNowDead || !m_occur || !m_age || !m_residence || !f_name ||
-        !f_citizenship || !f_religion || !f_occur || !f_age || !f_residence || !mpDate ||
-        !mpPlace || !attendant) {
+        !f_citizenship || !f_religion || !f_occur || !f_age || !f_residence || !attendant) {
         Alert.alert("Incomplete Form", "Please fill in all required fields.");
         return;
       }
@@ -466,7 +465,6 @@ export default function BirthReg() {
           </View>
         </View>
 
-        {typeofbirth !== 'Single' && (
           <View style={{ marginBottom: 10 }}>
             <Text style={styles.label}>IF MULTIPLE BIRTH, CHILD WAS</Text>
 
@@ -480,6 +478,9 @@ export default function BirthReg() {
                 <Picker.Item label="First" value="First" />
                 <Picker.Item label="Second" value="Second" />
                 <Picker.Item label="Third" value="Third" />
+                <Picker.Item label="Fourth" value="Fourth" />
+                <Picker.Item label="Fifth" value="Fifth" />
+                <Picker.Item label="Not Applicable" value="Not Applicable" />
               </Picker>
             </View>
 
@@ -492,15 +493,16 @@ export default function BirthReg() {
                   onValueChange={(itemValue, itemIndex) => setBirthorder(itemValue)}
                   style={{ width: "100%" }}
                 >
-                  <Picker.Item label="Select" value="" />
-                  <Picker.Item label="First" value="First" />
-                  <Picker.Item label="Second" value="Second" />
-                  <Picker.Item label="Third" value="Third" />
+                  <Picker.Item label="Select" value=""/>
+                  <Picker.Item label="First" value="First"/>
+                  <Picker.Item label="Second" value="Second"/>
+                  <Picker.Item label="Third" value="Third"/>
+                  <Picker.Item label="Fourth" value="Fourth"/>
+                  <Picker.Item label="Fifth" value="Fifth"/>
                 </Picker>
               </View>
             </View>
           </View>
-        )}
 
         <View style={{ marginBottom: 10 }}>
           <Text style={styles.label}>WEIGHT AT BIRTH (grams)</Text>
@@ -744,6 +746,10 @@ export default function BirthReg() {
                 <Picker.Item
                   label="Seventh-day Adventist"
                   value="Seventh-day Adventist"
+                />
+                <Picker.Item
+                  label="Not Applicable"
+                  value="Not Applicable"
                 />
               </Picker>
             </View>
