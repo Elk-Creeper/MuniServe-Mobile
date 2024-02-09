@@ -90,7 +90,7 @@ const Council = () => {
                             </View>
 
                             <TouchableOpacity style={styles.imageStyle} onPress={() => {
-                                router.push("/PC_carling");
+                                router.push("/PC_mayora");
                             }}>
                                 <Text style={styles.title}>Mayor</Text>
                                 {item.mayor && (
@@ -102,7 +102,7 @@ const Council = () => {
                             </TouchableOpacity>
 
                             <TouchableOpacity style={styles.imageStyle} onPress={() => {
-                                router.push("/PC_carling");
+                                router.push("/PC_florence");
                             }}>
                                 <Text style={styles.title}>Vice Mayor</Text>
                                 {item.viceMayor && (
@@ -175,7 +175,7 @@ const Council = () => {
                             <View style={styles.boxContainer}>
                                 <View style={styles.box} >
                                     <TouchableOpacity style={styles.imageStyle} onPress={() => {
-                                        router.push("/PC_uy");
+                                        router.push("/PC_antet");
                                     }}>
                                         {item.antet && (
                                             <Image
@@ -190,7 +190,7 @@ const Council = () => {
 
                                 <View style={styles.box}>
                                     <TouchableOpacity style={styles.imageStyle} onPress={() => {
-                                        router.push("/PC_uy");
+                                        router.push("/PC_adulta");
                                     }}>
                                         {item.adulta && (
                                             <Image
@@ -207,7 +207,7 @@ const Council = () => {
                             <View style={styles.boxContainer}>
                                 <View style={styles.box}>
                                     <TouchableOpacity style={styles.imageStyle} onPress={() => {
-                                        router.push("/PC_uy");
+                                        router.push("/PC_ems");
                                     }}>
                                         {item.emma && (
                                             <Image source={{ uri: item.emma }} style={styles.image} />
@@ -246,34 +246,12 @@ const styles = StyleSheet.create({
         backgroundColor: "white",
         padding: 20,
     },
-    historyText: {
-        fontSize: 17,
-        textAlign: "center",
-        marginTop: 15,
-        fontWeight: "500",
-        marginBottom: 15,
-        color: "white",
-        fontWeight: "400",
-    },
-    text: {
-        fontSize: 21,
-        marginTop: 30,
-        fontWeight: "500",
-        marginBottom: 25,
-        textAlign: "center",
-    },
     muniText: {
         fontSize: 18,
         fontWeight: "700",
         textAlign: "center",
         marginTop: 10,
         marginBottom: 20,
-    },
-    mayorsName: {
-        fontSize: 16,
-        fontWeight: "400",
-        textAlign: "center",
-        marginBottom: 10,
     },
     councilImage: {
         marginLeft: 10,
@@ -286,11 +264,11 @@ const styles = StyleSheet.create({
         borderRadius: 10,
     },
     image: {
-        width: 100, // Adjust the width as needed
-        height: 110, // Adjust the height as needed
-        resizeMode: "cover", // Adjust the resizeMode as needed
-        borderRadius: 10, // Optional: add border radius for rounded corners
-        marginTop: 10, // Optional: add margin for spacing
+        width: 100, 
+        height: 110, 
+        resizeMode: "cover", 
+        borderRadius: 10, 
+        marginTop: 10, 
     },
     imageStyle: {
         marginLeft: 10,
@@ -314,7 +292,7 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         marginBottom: 30
     },
-    title: { 
+    title: {
         fontSize: 18,
         fontWeight: "700",
     },

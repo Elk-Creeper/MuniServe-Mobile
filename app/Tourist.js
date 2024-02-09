@@ -4,7 +4,6 @@ import {
     Image,
     FlatList,
     SafeAreaView,
-    StyleSheet,
 } from "react-native";
 import { Link, useRouter } from "expo-router";
 import { twJoin } from "tailwind-merge";
@@ -119,29 +118,4 @@ export default function onboarding() {
     );
 }
 
-const styles = StyleSheet.create({
-    texts: {
-        flexDirection: "row",
-        marginLeft: 10,
-    },
-    box: {
-        backgroundColor: "#307A59",
-        height: 60,
-        width: 290,
-        borderRadius: 10,
-    },
-    regText: {
-        color: "#fff",
-        fontSize: 20,
-        fontWeight: "light",
-        textAlign: "center",
-        marginTop: 15
-    },
-    logText: {
-        color: "#0174BE",
-        marginTop: 20,
-        fontWeight: '500',
-        fontSize: 16,
-    },
-});
 

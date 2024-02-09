@@ -7,6 +7,7 @@ import {
     ScrollView,
     Image,
     TouchableOpacity,
+    Linking,
 } from "react-native";
 import { firebase } from "../config";
 import { StatusBar } from "expo-status-bar";
@@ -137,7 +138,23 @@ const NewsOpen = () => {
                                             ))}
                                     </View>
                                 </View>
-                                <Text style={styles.itemContent}>{item.content}</Text>
+                                <Text style={styles.itemContent}>
+                                    {item.content.split(' ').map((word, index) => {
+                                        if (word.startsWith('https://')) {
+                                            return (
+                                                <Text
+                                                    key={index}
+                                                    style={{ color: 'blue', textDecorationLine: 'underline' }}
+                                                    onPress={() => Linking.openURL(word)}
+                                                >
+                                                    {word}{' '}
+                                                </Text>
+                                            );
+                                        } else {
+                                            return word + ' ';
+                                        }
+                                    })}
+                                </Text>                         
                             </View>
                         )}
                     />
@@ -187,24 +204,6 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         fontSize: 20,
     },
-    assembler: {
-        flexDirection: "row",
-        marginTop: 20,
-        marginBottom: 20,
-        justifyContent: "center",
-    },
-    Main: {
-        backgroundColor: "#FFF",
-        width: "92%",
-        height: 40,
-        borderWidth: 1,
-        borderColor: "black",
-        borderRadius: 50,
-    },
-    Input: {
-        marginLeft: 10,
-        marginTop: 5,
-    },
     newsText: {
         fontSize: 20,
         fontWeight: "800",
@@ -218,7 +217,7 @@ const styles = StyleSheet.create({
     },
     cImage: {
         width: 300,
-        height: 200,
+        height: 300,
         resizeMode: "cover",
         borderRadius: 5,
     },
@@ -251,9 +250,6 @@ const styles = StyleSheet.create({
     boxIcon: {
         width: 25,
         height: 25,
-    },
-    container4: {
-        flexDirection: "row",
     },
     container3: {
         flexDirection: "row",

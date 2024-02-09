@@ -149,45 +149,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 20,
   },
-  boxes1: {
-    width: "100%",
-    height: 65,
-    backgroundColor: "#307A59",
-    borderRadius: 15,
-    marginBottom: 30,
-    marginTop: 15,
-  },
-  boxAcc: {
-    flexDirection: "row",
-  },
-  boxIcon: {
-    marginTop: 12,
-    marginLeft: 15,
-    width: 40,
-    height: 40,
-  },
-  innerContainer: {
-    alignContent: "center",
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  itemService_name: {
-    marginLeft: 20,
-    color: "white",
-    fontSize: 18,
-    marginTop: 19,
-  },
-  itemService_desc: {
-    fontWeight: "300",
-    fontSize: 15,
-    textAlign: "justify",
-    lineHeight: 30,
-  },
-  regText: {
-    fontSize: 25,
-    textAlign: "center",
-  },
   noteText: {
     fontSize: 25,
     marginBottom: 20,
@@ -197,11 +158,6 @@ const styles = StyleSheet.create({
   choices: {
     flexDirection: "row",
     justifyContent: "space-around",
-    alignItems: "center",
-    marginTop: 30,
-  },
-  choice: {
-    justifyContent: "center",
     alignItems: "center",
     marginTop: 30,
   },

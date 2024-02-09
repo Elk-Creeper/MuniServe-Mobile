@@ -26,7 +26,7 @@ export default function tab1() {
   const [showPersonnelDropdown, setShowPersonnelDropdown] = useState(false); 
   const [loadingModalVisible, setLoadingModalVisible] = useState(false);
   const [uploading, setUploading] = useState(false);
-
+ 
   const router = useRouter();
 
   //for storing the user info
@@ -593,16 +593,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5,
     fontSize: 16,
     color: "#000",
-  },
-  errorMessage: {
-    color: "red",
-    fontSize: 16,
-    marginBottom: 10,
-  },
-  successMessage: {
-    color: "green",
-    fontSize: 16,
-    marginBottom: 10,
   },
   loadingContainer: {
     ...StyleSheet.absoluteFillObject,

@@ -409,14 +409,6 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         fontSize: 20,
     },
-    serveText: {
-        fontSize: 18,
-        fontWeight: "bold",
-        color: "black",
-        textAlign: "left",
-        marginTop: 15,
-        marginBottom: 15,
-    },
     boxes1: {
         width: "100%",
         height: 65,
@@ -424,12 +416,6 @@ const styles = StyleSheet.create({
         borderRadius: 15,
         marginBottom: 30,
         marginTop: 15,
-    },
-    box: {
-        marginLeft: 20,
-        color: "white",
-        fontSize: 17,
-        marginTop: 19,
     },
     boxAcc: {
         flexDirection: "row",
@@ -439,54 +425,6 @@ const styles = StyleSheet.create({
         marginLeft: 15,
         width: 40,
         height: 40,
-    },
-    containers: {
-        alignItems: "center",
-        justifyContent: "center",
-    },
-    inputContainer: {
-        flexDirection: "row",
-        alignItems: "center",
-        borderWidth: 2,
-        borderColor: "#307A59",
-        borderRadius: 5,
-        paddingVertical: 8,
-        paddingHorizontal: 10,
-        marginTop: 25,
-        height: 60,
-    },
-    icon: {
-        marginRight: 10,
-        color: "#307A59", // Change the color to match your design
-    },
-    input: {
-        flex: 1,
-        fontSize: 17,
-    },
-    loginButton: {
-        backgroundColor: "#307A59",
-        justifyContent: "center",
-        alignItems: "center",
-        borderRadius: 50,
-        paddingVertical: 10,
-        marginTop: 20,
-        width: 165,
-    },
-    loginButtonText: {
-        color: "white",
-        fontSize: 15,
-    },
-    serveContainer: {
-        padding: 15,
-        borderRadius: 15,
-        margin: 5,
-        marginHorizontal: 10,
-    },
-    innerContainer: {
-        alignContent: "center",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
     },
     itemService_name: {
         marginLeft: 20,
@@ -500,47 +438,9 @@ const styles = StyleSheet.create({
         textAlign: "justify",
         lineHeight: 30,
     },
-    itemService_proc: {
-        fontWeight: "300",
-        fontSize: 15,
-        textAlign: "justify",
-        lineHeight: 30,
-    },
     imageContainer: {
         marginTop: 20,
         alignItems: "center",
-    },
-    imageName: {
-        fontSize: 18,
-        fontWeight: "bold",
-        marginBottom: 10,
-    },
-    image: {
-        width: 200,
-        height: 200,
-        resizeMode: "cover",
-    },
-    closeButton: {
-        position: "absolute",
-        top: 30,
-        right: 10,
-        backgroundColor: "#307A59",
-        borderRadius: 100,
-        padding: 5,
-        width: 30,
-        height: 30,
-        justifyContent: "center",
-        alignItems: "center",
-        textAlign: "center",
-    },
-    closeButtonText: {
-        fontSize: 18,
-        color: "white",
-        textAlign: "center",
-    },
-    regText: {
-        fontSize: 25,
-        textAlign: "center",
     },
     noteText: {
         fontSize: 17,
@@ -557,24 +457,6 @@ const styles = StyleSheet.create({
         fontWeight: "500",
         color: "#945",
     },
-    boxContainer: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-    },
-    Input: {
-        marginLeft: 10,
-        marginTop: 5,
-        textAlign: "left",
-    },
-    Main: {
-        backgroundColor: "#FFF",
-        width: 270,
-        height: 40,
-        borderWidth: 1,
-        borderColor: "black",
-        borderTopLeftRadius: 40,
-        borderBottomLeftRadius: 40,
-    },
     button: {
         backgroundColor: "#307A59",
         alignItems: "center",
@@ -584,47 +466,6 @@ const styles = StyleSheet.create({
         width: 165,
         marginLeft: 15,
         marginBottom: 40,
-    },
-    selectButton: {
-        borderRadius: 10,
-        flexDirection: "row", // Align items horizontally
-        justifyContent: "space-between", // Space between children
-        alignItems: "center", // Center vertically
-        width: "100%",
-        height: 50,
-        backgroundColor: "transparent",
-        borderColor: "#000",
-        borderWidth: 1,
-        marginTop: 10,
-        flexDirection: "row",
-        marginVertical: 10,
-        padding: 10,
-    },
-    buttonText: {
-        flex: 1, // Take up available space
-        color: "#000",
-        fontSize: 14,
-        fontWeight: "light",
-        textAlign: "left",
-    },
-    plusCircle: {
-        width: 30,
-        height: 30,
-        borderRadius: 15,
-        backgroundColor: "#307A59",
-        justifyContent: "center",
-        alignItems: "center",
-        marginRight: 10, // Adjust margin as needed
-    },
-    checkCircle: {
-        width: 30,
-        height: 30,
-        borderRadius: 15,
-        backgroundColor: "#3498db", // Check sign color
-        justifyContent: "center",
-        alignItems: "center",
-        marginRight: 10, // Adjust margin as needed
-        marginBottom: 30,
     },
     submitText: {
         color: "#fff",
@@ -666,14 +507,6 @@ const styles = StyleSheet.create({
         fontSize: 15,
         fontWeight: "400",
         marginVertical: 8,
-    },
-    datePickerStyle: {
-        width: '100%',
-        borderColor: 'black',
-        borderRadius: 8,
-        borderWidth: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
     },
     loadingContainer: {
         ...StyleSheet.absoluteFillObject,

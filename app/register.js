@@ -56,8 +56,8 @@ const Registration = () => {
                 return;
             }
 
-            if (!contact || !contact.trim() || !/^\d{11}$/.test(contact.trim())) {
-                Alert.alert("Invalid Contact", "Please enter a valid 11-digit contact number with only numbers.");
+            if (!contact || !contact.trim() || !/^09\d{9}$/.test(contact.trim())) {
+                Alert.alert("Invalid Contact", "Please enter a valid contact number starting with 09.");
                 return;
             }
 
@@ -158,38 +158,38 @@ const Registration = () => {
                             >
                                 <Picker.Item label="Select Your Address" value="" />
                                 <Picker.Item label="From Other Town" value="From Other Town" />
-                                <Picker.Item label="Bagong Silang" value="Bagong Silang" />
-                                <Picker.Item label="Bucal" value="Bucal" />
-                                <Picker.Item label="Cabasag" value="Cabasag" />
-                                <Picker.Item label="Comadaycaday" value="Comadaycaday" />
-                                <Picker.Item label="Comadogcadog" value="Comadogcadog" />
-                                <Picker.Item label="Domagondong" value="Domagondong" />
-                                <Picker.Item label="Kinalangan" value="Kinalangan" />
-                                <Picker.Item label="Mabini" value="Mabini" />
-                                <Picker.Item label="Magais 1" value="Magais 1" />
-                                <Picker.Item label="Magais 2" value="Magais 2" />
-                                <Picker.Item label="Mansalaya" value="Mansalaya" />
-                                <Picker.Item label="Nagkalit" value="Nagkalit" />
-                                <Picker.Item label="Palaspas" value="Palaspas" />
-                                <Picker.Item label="Pamplona" value="Pamplona" />
-                                <Picker.Item label="Pasay" value="Pasay" />
-                                <Picker.Item label="Peñafrancia" value="Peñafrancia" />
-                                <Picker.Item label="Pinagdapian" value="Pinagdapian" />
-                                <Picker.Item label="Pinugusan" value="Pinugusan" />
-                                <Picker.Item label="Poblacion Zone 1" value="Poblacion Zone 1" />
-                                <Picker.Item label="Poblacion Zone 2" value="Poblacion Zone 2" />
-                                <Picker.Item label="Poblacion Zone 3" value="Poblacion Zone 3" />
-                                <Picker.Item label="Sabang" value="Sabang" />
-                                <Picker.Item label="Salvacion" value="Salvacion" />
-                                <Picker.Item label="San Juan" value="San Juan" />
-                                <Picker.Item label="San Pablo" value="San Pablo" />
-                                <Picker.Item label="Santa Rita 1" value="Santa Rita 1" />
-                                <Picker.Item label="Santa Rita 2" value="Santa Rita 2" />
-                                <Picker.Item label="Sinuknipan 1" value="Sinuknipan 1" />
-                                <Picker.Item label="Sinuknipan 2" value="Sinuknipan 2" />
-                                <Picker.Item label="Sugsugin" value="Sugsugin" />
-                                <Picker.Item label="Tabion" value="Tabion" />
-                                <Picker.Item label="Tomagoktok" value="Tomagoktok" />
+                                <Picker.Item label="Bagong Silang, Del Gallego" value="Bagong Silang, Del Gallego" />
+                                <Picker.Item label="Bucal, Del Gallego" value="Bucal, Del Gallego" />
+                                <Picker.Item label="Cabasag, Del Gallego" value="Cabasag, Del Gallego" />
+                                <Picker.Item label="Comadaycaday, Del Gallego" value="Comadaycaday, Del Gallego" />
+                                <Picker.Item label="Comadogcadog, Del Gallego" value="Comadogcadog, Del Gallego" />
+                                <Picker.Item label="Domagondong, Del Gallego" value="Domagondong, Del Gallego" />
+                                <Picker.Item label="Kinalangan, Del Gallego" value="Kinalangan, Del Gallego" />
+                                <Picker.Item label="Mabini, Del Gallego" value="Mabini, Del Gallego" />
+                                <Picker.Item label="Magais 1, Del Gallego" value="Magais 1, Del Gallego" />
+                                <Picker.Item label="Magais 2, Del Gallego" value="Magais 2, Del Gallego" />
+                                <Picker.Item label="Mansalaya, Del Gallego" value="Mansalaya, Del Gallego" />
+                                <Picker.Item label="Nagkalit, Del Gallego" value="Nagkalit, Del Gallego" />
+                                <Picker.Item label="Palaspas, Del Gallego" value="Palaspas, Del Gallego" />
+                                <Picker.Item label="Pamplona, Del Gallego" value="Pamplona, Del Gallego" />
+                                <Picker.Item label="Pasay, Del Gallego" value="Pasay, Del Gallego" />
+                                <Picker.Item label="Peñafrancia, Del Gallego" value="Peñafrancia, Del Gallego" />
+                                <Picker.Item label="Pinagdapian, Del Gallego" value="Pinagdapian, Del Gallego" />
+                                <Picker.Item label="Pinugusan, Del Gallego" value="Pinugusan, Del Gallego" />
+                                <Picker.Item label="Poblacion Zone 1, Del Gallego" value="Poblacion Zone 1, Del Gallego" />
+                                <Picker.Item label="Poblacion Zone 2, Del Gallego" value="Poblacion Zone 2, Del Gallego" />
+                                <Picker.Item label="Poblacion Zone 3, Del Gallego" value="Poblacion Zone 3, Del Gallego" />
+                                <Picker.Item label="Sabang, Del Gallego" value="Sabang, Del Gallego" />
+                                <Picker.Item label="Salvacion, Del Gallego" value="Salvacion, Del Gallego" />
+                                <Picker.Item label="San Juan, Del Gallego" value="San Juan, Del Gallego" />
+                                <Picker.Item label="San Pablo, Del Gallego" value="San Pablo, Del Gallego" />
+                                <Picker.Item label="Santa Rita 1, Del Gallego" value="Santa Rita 1, Del Gallego" />
+                                <Picker.Item label="Santa Rita 2, Del Gallego" value="Santa Rita 2, Del Gallego" />
+                                <Picker.Item label="Sinuknipan 1, Del Gallego" value="Sinuknipan 1, Del Gallego" />
+                                <Picker.Item label="Sinuknipan 2, Del Gallego" value="Sinuknipan 2, Del Gallego" />
+                                <Picker.Item label="Sugsugin, Del Gallego" value="Sugsugin, Del Gallego" />
+                                <Picker.Item label="Tabion, Del Gallego" value="Tabion, Del Gallego" />
+                                <Picker.Item label="Tomagoktok, Del Gallego" value="Tomagoktok, Del Gallego" />
                             </Picker>
                         </View>
 

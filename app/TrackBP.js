@@ -185,34 +185,6 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         fontSize: 20,
     },
-    navigationButtons: {
-        flexDirection: "row",
-        justifyContent: "space-around",
-        marginVertical: 10,
-    },
-
-    navigationButton: {
-        backgroundColor: "#307A59",
-        padding: 10,
-        borderRadius: 10,
-        width: "49%",
-        alignItems: "center",
-    },
-
-    activeButton: {
-        backgroundColor: "#93C49E", // Change to your active button color
-        color: "black",
-    },
-
-    buttonText: {
-        color: "white",
-        fontWeight: "500",
-        textAlign: "center",
-    },
-
-    content: {
-        flex: 1,
-    },
     container2: {
         padding: 15,
         borderRadius: 15,
@@ -223,11 +195,6 @@ const styles = StyleSheet.create({
     },
     container5: {
         marginBottom: 30,
-    },
-    itemStatus: {
-        color: "green",
-        fontWeight: "500",
-        textTransform: "uppercase",
     },
     itemPersonnel: {
         textAlign: "justify",

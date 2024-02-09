@@ -1,4 +1,14 @@
-import { View, Text, StyleSheet, Image, TouchableOpacity, Alert, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  Modal,
+  TextInput,
+  ActivityIndicator,
+  Alert,
+} from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { firebase } from "../config";
 import React, { useState, useEffect } from "react";
@@ -6,6 +16,9 @@ import * as ImagePicker from 'expo-image-picker';
 
 export default function EditProfile() {
   const storage = firebase.storage();
+  const [modalVisible, setModalVisible] = useState(false);
+  const [loadingModalVisible, setLoadingModalVisible] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -19,45 +32,35 @@ export default function EditProfile() {
   });
 
   const [profileImage, setProfileImage] = useState(require("../assets/imported/DP.jpg"));
-
   useEffect(() => {
-    firebase
+    const unsubscribe = firebase
       .firestore()
       .collection("users")
       .doc(firebase.auth().currentUser.uid)
-      .get()
-      .then((snapshot) => {
+      .onSnapshot((snapshot) => {
         if (snapshot.exists) {
-          setName(snapshot.data());
-          setEmail(snapshot.data());
+          const userData = snapshot.data();
+          setName(userData);
+          setEmail(userData);
+
+          setUser({
+            firstName: userData.firstName || "",
+            lastName: userData.lastName || "",
+            email: userData.email || "",
+            contact: userData.contact || "",
+            barangay: userData.barangay || "",
+          });
+
+          if (userData.profileImage) {
+            setProfileImage({ uri: userData.profileImage });
+          }
         } else {
           console.log("User does not exist");
         }
       });
-  }, []);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const userDoc = await firebase.firestore().collection("users").doc(firebase.auth().currentUser.uid).get();
-      if (userDoc.exists) {
-        const userData = userDoc.data();
-        setUser({
-          firstName: userData.firstName || "",
-          lastName: userData.lastName || "",
-          email: userData.email || "",
-          contact: userData.contact || "",
-          barangay: userData.barangay || "",
-        });
-
-        if (userData.profileImage) {
-          setProfileImage({ uri: userData.profileImage });
-        }
-      } else {
-        console.log("User does not exist");
-      }
-    };
-
-    fetchData();
+    // Clean up listener on component unmount
+    return () => unsubscribe();
   }, []);
 
   const handleImagePicker = async () => {
@@ -86,9 +89,52 @@ export default function EditProfile() {
       }
     } catch (error) {
       console.error("Error during image upload:", error);
-      // Handle the error here (e.g., show a user-friendly error message)
     }
   };
+
+  const handleEditProfile = () => {
+    setModalVisible(true);
+  };
+
+  const handleSaveProfile = async () => {
+    setLoadingModalVisible(true);
+    setUploading(true);
+
+    try {
+      // Validation checks
+      const nameRegex = /^[A-Za-z. ]+$/;
+      if (!nameRegex.test(user.firstName) || !nameRegex.test(user.lastName)) {
+        Alert.alert("Error", "First name and last name should contain only letters, space, and dot.");
+        return;
+      }
+
+      const contactRegex = /^09[0-9]+$/;
+      if (!contactRegex.test(user.contact)) {
+        Alert.alert("Error", "Contact number should contain only numbers and start with 09.");
+        return;
+      }
+      
+      // Update the user's profile information in Firebase Firestore
+      await firebase.firestore().collection("users").doc(firebase.auth().currentUser.uid).update({
+        firstName: user.firstName,
+        lastName: user.lastName,
+        contact: user.contact,
+        barangay: user.barangay,
+      });
+
+      setModalVisible(false);
+      setUploading(false);
+      Alert.alert("Success", "Profile saved successfully!");
+    } catch (error) {
+      console.error("Error saving profile:", error);
+      Alert.alert("Error", "Failed to save profile. Please try again.");
+      setUploading(false);
+    } finally {
+      setUploading(false);
+      setLoadingModalVisible(false); // Hide loading modal
+    } 
+  };
+
 
   return (
     <View style={styles.container}>
@@ -99,10 +145,10 @@ export default function EditProfile() {
       <Text style={styles.header}>Personal Information</Text>
 
       <View style={styles.profileContainer}>
-          <Image
-            source={profileImage}
-            style={styles.profileImage}
-          />
+        <Image
+          source={profileImage}
+          style={styles.profileImage}
+        />
       </View>
 
       <View style={styles.userInfo}>
@@ -110,8 +156,68 @@ export default function EditProfile() {
         <Text style={styles.userEmail}>{email.email}</Text>
       </View>
 
-      <TouchableOpacity onPress={handleImagePicker}>
-        <Text style={styles.editable}>Edit Image</Text>
+      <Modal animationType="slide" transparent={true} visible={modalVisible}>
+        <View style={styles.modalContainer}>
+            <Text style={styles.editHeader}>Edit Profile</Text>
+
+            <View style={styles.profileContainer}>
+              <Image
+                source={profileImage}
+                style={styles.profileImage}
+              />
+            </View>
+
+            <TouchableOpacity onPress={handleImagePicker}>
+              <Text style={styles.editable}>Edit Image</Text>
+            </TouchableOpacity>
+
+            <TextInput
+              style={styles.input}
+              placeholder="First Name"
+              value={user.firstName}
+              onChangeText={(text) => setUser({ ...user, firstName: text })}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Last Name"
+              value={user.lastName}
+              onChangeText={(text) => setUser({ ...user, lastName: text })}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Contact Number"
+              maxLength={11}
+              keyboardType="number-pad"
+              value={user.contact}
+              onChangeText={(text) => setUser({ ...user, contact: text })}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Address"
+              maxLength={50}
+              value={user.barangay}
+              onChangeText={(text) => setUser({ ...user, barangay: text })}
+            />
+
+            <View style={styles.buttonDesign}>
+              <TouchableOpacity onPress={handleSaveProfile} style={styles.button1}>
+                <Text style={{ fontWeight: "500", fontSize: 15, color: "white" }}>Save</Text>
+              </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.button}>
+              <Text style={{ fontWeight: "500", fontSize: 15, color: "white" }}>Cancel</Text>
+            </TouchableOpacity>
+            </View>
+        </View>
+        {uploading && (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#307A59" />
+          </View>
+        )}
+      </Modal>
+
+      <TouchableOpacity onPress={handleEditProfile}>
+        <Text style={styles.editable1}>Edit Profile</Text>
       </TouchableOpacity>
 
       <View style={styles.userInfo1}>
@@ -122,7 +228,7 @@ export default function EditProfile() {
         <Text style={styles.text}>Contact Number</Text>
         <Text style={styles.data}>{user.contact}</Text>
         <Text style={styles.text}>Address</Text>
-        <Text style={styles.data}>{user.barangay}, Del Gallego, Camarines Sur</Text>
+        <Text style={styles.data}>{user.barangay}</Text>
       </View>
     </View>
   );
@@ -183,17 +289,60 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '700',
     color: "#0174BE",
-    marginBottom: 10,
+    marginBottom: 20,
+    marginTop: 10,
   },
   editable1: {
-    fontSize: 16,
+    textAlign: 'center',
+    fontSize: 15,
     fontWeight: '700',
-    marginTop: 3,
     color: "#0174BE",
+    marginBottom: 10,
   },
-  forgotText: {
-    fontSize: 18,
-    marginTop: 20,
-    fontWeight: '700',
+  modalContainer: {
+    flex: 1,
+    padding: 50,
+    backgroundColor: "white",
+  },
+  input: {
+    height: 50,
+    borderColor: "#307A59",
+    borderWidth: 1,
+    marginBottom: 15,
+    paddingHorizontal: 10,
+    borderRadius: 10,
+  },
+  editHeader: {
+    textAlign: 'center',
+    fontSize: 20,
+    fontWeight: '600',
+  },
+  button: {
+    height: 40,
+    width: 70,
+    backgroundColor: "#307A59",
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    marginLeft: 3,
+  },
+  button1: {
+    height: 40,
+    width: 70,
+    backgroundColor: "#307A59",
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  buttonDesign: {
+    flexDirection: "row",
+    justifyContent: 'center',
+    marginTop: 10,
+  },
+  loadingContainer: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
 });

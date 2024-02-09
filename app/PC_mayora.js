@@ -21,11 +21,11 @@ const Profile = () => {
 
                 querySnapshot.forEach((doc) => {
                     const {
-                        anie,
+                        mayor,
                     } = doc.data();
                     councilData.push({
                         id: doc.id,
-                        anie,
+                        mayor,
                     });
                 });
 
@@ -50,20 +50,20 @@ const Profile = () => {
                 renderItem={({ item }) => (
                     <View style={styles.paraText}>
                         <View style={styles.councilImage}>
-                            {item.anie && (
+                            {item.mayor && (
                                 <Image
-                                    source={{ uri: item.anie }}
+                                    source={{ uri: item.mayor }}
                                     style={styles.image}
                                 />
                             )}
                         </View>
 
-                        <Text style={styles.name}>Arnel Terrenal Verdejo</Text>
+                        <Text style={styles.name}>Melanie Abarientos-Garcia</Text>
 
                         <View style={styles.container1}>
                             <View style={styles.info}>
                                 <Text style={styles.ask}>Date of Birth:</Text>
-                                <Text style={styles.answer}>May 26, 1980</Text>
+                                <Text style={styles.answer}>June 15, 1978</Text>
                             </View>
 
                             <View style={styles.info}>
@@ -73,7 +73,7 @@ const Profile = () => {
 
                             <View style={styles.info}>
                                 <Text style={styles.ask}>Sex:</Text>
-                                <Text style={styles.answer}>Male</Text>
+                                <Text style={styles.answer}>Female</Text>
                             </View>
 
                             <View style={styles.info}>
@@ -88,17 +88,17 @@ const Profile = () => {
 
                             <View style={styles.info}>
                                 <Text style={styles.ask}>Address:</Text>
-                                <Text style={styles.answer}>Pob. Zone 1, Del Gallego</Text>
+                                <Text style={styles.answer}>Sinuknipan, Del Gallego</Text>
                             </View>
 
                             <View style={styles.info}>
                                 <Text style={styles.ask}>Educational Background:</Text>
-                                <Text style={styles.answer}>Vocational</Text>
+                                <Text style={styles.answer}>College</Text>
                             </View>
 
                             <View style={styles.info}>
                                 <Text style={styles.ask}>Political Terms:</Text>
-                                <Text style={styles.answer}>Last Terms</Text>
+                                <Text style={styles.answer}>Second Terms</Text>
                             </View>
                         </View>
                     </View>
@@ -106,6 +106,7 @@ const Profile = () => {
             />
         </View>
     );
+
 };
 
 export default Profile;
@@ -118,11 +119,11 @@ const styles = StyleSheet.create({
         padding: 20,
     },
     image: {
-        width: 120, 
-        height: 130, 
-        resizeMode: "cover", 
-        borderRadius: 10, 
-        marginTop: 10, 
+        width: 120,
+        height: 130,
+        resizeMode: "cover",
+        borderRadius: 10,
+        marginTop: 10,
     },
     councilImage: {
         alignItems: 'center',

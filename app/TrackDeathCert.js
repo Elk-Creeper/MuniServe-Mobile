@@ -42,7 +42,7 @@ const Transaction = () => {
                         formattedCreatedAt = `${timeDiffInMinutes}m ago`;
                     } else if (timeDiffInMinutes < 1440) {
                         const hours = Math.floor(timeDiffInMinutes / 60);
-                        formattedCreatedAt = `${hours} ${hours === 1 ? "hour" : "hours"} ago`;
+                        formattedCreatedAt = `${hours} ${hours === 1 ? "hour" : "hrs"} ago`;
                     } else {
                         formattedCreatedAt = createdAt.toDate().toLocaleDateString();
                     }
@@ -182,34 +182,6 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         fontSize: 20,
     },
-    navigationButtons: {
-        flexDirection: "row",
-        justifyContent: "space-around",
-        marginVertical: 10,
-    },
-
-    navigationButton: {
-        backgroundColor: "#307A59",
-        padding: 10,
-        borderRadius: 10,
-        width: "49%",
-        alignItems: "center",
-    },
-
-    activeButton: {
-        backgroundColor: "#93C49E", // Change to your active button color
-        color: "black",
-    },
-
-    buttonText: {
-        color: "white",
-        fontWeight: "500",
-        textAlign: "center",
-    },
-
-    content: {
-        flex: 1,
-    },
     container2: {
         padding: 15,
         borderRadius: 15,
@@ -220,11 +192,6 @@ const styles = StyleSheet.create({
     },
     container5: {
         marginBottom: 30,
-    },
-    itemStatus: {
-        color: "green",
-        fontWeight: "500",
-        textTransform: "uppercase",
     },
     itemPersonnel: {
         textAlign: "justify",
@@ -261,7 +228,7 @@ const styles = StyleSheet.create({
         marginBottom: 270,
     },
     itemCreatedAt: {
-        marginLeft: 70,
+        marginLeft: 80,
         marginTop: 3,
         fontSize: 13,
         color: "#597ae8",

@@ -154,10 +154,6 @@ const styles = StyleSheet.create({
         textAlign: "justify",
         lineHeight: 30,
     },
-    regText: {
-        fontSize: 25,
-        textAlign: "center",
-    },
     noteText: {
         fontSize: 17,
         textAlign: "justify",

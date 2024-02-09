@@ -21,11 +21,11 @@ const Profile = () => {
 
                 querySnapshot.forEach((doc) => {
                     const {
-                        anie,
+                        antet,
                     } = doc.data();
                     councilData.push({
                         id: doc.id,
-                        anie,
+                        antet,
                     });
                 });
 
@@ -50,20 +50,20 @@ const Profile = () => {
                 renderItem={({ item }) => (
                     <View style={styles.paraText}>
                         <View style={styles.councilImage}>
-                            {item.anie && (
+                            {item.antet && (
                                 <Image
-                                    source={{ uri: item.anie }}
+                                    source={{ uri: item.antet }}
                                     style={styles.image}
                                 />
                             )}
                         </View>
 
-                        <Text style={styles.name}>Arnel Terrenal Verdejo</Text>
+                        <Text style={styles.name}>Francisco D. Verceluz</Text>
 
                         <View style={styles.container1}>
                             <View style={styles.info}>
                                 <Text style={styles.ask}>Date of Birth:</Text>
-                                <Text style={styles.answer}>May 26, 1980</Text>
+                                <Text style={styles.answer}>October 20, 1988</Text>
                             </View>
 
                             <View style={styles.info}>
@@ -88,7 +88,7 @@ const Profile = () => {
 
                             <View style={styles.info}>
                                 <Text style={styles.ask}>Address:</Text>
-                                <Text style={styles.answer}>Pob. Zone 1, Del Gallego</Text>
+                                <Text style={styles.answer}>Pob. Zone 2, Del Gallego</Text>
                             </View>
 
                             <View style={styles.info}>
@@ -106,6 +106,7 @@ const Profile = () => {
             />
         </View>
     );
+
 };
 
 export default Profile;
@@ -118,11 +119,11 @@ const styles = StyleSheet.create({
         padding: 20,
     },
     image: {
-        width: 120, 
-        height: 130, 
-        resizeMode: "cover", 
-        borderRadius: 10, 
-        marginTop: 10, 
+        width: 120,
+        height: 130,
+        resizeMode: "cover",
+        borderRadius: 10,
+        marginTop: 10,
     },
     councilImage: {
         alignItems: 'center',

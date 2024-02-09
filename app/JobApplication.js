@@ -153,14 +153,19 @@ export default function JobApplication() {
             }
 
             // Validate phone number
-            if (!/^\d{11}$/.test(phoneNum)) {
-                Alert.alert("Invalid Phone Number", "Phone number must be exactly 11 digits.");
+            const contactRegex = /^09[0-9]+$/;
+            if (!contactRegex.test(phoneNum)) {
+                Alert.alert("Invalid Number", "Contact number should contain only numbers and start with 09.");
                 return;
             }
-
             // Check if image or document is provided
             if (!image && documents.length === 0) {
                 Alert.alert("Missing Media", "Please upload an image or document.");
+                return;
+            }
+
+            if (!/^\d+$/.test(age)) {
+                Alert.alert("Invalid Input", "Age should only contain numbers.");
                 return;
             }
 
@@ -581,12 +586,6 @@ const styles = StyleSheet.create({
         marginBottom: 15,
         marginTop: 15,
     },
-    box: {
-        marginLeft: 20,
-        color: "white",
-        fontSize: 17,
-        marginTop: 19,
-    },
     boxAcc: {
         flexDirection: "row",
     },
@@ -595,25 +594,6 @@ const styles = StyleSheet.create({
         marginLeft: 15,
         width: 40,
         height: 40,
-    },
-    inputContainer: {
-        flexDirection: "row",
-        alignItems: "center",
-        borderWidth: 2,
-        borderColor: "#307A59",
-        borderRadius: 5,
-        paddingVertical: 8,
-        paddingHorizontal: 10,
-        marginTop: 25,
-        height: 60,
-    },
-    icon: {
-        marginRight: 10,
-        color: "#307A59", // Change the color to match your design
-    },
-    input: {
-        flex: 1,
-        fontSize: 17,
     },
     innerContainer: {
         alignContent: "center",
@@ -640,19 +620,10 @@ const styles = StyleSheet.create({
     documentContainer: {
         marginTop: 10,
     },
-    imageName: {
-        fontSize: 18,
-        fontWeight: "bold",
-        marginBottom: 10,
-    },
     image: {
         width: 200,
         height: 200,
         resizeMode: "cover",
-    },
-    regText: {
-        fontSize: 25,
-        textAlign: "center",
     },
     noteText: {
         fontSize: 15,
@@ -660,24 +631,6 @@ const styles = StyleSheet.create({
         marginTop: 5,
         marginBottom: 10,
         fontWeight: "400",
-    },
-    boxContainer: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-    },
-    Input: {
-        marginLeft: 10,
-        marginTop: 5,
-        textAlign: "left",
-    },
-    Main: {
-        backgroundColor: "#FFF",
-        width: 270,
-        height: 40,
-        borderWidth: 1,
-        borderColor: "black",
-        borderTopLeftRadius: 40,
-        borderBottomLeftRadius: 40,
     },
     button: {
         backgroundColor: "#307A59",
@@ -738,25 +691,10 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         paddingLeft: 10,
     },
-    placeholder3: {
-        borderWidth: 1,
-        borderColor: "#000",
-        borderRadius: 15,
-        padding: 10,
-        marginBottom: 20,
-    },
     label: {
         fontSize: 15,
         fontWeight: "400",
         marginVertical: 8,
-    },
-    datePickerStyle: {
-        width: "100%",
-        borderColor: "black",
-        borderRadius: 8,
-        borderWidth: 1,
-        alignItems: "center",
-        justifyContent: "center",
     },
     plusCircle: {
         width: 30,

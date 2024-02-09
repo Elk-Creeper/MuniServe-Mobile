@@ -202,22 +202,6 @@ const styles = StyleSheet.create({
         fontWeight: "600",
         marginBottom: 15,
     },
-    itemPara: {
-        textAlign: "justify",
-        fontSize: 16,
-        fontWeight: "300",
-        lineHeight: 25,
-        marginTop: 5,
-    },
-    input: {
-        height: 48,
-        borderRadius: 5,
-        overflow: "hidden",
-        backgroundColor: "white",
-        paddingLeft: 16,
-        flex: 1,
-        marginRight: 5,
-    },
     button: {
         height: 47,
         borderRadius: 10,

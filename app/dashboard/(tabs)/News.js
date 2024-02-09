@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { firebase } from "../../../config";
 import { StatusBar } from "expo-status-bar";
-import { Ionicons } from "@expo/vector-icons"; // Import the Ionicons library for the bell icon
+import { Ionicons } from "@expo/vector-icons";
 import { Link, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 
@@ -132,7 +132,6 @@ export default function tab4() {
                 </View>
 
                 <View style={styles.subContainer3}>
-                  <Text style={styles.itemTitle}>{item.title}</Text>
                   <View style={styles.imageStyle}>
                     {item.imageUrls &&
                       item.imageUrls.length > 0 &&
@@ -145,6 +144,8 @@ export default function tab4() {
                       ))}
                   </View>
                 </View>
+
+                <Text style={styles.itemTitle}>{item.title}</Text>
 
               </View>
             </TouchableOpacity>
@@ -208,10 +209,6 @@ const styles = StyleSheet.create({
     borderColor: "black",
     borderRadius: 50,
   },
-  Input: {
-    marginLeft: 10,
-    marginTop: 5,
-  },
   newsText: {
     fontSize: 20,
     fontWeight: "800",
@@ -231,7 +228,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   imageStyle: {
-    marginTop: 20,
+    marginTop: 10,
     alignItems: "center",
   },
   container2: {
@@ -242,16 +239,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginTop: 10,
   },
-  itemContent: {
-    textAlign: "justify",
-    lineHeight: 20,
-    marginTop: 10,
-  },
   itemTitle: {
     textAlign: "justify",
     lineHeight: 15,
     fontWeight: "700",
     textAlign: "left",
+    marginTop: 20,
   },
   appText: {
     fontSize: 18,
@@ -266,14 +259,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   itemCreatedAt: {
-    marginLeft: 110,
+    marginLeft: 105,
     marginTop: 3,
     fontSize: 13,
     color: "#597ae8",
     fontWeight: "600",
-  },
-  subContainer3: {
-  flexDirection: "row",
-  display: "grid",
   },
 });

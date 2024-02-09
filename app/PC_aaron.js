@@ -2,9 +2,7 @@ import {
     View,
     Text,
     StyleSheet,
-    ScrollView,
     Image,
-    TouchableOpacity,
     FlatList,
 } from "react-native";
 import React, { useState, useEffect } from "react";
@@ -121,11 +119,11 @@ const styles = StyleSheet.create({
         padding: 20,
     },
     image: {
-        width: 120, // Adjust the width as needed
-        height: 130, // Adjust the height as needed
-        resizeMode: "cover", // Adjust the resizeMode as needed
-        borderRadius: 10, // Optional: add border radius for rounded corners
-        marginTop: 10, // Optional: add margin for spacing
+        width: 120, 
+        height: 130, 
+        resizeMode: "cover", 
+        borderRadius: 10, 
+        marginTop: 10, 
     },
     councilImage: {
         alignItems: 'center',

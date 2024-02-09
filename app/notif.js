@@ -39,6 +39,8 @@ const Transaction = () => {
                         date,
                         name,
                         createdAt,
+                        remarks,
+                        userName,
                     } = doc.data();
 
                     if (
@@ -87,6 +89,8 @@ const Transaction = () => {
                             time: formattedTime,
                             name,
                             createdAt: formattedCreatedAt,
+                            remarks,
+                            userName,
                         });
                     } else {
                         console.warn(
@@ -103,6 +107,24 @@ const Transaction = () => {
             unsubscribeTransaction();
         };
     }, []);
+
+    const getStatusMessage = (item) => {
+        const { userName, status, remarks, personnel, date, time, department } = item;
+
+        switch (status) {
+            case 'Pending':
+                return `Dear ${userName}, your requested appointment for ${personnel} from ${department} on ${date} at ${time} is still PENDING.\n\nREMARKS: ${remarks}`;
+            case 'Approved':
+                return `Dear ${userName}, your requested appointment for ${personnel} from ${department} on ${date} at ${time} is already APPROVED.\n\nREMARKS: ${remarks}`;
+            case 'Rejected':
+                return `Dear ${userName}, your requested appointment for ${personnel} from ${department} on ${date} at ${time} is REJECTED.\n\nREMARKS: ${remarks}`;
+           case 'Disapproved':
+                return `Dear ${userName}, your requested appointment for ${personnel} from ${department} on ${date} at ${time} is DISAPPROVED.\n\nREMARKS: ${remarks}`;
+            default:
+                return ''; // Handle other statuses if needed
+        }
+    };
+
 
     return (
         <View style={styles.container}>
@@ -135,26 +157,23 @@ const Transaction = () => {
                         </View>
                     ) : (
                         <FlatList
-                            data={appointmentData}
-                            renderItem={({ item }) => (
-                                <View style={styles.container2}>
+                                data={appointmentData}
+                                renderItem={({ item }) => (
+                                    <View style={styles.container2}>
                                         <View style={styles.container4}>
                                             <Image
                                                 source={require("../assets/imported/Del_Gallego_Camarines_Sur.png")}
                                                 style={styles.boxIcon}
                                             />
-                                            <Text style={styles.appText}>Appointment</Text>
+                                            <Text style={styles.appText}>Transaction</Text>
                                             <Text style={styles.itemCreatedAt}>
                                                 {item.createdAt}
                                             </Text>
                                         </View>
                                         <Text style={styles.itemPersonnel}>
-                                            Dear {item.name}, your requested appointment for{" "}
-                                            {item.personnel} from {item.department} on {item.date} at{" "}
-                                            {item.time} is
-                                            <Text style={styles.itemStatus}> {item.status}.</Text>
+                                            {getStatusMessage(item)}
                                         </Text>
-                                </View>
+                                    </View>
                             )}
                         />
                     )}
@@ -204,34 +223,6 @@ const styles = StyleSheet.create({
         color: "green",
         fontWeight: "bold",
         fontSize: 20,
-    },
-    navigationButtons: {
-        flexDirection: "row",
-        justifyContent: "space-around",
-        marginVertical: 10,
-    },
-
-    navigationButton: {
-        backgroundColor: "#307A59",
-        padding: 10,
-        borderRadius: 10,
-        width: "49%",
-        alignItems: "center",
-    },
-
-    activeButton: {
-        backgroundColor: "#93C49E", // Change to your active button color
-        color: "black",
-    },
-
-    buttonText: {
-        color: "white",
-        fontWeight: "500",
-        textAlign: "center",
-    },
-
-    content: {
-        flex: 1,
     },
     container2: {
         padding: 15,
@@ -284,7 +275,7 @@ const styles = StyleSheet.create({
         marginBottom: 270,
     },
     itemCreatedAt: {
-        marginLeft: 55,
+        marginLeft: 80,
         marginTop: 3,
         fontSize: 13,
         color: "#597ae8",

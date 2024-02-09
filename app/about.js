@@ -78,18 +78,11 @@ const styles = StyleSheet.create({
         color: 'white',
         fontWeight: '400'
     },
-    text: {
-        fontSize: 21,
-        marginTop: 30,
-        fontWeight: "500",
-        marginBottom: 15,
-        textAlign: "center",
-    },
     itemPara: {
         textAlign: "justify",
-        fontSize: 16,
+        fontSize: 15,
         fontWeight: "300",
-        lineHeight: 25,
-        marginTop: 15,
+        lineHeight: 35,
+        marginTop: 35,
     },
 });

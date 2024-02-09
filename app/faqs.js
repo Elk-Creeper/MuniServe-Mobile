@@ -83,7 +83,6 @@ const styles = StyleSheet.create({
         padding: 35,
     },
     header: {
-        marginTop: 10,
         backgroundColor: "#307A59",
         borderRadius: 10,
     },
@@ -105,22 +104,22 @@ const styles = StyleSheet.create({
     },
     itemA1: {
         textAlign: "justify",
-        fontSize: 16,
+        fontSize: 15,
         fontWeight: "300",
         lineHeight: 25,
-        marginTop: 5,
+        marginTop: 10,
     },
     itemQ1: {
         textAlign: "justify",
-        marginTop: 20,
+        marginTop: 40,
         fontSize: 18,
     },
     itemA2: {
         textAlign: "justify",
-        fontSize: 16,
+        fontSize: 15,
         fontWeight: "300",
         lineHeight: 25,
-        marginTop: 5,
+        marginTop: 10,
     },
     itemQ2: {
         textAlign: "justify",
@@ -129,10 +128,10 @@ const styles = StyleSheet.create({
     },
     itemA3: {
         textAlign: "justify",
-        fontSize: 16,
+        fontSize: 15,
         fontWeight: "300",
         lineHeight: 25,
-        marginTop: 5,
+        marginTop: 10,
     },
     itemQ3: {
         textAlign: "justify",
@@ -141,22 +140,21 @@ const styles = StyleSheet.create({
     },
     itemA4: {
         textAlign: "justify",
-        fontSize: 16,
+        fontSize: 15,
         fontWeight: "300",
         lineHeight: 25,
-        marginTop: 5,
+        marginTop: 10,
     },
     itemQ4: {
         textAlign: "justify",
-        marginTop: 30,
         fontSize: 18,
     },
     itemA5: {
         textAlign: "justify",
-        fontSize: 16,
+        fontSize: 15,
         fontWeight: "300",
         lineHeight: 25,
-        marginTop: 5,
+        marginTop: 10,
         marginBottom: 20,
     },
     itemQ5: {

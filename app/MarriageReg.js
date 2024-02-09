@@ -216,6 +216,11 @@ export default function MarriageReg() {
                 return;
             }
 
+            if (!/^\d+$/.test(h_age) || !/^\d+$/.test(w_age)) {
+                Alert.alert("Invalid Input", "Age should only contain numbers.");
+                return;
+            }
+
             // Store the download URL in Firestore
             const MuniServe = firebase.firestore();
             const MarriageReg = MuniServe.collection("marriage_reg");
@@ -1197,14 +1202,6 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         fontSize: 20,
     },
-    serveText: {
-        fontSize: 18,
-        fontWeight: "bold",
-        color: "black",
-        textAlign: "left",
-        marginTop: 15,
-        marginBottom: 15,
-    },
     boxes1: {
         width: "100%",
         height: 65,
@@ -1222,10 +1219,6 @@ const styles = StyleSheet.create({
         width: 40,
         height: 40,
     },
-    containers: {
-        alignItems: "center",
-        justifyContent: "center",
-    },
     inputContainer: {
         flexDirection: "row",
         alignItems: "center",
@@ -1238,29 +1231,6 @@ const styles = StyleSheet.create({
     icon: {
         marginRight: 10,
         color: "#000", // Change the color to match your design
-    },
-    input: {
-        flex: 1,
-        fontSize: 17,
-    },
-    loginButton: {
-        backgroundColor: "#307A59",
-        justifyContent: "center",
-        alignItems: "center",
-        borderRadius: 50,
-        paddingVertical: 10,
-        marginTop: 20,
-        width: 165,
-    },
-    loginButtonText: {
-        color: "white",
-        fontSize: 15,
-    },
-    serveContainer: {
-        padding: 15,
-        borderRadius: 15,
-        margin: 5,
-        marginHorizontal: 10,
     },
     innerContainer: {
         alignContent: "center",
@@ -1281,47 +1251,9 @@ const styles = StyleSheet.create({
         fontWeight: '400',
         marginBottom: 30
     },
-    itemService_proc: {
-        fontWeight: "300",
-        fontSize: 15,
-        textAlign: "justify",
-        lineHeight: 30,
-    },
     imageContainer: {
         marginTop: 20,
         alignItems: "center",
-    },
-    imageName: {
-        fontSize: 18,
-        fontWeight: "bold",
-        marginBottom: 10,
-    },
-    image: {
-        width: 200,
-        height: 200,
-        resizeMode: "cover",
-    },
-    closeButton: {
-        position: "absolute",
-        top: 30,
-        right: 10,
-        backgroundColor: "#307A59",
-        borderRadius: 100,
-        padding: 5,
-        width: 30,
-        height: 30,
-        justifyContent: "center",
-        alignItems: "center",
-        textAlign: "center",
-    },
-    closeButtonText: {
-        fontSize: 18,
-        color: "white",
-        textAlign: "center",
-    },
-    regText: {
-        fontSize: 25,
-        textAlign: "center",
     },
     noteText: {
         fontSize: 17,
@@ -1337,31 +1269,9 @@ const styles = StyleSheet.create({
         marginBottom: 5,
         fontWeight: "600",
     },
-    noteText2: {
-        fontSize: 17,
-        textAlign: "justify",
-        marginTop: 5,
-        marginBottom: 5,
-        fontWeight: "500",
-        color: "#945",
-    },
     boxContainer: {
         flexDirection: "row",
         justifyContent: "space-between",
-    },
-    Input: {
-        marginLeft: 10,
-        marginTop: 5,
-        textAlign: "left",
-    },
-    Main: {
-        backgroundColor: "#FFF",
-        width: 270,
-        height: 40,
-        borderWidth: 1,
-        borderColor: "black",
-        borderTopLeftRadius: 40,
-        borderBottomLeftRadius: 40,
     },
     button: {
         backgroundColor: "#307A59",
@@ -1373,57 +1283,11 @@ const styles = StyleSheet.create({
         marginTop: 20,
         width: 165,
     },
-    selectButton: {
-        borderRadius: 10,
-        flexDirection: "row", // Align items horizontally
-        justifyContent: "space-between", // Space between children
-        alignItems: "center", // Center vertically
-        width: "100%",
-        height: 50,
-        backgroundColor: "transparent",
-        borderColor: "#000",
-        borderWidth: 1,
-        marginTop: 10,
-        flexDirection: "row",
-        marginVertical: 10,
-        padding: 10,
-    },
-
-    buttonText: {
-        flex: 1, // Take up available space
-        color: "#000",
-        fontSize: 14,
-        fontWeight: "light",
-        textAlign: "left",
-    },
-
     submitText: {
         color: "#fff",
         fontSize: 15,
         fontWeight: "bold",
     },
-
-    plusCircle: {
-        width: 30,
-        height: 30,
-        borderRadius: 15,
-        backgroundColor: "#307A59",
-        justifyContent: "center",
-        alignItems: "center",
-        marginRight: 10, // Adjust margin as needed
-    },
-
-    checkCircle: {
-        width: 30,
-        height: 30,
-        borderRadius: 15,
-        backgroundColor: "#3498db", // Check sign color
-        justifyContent: "center",
-        alignItems: "center",
-        marginRight: 10, // Adjust margin as needed
-        marginBottom: 30,
-    },
-
     imageContainer: {
         marginTop: 30,
         marginBottom: 50,
@@ -1451,16 +1315,6 @@ const styles = StyleSheet.create({
         fontSize: 15,
         fontWeight: "400",
         marginVertical: 8,
-    },
-    loadingModal: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: "rgba(0, 0, 0, 0.5)",
-    },
-    loadingModalText: {
-        marginTop: 10,
-        color: "#fff",
     },
     loadingContainer: {
         ...StyleSheet.absoluteFillObject,

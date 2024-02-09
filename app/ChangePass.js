@@ -60,6 +60,7 @@ export default function ChangePassword() {
                                         password: newPassword,
                                     })
                                         .then(() => {
+                                            resetForm();
                                             Alert.alert('Password Updated', 'Your password has been successfully updated.');
                                         })
                                         .catch((error) => {
@@ -89,6 +90,12 @@ export default function ChangePassword() {
             Alert.alert('User not found', 'Please make sure you are logged in.');
             setLoading(false);
         }
+    };
+
+    const resetForm = () => {
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmNewPassword("");
     };
 
     return (
@@ -152,7 +159,6 @@ export default function ChangePassword() {
 
             <Modal
                 transparent={true}
-                animationType="slide"
                 visible={loading}
                 onRequestClose={() => setLoading(false)}
             >
@@ -186,9 +192,11 @@ const styles = StyleSheet.create({
         fontSize: 17,
     },
     text: {
-        fontSize: 20,
+        fontSize: 22,
         textAlign: 'center',
-        marginBottom: 150,
+        marginBottom: 140,
+        fontWeight: '600',
+        marginTop: 20,
     },
     textInput: {
         paddingTop: 10,
@@ -204,10 +212,10 @@ const styles = StyleSheet.create({
         height: 50
     },
     modalContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.1)',
+        ...StyleSheet.absoluteFillObject,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "rgba(0, 0, 0, 0.5)",
     },
     con: {
         flexDirection: 'row',

@@ -4,7 +4,6 @@ import {
   Image,
   FlatList,
   SafeAreaView,
-  Pressable,
   TouchableOpacity,
   StyleSheet,
 } from "react-native";

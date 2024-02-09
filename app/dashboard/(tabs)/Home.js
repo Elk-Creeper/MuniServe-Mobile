@@ -29,29 +29,30 @@ export default function tab1() {
     setRefreshing(false);
   };
 
-  const fetchDataFromFirebase = async () => {
+  const fetchDataFromFirebase = () => {
     const currentUser = firebase.auth().currentUser;
+
     if (currentUser) {
       const userId = currentUser.uid;
 
-      const snapshot = await firebase.firestore().collection("users").doc(userId).get();
+      const userRef = firebase.firestore().collection("users").doc(userId);
 
-      if (snapshot.exists) {
-        const userData = snapshot.data();
-        console.log("User Data:", userData);
-        setName(userData.firstName || "");
-        setContact(userData.contact || "");
-        setProfileImage(userData.profileImage || "");
-      } else {
-        console.log("User does not exist");
-      }
+      const unsubscribe = userRef.onSnapshot((snapshot) => {
+        if (snapshot.exists) {
+          const userData = snapshot.data();
+          console.log("User Data:", userData);
+          setName(userData.firstName || "");
+          setContact(userData.contact || "");
+          setProfileImage(userData.profileImage || "");
+        } else {
+          console.log("User does not exist");
+        }
+      });
+
+      return () => unsubscribe();
     }
   };
 
-  useEffect(() => {
-    fetchDataFromFirebase();
-  }, []);
-  
   return (
     <View style={styles.container}>
       <StatusBar
