@@ -152,7 +152,7 @@ export default function EditProfile() {
       </View>
 
       <View style={styles.userInfo}>
-        <Text style={styles.userName}>Hi, {name.firstName}</Text>
+        <Text style={styles.userName}>{name.firstName}</Text>
         <Text style={styles.userEmail}>{email.email}</Text>
       </View>
 

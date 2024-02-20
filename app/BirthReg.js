@@ -91,6 +91,7 @@ export default function BirthReg() {
   const [m_occur, setM_occur] = useState("");
   const [m_religion, setM_religion] = useState("");
   const [m_residence, setM_residence] = useState("");
+  const [marriedType, setMarriedType] = useState("");
   const [mpDate, setMpDate] = useState(new Date());
   const [mpPlace, setMpPlace] = useState("");
 
@@ -142,6 +143,14 @@ export default function BirthReg() {
       if (!/^\d+$/.test(childAliveButNowDead) || !/^\d+$/.test(childStillLiving) || !/^\d+$/.test(bornAlive)) {
         Alert.alert("Invalid Input", "Number of Child should only contain numbers.");
         return;
+      }
+
+      // Check married field
+      if (marriedType === "Yes") {
+        if (!mpDate || !mpPlace) {
+          Alert.alert("Incomplete Information", "Please fill in all required marriage-related fields.");
+          return;
+        }
       }
 
       // Store the download URL in Firestore
@@ -241,6 +250,7 @@ export default function BirthReg() {
     setM_occur("");
     setM_religion("");
     setM_residence("");
+    setMarriedType("");
     setMpDate(new Date());
     setMpPlace("");
 
@@ -825,54 +835,74 @@ export default function BirthReg() {
           </View>
         </View>
 
-        <Text style={styles.noteText}>MARRIAGE OF PARENTS</Text>
-        <Text style={styles.label1}>
-          (If not married, accomplish Affidavit of Acknowledgement/Admission
-          of Paternity.)
-        </Text>
-
         <View style={{ marginBottom: 10 }}>
-          <Text style={styles.label}>
-            DATE
+          <Text style={styles.noteText}>MARRIAGE OF PARENTS</Text>
+          <Text style={styles.label1}>
+            (If not married, accomplish Affidavit of Acknowledgement/Admission
+            of Paternity.)
           </Text>
-
-          <TouchableOpacity
-            onPress={() => setShowDatePlacePicker(true)}
-            style={styles.placeholder}
-          >
-            <Text>{selectedDatePlaceText}</Text>
-          </TouchableOpacity>
-
-          {showDatePlacePicker && (
-            <DateTimePicker
-              value={mpDate}
-              mode="date"
-              display="default"
-              onChange={onDatePlaceChange}
-              maximumDate={maxDate}
-            />
-          )}
-        </View>
-
-        <View style={{ marginBottom: 10 }}>
-          <Text style={styles.label}>
-            PLACE (municipality, province, country)
-          </Text>
-
           <View style={styles.placeholder}>
-            <TextInput
-              placeholder=""
-              maxLength={50}
-              value={mpPlace}
-              onChangeText={(mpPlace) =>
-                setMpPlace(mpPlace)
-              }
-              style={{
-                width: "100%",
-              }}
-            ></TextInput>
+            <Picker
+              selectedValue={marriedType}
+              onValueChange={(itemValue, itemIndex) => setMarriedType(itemValue)}
+              style={{ width: "100%" }}
+            >
+              <Picker.Item label="Select" value="" />
+              <Picker.Item label="Yes" value="Yes" />
+              <Picker.Item label="No" value="No" />
+            </Picker>
           </View>
         </View>
+
+        {marriedType === 'Yes' && (
+          <View style={{ marginBottom: 10 }}>
+            <Text style={styles.noteText}>IF PARENTS ARE MARRIED, FILL THIS PART</Text>
+
+            <View style={{ marginBottom: 10 }}>
+              <Text style={styles.label}>
+                DATE
+              </Text>
+
+              <TouchableOpacity
+                onPress={() => setShowDatePlacePicker(true)}
+                style={styles.placeholder}
+              >
+                <Text>{selectedDatePlaceText}</Text>
+              </TouchableOpacity>
+
+              {showDatePlacePicker && (
+                <DateTimePicker
+                  value={mpDate}
+                  mode="date"
+                  display="default"
+                  onChange={onDatePlaceChange}
+                  maximumDate={maxDate}
+                />
+              )}
+            </View>
+
+            <View style={{ marginBottom: 10 }}>
+              <Text style={styles.label}>
+                PLACE (municipality, province, country)
+              </Text>
+
+              <View style={styles.placeholder}>
+                <TextInput
+                  placeholder=""
+                  maxLength={50}
+                  value={mpPlace}
+                  onChangeText={(mpPlace) =>
+                    setMpPlace(mpPlace)
+                  }
+                  style={{
+                    width: "100%",
+                  }}
+                ></TextInput>
+              </View>
+            </View>
+
+          </View>
+        )}
 
         <View style={{ marginBottom: 10 }}>
           <Text style={styles.label}>ATTENDANT</Text>

@@ -281,6 +281,16 @@ export default function JobApplication() {
         setPosition("");
     };
 
+    const removeDocument = (index) => {
+        const updatedDocuments = [...documents];
+        updatedDocuments.splice(index, 1);
+        setDocuments(updatedDocuments);
+    };
+
+    const removeImage = () => {
+        setImage(null);
+    };
+
     return (
         <View style={styles.container}>
             <StatusBar backgroundColor="#93C49E" />
@@ -326,7 +336,7 @@ export default function JobApplication() {
                     below:
                 </Text>
                 <View style={{ marginBottom: 10 }}>
-                    <Text style={styles.label}>Complete name</Text>
+                    <Text style={styles.label}>Complete name (First, Middle Name, Last)</Text>
 
                     <View style={styles.placeholder}>
                         <TextInput
@@ -377,7 +387,7 @@ export default function JobApplication() {
                 </View>
 
                 <View style={{ marginBottom: 10 }}>
-                    <Text style={styles.label}>Address</Text>
+                    <Text style={styles.label}>Complete Address</Text> 
 
                     <View style={styles.placeholder}>
                         <TextInput
@@ -469,7 +479,7 @@ export default function JobApplication() {
                         {documents.map((document, index) => (
                             <View key={index} style={styles.documentItem}>
                                 <Ionicons name="ios-document" size={50} color="black" />
-                                <View style={{ marginLeft: 10 }}>
+                                <View style={{ marginLeft: 10, marginTop: 10}}>
                                     <Text style={styles.documentName}>
                                         {document.assets?.[0]?.name || "Unknown Name"}
                                     </Text>
@@ -477,6 +487,9 @@ export default function JobApplication() {
                                         {formatBytes(document.assets?.[0]?.size) || "Unknown Size"}
                                     </Text>
                                 </View>
+                                <TouchableOpacity onPress={() => removeDocument(index)}>
+                                    <Ionicons name="ios-close-circle" size={24} color="black" marginLeft={10} marginTop={5}/>
+                                </TouchableOpacity>
                             </View>
                         ))}
                     </View>
@@ -514,10 +527,17 @@ export default function JobApplication() {
 
                 <View style={styles.imageContainer}>
                     {image && (
-                        <Image
-                            source={{ uri: image }}
-                            style={{ width: 200, height: 200 }}
-                        />
+                        <View style={{ alignItems: 'center' }}>
+                            <View style={styles.imageContainer}>
+                                <TouchableOpacity
+                                    style={styles.removeIcon}
+                                    onPress={() => removeImage()}
+                                >
+                                    <Ionicons name="ios-close-circle" size={24} color="black" />
+                                </TouchableOpacity>
+                                <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />
+                            </View>
+                        </View>
                     )}
                     <TouchableOpacity
                         style={styles.button}
@@ -638,7 +658,6 @@ const styles = StyleSheet.create({
         borderRadius: 50,
         paddingVertical: 10,
         width: 165,
-        marginTop: 30,
     },
     selectButton: {
         borderRadius: 10,
@@ -666,7 +685,7 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
     },
     imageContainer: {
-        marginTop: 30,
+        marginTop: 15,
         marginBottom: 50,
         alignItems: "center",
     },
@@ -725,5 +744,16 @@ const styles = StyleSheet.create({
     },
     documentName: {
         color: "#000"
-    }
+    },
+    documentItem: {
+        flexDirection: 'row',
+    },
+     removeIcon: {
+        position: 'absolute',
+        top: 10,
+        right: 10,
+        zIndex: 1, // To place the icon above the image
+    },
+
 });
+   

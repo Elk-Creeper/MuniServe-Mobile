@@ -84,6 +84,7 @@ export default function DeathReg() {
     const [orderChild, setOrderChild] = useState("");
     const [causeOfDeath, setCauseOfDeath] = useState("");
     const [maternalCondi, setMaternalCondi] = useState("");
+    const [mannerDeath, setMannerDeath] = useState("");
     const [externalCause, setExternalCause] = useState("");
     const [autopsy, setAutopsy] = useState("");
     const [attendant, setAttendant] = useState("");
@@ -116,6 +117,7 @@ export default function DeathReg() {
                 !motherName ||
                 !causeOfDeath ||
                 !maternalCondi ||
+                !mannerDeath ||
                 !externalCause ||
                 !autopsy ||
                 !attendant ||
@@ -148,7 +150,7 @@ export default function DeathReg() {
                 Alert.alert("Invalid Input", "Age should only contain numbers.");
                 return;
             }
-            
+
             // Store the download URL in Firestore
             const MuniServe = firebase.firestore();
             const deathreg = MuniServe.collection("death_reg");
@@ -160,7 +162,7 @@ export default function DeathReg() {
                 userEmail: userEmail,
                 userContact: userContact,
                 userBarangay: userBarangay,
-                regType : regType,
+                regType: regType,
                 name: name,
                 sex: sex,
                 dateDeath: dateDeath,
@@ -181,13 +183,14 @@ export default function DeathReg() {
                 orderChild: orderChild,
                 causeOfDeath: causeOfDeath,
                 maternalCondi: maternalCondi,
+                mannerDeath: mannerDeath,
                 externalCause: externalCause,
-                autopsy : autopsy,
+                autopsy: autopsy,
                 attendant: attendant,
                 corpseDis: corpseDis,
                 addOfCemetery: addOfCemetery,
-                forChild : forChild,
-                status: "Pending", 
+                forChild: forChild,
+                status: "Pending",
                 createdAt: timestamp,
                 remarks: "",
             });
@@ -214,7 +217,7 @@ export default function DeathReg() {
             setUploading(false);
             setLoadingModalVisible(false);
         }
-    }; 
+    };
 
     const resetForm = () => {
         setRegType("");
@@ -238,6 +241,7 @@ export default function DeathReg() {
         setOrderChild("");
         setCauseOfDeath("");
         setMaternalCondi("");
+        setMannerDeath("");
         setExternalCause("");
         setCorpseDis("");
         setAddOfCemetery("");
@@ -325,17 +329,17 @@ export default function DeathReg() {
                 <View style={styles.innerContainer}>
                     <Text style={styles.itemService_desc}>
                         Note: Death Registration must be filed within 30 days after the death.
-                        The day after 30th day is considered as Delayed registration, some documents 
+                        The day after 30th day is considered as Delayed registration, some documents
                         are required to be submitted and you need to fill out the affidavit personally.
                     </Text>
                 </View>
 
                 <Text style={styles.feesNote}>
-                    LOCAL CIVIL REGISTRY FEES:                     
+                    LOCAL CIVIL REGISTRY FEES:
                 </Text>
 
                 <Text style={styles.feesDesc}>
-                    P50.00 - For On Time Registration 
+                    P50.00 - For On Time Registration
                     {"\n"}{"\n"}
                     Additional P17.00 - For Delayed Registration of Document for every year of delay.
                 </Text>
@@ -593,21 +597,21 @@ export default function DeathReg() {
 
                 <Text style={styles.noteText}>MEDICAL CERTIFICATE</Text>
 
-                 <View style={{ marginBottom: 10 }}>
+                <View style={{ marginBottom: 10 }}>
                     <Text style={styles.label}>Does the deceased aged 0 to 7</Text>
 
-            <View style={styles.placeholder}>
-              <Picker
-                selectedValue={forChild}
-                onValueChange={(itemValue, itemIndex) => setForChild(itemValue)}
-                style={{ width: "100%" }}
-              >
-                <Picker.Item label="Select" value="" />
-                <Picker.Item label="Yes" value="Yes" />
-                <Picker.Item label="No" value="No" />
-              </Picker>
-            </View>
-          </View> 
+                    <View style={styles.placeholder}>
+                        <Picker
+                            selectedValue={forChild}
+                            onValueChange={(itemValue, itemIndex) => setForChild(itemValue)}
+                            style={{ width: "100%" }}
+                        >
+                            <Picker.Item label="Select" value="" />
+                            <Picker.Item label="Yes" value="Yes" />
+                            <Picker.Item label="No" value="No" />
+                        </Picker>
+                    </View>
+                </View>
 
                 {forChild !== 'No' && (
                     <View style={{ marginBottom: 10 }}>
@@ -757,24 +761,35 @@ export default function DeathReg() {
                     </View>
                 </View>
 
-                <View style={{ marginBottom: 10 }}>
-                    <Text style={styles.label}>DEATH BY EXTERNAL CAUSES</Text>
+                <Text style={styles.noteText}>DEATH BY EXTERNAL CAUSES</Text>
 
+                <View style={{ marginBottom: 10 }}>
+                    <Text style={styles.label}>A: MANNER OF DEATH (homicide, suicide, accident, etc)</Text>
                     <View style={styles.placeholder}>
-                        <Picker
-                            selectedValue={externalCause}
-                            onValueChange={(itemValue, itemIndex) =>
-                                setExternalCause(itemValue)
-                            }
-                            style={{ width: "100%" }}
-                        >
-                            <Picker.Item label="Select" value="" />
-                            <Picker.Item label="Manner of death" value="Manner of death" />
-                            <Picker.Item
-                                label="Place of occurence of external cause"
-                                value="Place of occurence of external cause"
-                            />
-                        </Picker>
+                        <TextInput
+                            placeholder=""
+                            maxLength={50}
+                            value={mannerDeath}
+                            onChangeText={(mannerDeath) => setMannerDeath(mannerDeath)}
+                            style={{
+                                width: "100%",
+                            }}
+                        ></TextInput>
+                    </View>
+                </View>
+
+                <View style={{ marginBottom: 10 }}>
+                    <Text style={styles.label}>B: PLACE OF OCCURRENCE OF EXTERNAL CAUSE (e.g. home, farm, street, sea, etc)</Text>
+                    <View style={styles.placeholder}>
+                        <TextInput
+                            placeholder=""
+                            maxLength={50}
+                            value={externalCause}
+                            onChangeText={(externalCause) => setExternalCause(externalCause)}
+                            style={{
+                                width: "100%",
+                            }}
+                        ></TextInput>
                     </View>
                 </View>
 
@@ -785,13 +800,13 @@ export default function DeathReg() {
                         <Picker
                             selectedValue={autopsy}
                             onValueChange={(itemValue, itemIndex) =>
-                            setAutopsy(itemValue)
+                                setAutopsy(itemValue)
                             }
                             style={{ width: "100%" }}
-                        > 
+                        >
                             <Picker.Item label="Select" value="" />
                             <Picker.Item label="Yes" value="Yes" />
-                            <Picker.Item label="No" value="No"/>
+                            <Picker.Item label="No" value="No" />
                         </Picker>
                     </View>
                 </View>

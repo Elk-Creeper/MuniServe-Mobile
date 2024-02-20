@@ -57,11 +57,11 @@ const Registration = () => {
             }
 
             if (!contact || !contact.trim() || !/^09\d{9}$/.test(contact.trim())) {
-                Alert.alert("Invalid Contact", "Please enter a valid contact number starting with 09.");
+                Alert.alert("Invalid Contact", "Please enter a valid contact number starting with '09' and consisting of 11 numbers.");
                 return;
             }
 
-            if (!selectedBarangay || (selectedBarangay === "From Other Town" && (!otherBarangay.trim() || !isInputValid(otherBarangay)))) {
+            if (!selectedBarangay || (selectedBarangay === "From Other Town" && otherBarangay.trim() === "")) {
                 Alert.alert("Invalid Barangay", "Please enter/select a valid barangay.");
                 return;
             }
